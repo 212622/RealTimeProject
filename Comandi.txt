@@ -4,3 +4,7 @@ git push origin master
 
 per vedere stato
 git status
+
+///////////////
+
+git pull
