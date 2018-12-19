@@ -15,42 +15,39 @@ BITMAP *bitmap(char* filename){
 int main(int argc, char const *argv[])
 {
 	/* code */
+	srand(time(NULL));
 	init();
-	float x = 1024,y = 300;
-	float x2 = 0, y2 = 300;
-    int col = 14;
-	int Defense = 0;
 	BITMAP *razzo = bitmap("img/rocket.bmp");
 	BITMAP *razzo2 = bitmap("img/rocket2.bmp");
 	BITMAP *boom = bitmap("img/Pow.bmp");
-	do{	
-		if(key[KEY_ENTER]){		
-			while(x > 0 && !key[KEY_ESC] && x > x2){	
-				
-				if(key[KEY_SPACE]){	
-					Defense = 1; 
-				}
-				putpixel(screen, x+5+razzo->w, y+(razzo->h)/2, col);
-				draw_sprite(screen, razzo, x, y);
-				x = x - speed;
-
-				if(Defense == 1){
-					putpixel(screen, x2-20, y2+(razzo2->h)/2, col);
-					draw_sprite(screen, razzo2, x2, y2);
-					x2 = x2 + speed/2;
-				}
-				
-				
-			
-			
+	BITMAP *sfondo = bitmap("img/sfondo.bmp");
+	do{
+		float x = rand()%1024,y = 0;
+		float x2 = x, y2 = 780;
+    	int col = 14;
+		int Defense = 0;
+		while(y < 768-razzo->h && !key[KEY_SPACE] && y < y2){	
+			if(key[KEY_ENTER] || y > 100+rand()%400){	
+				Defense = 1; 
 			}
-		draw_sprite(screen, boom, x, y-20-(razzo->h)/2);
-		//draw_sprite(screen, boom, x, y2-20-(razzo2->h)/2);
+			//putpixel(screen, x, y-5+(razzo->h)/2, col);
+			draw_sprite(screen, razzo, x, y);
+			y = y + speed;
+			if(Defense == 1){
+				//putpixel(screen, x2, y2+5+(razzo2->h)/2, col);
+				draw_sprite(screen, razzo2, x2, y2);
+				y2 = y2 - speed;
+			}
+			draw_sprite(screen, sfondo, 0, 600);
 		}
+		draw_sprite(screen, boom, x+5-(boom->w)/2, y);
+		sleep(1);
+		rectfill(screen,0,0,1024,768,BLACK);
 	}while (!key[KEY_ESC]);
-	sleep(2);
+	destroy_bitmap(razzo2);
 	destroy_bitmap(razzo);
 	destroy_bitmap(boom);
+	destroy_bitmap(sfondo);
    	allegro_exit();
 	return 0;
 }

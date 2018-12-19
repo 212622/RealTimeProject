@@ -6,14 +6,11 @@
 #include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "ptask.h"
-
 /*--------------------------------------------------------------*/
 /*GLOBAL DATA*/
 /*--------------------------------------------------------------*/
-
-#define XWIN    1024     // window x resolution
+#define XWIN    1024    // window x resolution
 #define YWIN    768     // window y resolution
 #define XBASE   40      // X start for the message
 #define YBASE   50      // Y level for the first task
