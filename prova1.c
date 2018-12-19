@@ -1,5 +1,5 @@
-#include "Headerfiles.h"
-#include "Init.h"
+#include "lib/Headerfiles.h"
+#include "lib/Init.h"
 
 BITMAP *bitmap(char* filename){
 	BITMAP	*bitmap;
@@ -20,9 +20,9 @@ int main(int argc, char const *argv[])
 	float x2 = 0, y2 = 300;
     int col = 14;
 	int Defense = 0;
-	BITMAP *razzo = bitmap("rocket.bmp");
-	BITMAP *razzo2 = bitmap("rocket2.bmp");
-	BITMAP *boom = bitmap("Pow.bmp");
+	BITMAP *razzo = bitmap("img/rocket.bmp");
+	BITMAP *razzo2 = bitmap("img/rocket2.bmp");
+	BITMAP *boom = bitmap("img/Pow.bmp");
 	do{	
 		if(key[KEY_ENTER]){		
 			while(x > 0 && !key[KEY_ESC] && x > x2){	

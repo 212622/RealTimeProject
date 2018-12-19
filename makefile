@@ -13,7 +13,7 @@ CFLAGS = -I src/ -lpthread -lrt
 #---------------------------------------------------------------
 # CLIBS will be the libraries passed to the compiler
 #---------------------------------------------------------------
-CLIBS = ./libptask.a `allegro-config --libs`
+CLIBS = ./lib/libptask.a `allegro-config --libs`
 #---------------------------------------------------------------
 # Dependencies
 #---------------------------------------------------------------
