@@ -1,0 +1,6 @@
+git add .
+git commit -m 'messaggio'
+git push origin master
+
+per vedere stato
+git status
