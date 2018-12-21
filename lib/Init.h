@@ -1,17 +1,14 @@
 void init(void)
 {
-char s[LEN];
-char t[LEN];
-
-    allegro_init();
-    set_gfx_mode(GFX_AUTODETECT_WINDOWED, XWIN, YWIN, 0, 0);
-    clear_to_color(screen, BKG);
-    install_keyboard();
-    install_mouse();
+    al_init();
+    al_init_font_addon();
+    al_init_ttf_addon();
+    al_install_keyboard();
+    al_install_mouse();
+    al_init_image_addon();
+    srand(time(NULL));
     ptask_init(SCHED_FIFO, GLOBAL, PRIO_INHERITANCE);
-
-    sprintf(s, "Press ESC for quit");
-    sprintf(t, "Press ENTER for start");
-    textout_ex(screen, font, s, 10, 10, 14, BKG);
-    textout_ex(screen, font, t, 10, 20, 14, BKG);
+    display = al_create_display(XWIN, YWIN);
+    al_clear_to_color(BLACK);
+    al_flip_display();
 }

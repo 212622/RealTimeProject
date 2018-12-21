@@ -1,7 +1,7 @@
 #---------------------------------------------------------------
 # Target file to be compiled by default
 #---------------------------------------------------------------
-MAIN = prova1
+MAIN = prova
 #---------------------------------------------------------------
 # CC will be the compiler to use
 #---------------------------------------------------------------
@@ -13,7 +13,7 @@ CFLAGS = -I src/ -lpthread -lrt
 #---------------------------------------------------------------
 # CLIBS will be the libraries passed to the compiler
 #---------------------------------------------------------------
-CLIBS = ./lib/libptask.a `allegro-config --libs`
+CLIBS = ./lib/libptask.a `pkg-config --libs allegro-5 allegro_font-5 allegro_image-5 allegro_ttf-5`
 #---------------------------------------------------------------
 # Dependencies
 #---------------------------------------------------------------
