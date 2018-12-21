@@ -9,11 +9,9 @@ Simulate a set of Patriot defense missiles that identify enemy targets, predict 
 
 Per caricare le modifiche
 
-	```
 	git add .
 	git commit -m 'messaggio'
 	git push origin master
-	```
 
 Per scaricare le modifiche
 
