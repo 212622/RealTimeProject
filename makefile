@@ -9,7 +9,7 @@ CC = gcc
 #---------------------------------------------------------------
 # CFLAGS will be the options passed to the compiler
 #---------------------------------------------------------------
-CFLAGS = -I src/ -lpthread -lrt
+CFLAGS = -Wall -I src/ -lpthread -lrt
 #---------------------------------------------------------------
 # CLIBS will be the libraries passed to the compiler
 #---------------------------------------------------------------
@@ -17,6 +17,11 @@ CLIBS = ./lib/libptask.a `pkg-config --libs allegro-5 allegro_font-5 allegro_ima
 #---------------------------------------------------------------
 # Dependencies
 #---------------------------------------------------------------
-$(MAIN): $(MAIN).c
-	$(CC) $(MAIN).c -o $(MAIN) $(CLIBS) $(CFLAGS)
+all: $(MAIN)
 
+.PHONY: clean
+clean:
+	rm -rf $(MAIN)
+
+%: %.c
+	$(CC) $< -o $@ $(CLIBS) $(CFLAGS)
