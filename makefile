@@ -21,11 +21,11 @@ LIBS = ./lib/libptask.a `pkg-config --libs allegro-5 allegro_font-5 allegro_imag
 #---------------------------------------------------
 # Dependencies
 #---------------------------------------------------
-#%: %.c
-#	$(CC) $< -o $@ $(LIBS) $(CFLAGS)
+%: %.c
+	$(CC) $< -o $@ $(LIBS) $(CFLAGS)
 
-$(OBJS): $(MAIN).c
-	$(CC) -o $(OBJS) $(MAIN).c $(LIBS) $(CFLAGS)
+# $(OBJS): $(MAIN).c
+# 	$(CC) -o $(OBJS) $(MAIN).c $(LIBS) $(CFLAGS)
 
 #---------------------------------------------------
 # Command that can be specified inline: make all
