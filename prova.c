@@ -1,6 +1,13 @@
+/*--------------------------------------------------------------*/
+/*  Patriots																															*/
+/*	Real Time Project by Tomas Torricelli and Lorenzo Cuoghi																			*/
+/*																																		*/
+/*	This project simulate a physical system or the behavior of active agents interacting with each other and with the environment		*/
+/*	Simulate a set of Patriot defense missiles that identify enemy targets, predict their trajectories and are launched to catch them 	*/
+/*--------------------------------------------------------------*/
 #include "lib/Headerfiles.h"
 #include "lib/Init.h"
-
+/*--------------------------------------------------------------*/
 void make_p_b(char *old, char *new){
 	BITMAP *img, *imgp;
 	PALETTE pal;
@@ -20,58 +27,93 @@ void make_p_b(char *old, char *new){
 	save_bitmap(new,imgp,pal);
 	}
 }
+/*--------------------------------------------------------------*/
+/*  Periodic task for drawing   */
+/*--------------------------------------------------------------*/
+void draw(){
+	while(1){
+		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
+		ptask_wait_for_period();
+	}
+}
+/*--------------------------------------------------------------*/
+/*  Periodic task for background   */
+/*--------------------------------------------------------------*/
+void background(){
+	BITMAP *sfondo = load_bitmap("img/sfondo.bmp", NULL);
+	while(1){
+		clear_to_color(buf, makecol(0,0,0));
+		draw_sprite(buf, sfondo, 0, 600);
+		for(int k=0; k<MAXT; k++){
+			 if(tid[k]!=0) 
+			 	ptask_activate(tid[k]);
+		}
+		if(mti != 0)
+			ptask_activate(mti);
 
-
+		ptask_wait_for_period();
+	}
+}
+/*--------------------------------------------------------------*/
+/*  Periodic task for enemy   */
+/*--------------------------------------------------------------*/
 void enemy(){
+	float speed = 5;
 	float x = rand()%1024, y = 0, alfa = rand()%3;
 	int a;
-	speed = 2 + rand()%20;
-
-	BITMAP *aereo = load_bitmap("img/aereo.bmp", NULL);
+	// speed = 2 + rand()%20;
 	while(1){
-
-		//alfa usata per decidere se il razzo si sposta a destra sinistra o centrale
+		// alfa usata per decidere se il razzo si sposta a destra sinistra o centrale
 		if(alfa == 0)
 			a = 1;
 		if(alfa == 1)
 			a = -1;
 		if(alfa == 2)
 			a = 0;
-
-		//se il razzo non è arrivato alla citta scende, altrimenti scoppia
-		if(x < 1024 && x > 0 && y < 600-aereo->h){
+		// se il razzo non è arrivato alla citta scende, altrimenti scoppia
+		if(x < 1024 && x > 0 && y < 600 - (aereo->h)){
 			y = y + speed;
 			x = x - (a * speed/5);
 			draw_sprite(buf, aereo, x, y);
-		}/*}else{
-			al_draw_bitmap(boom, x+50-al_get_bitmap_width(boom), y, 0);
-		}*/	
-		
+		}else{
+			draw_sprite(buf, boom, x + 65 - (boom->w), y);
+			i--;
+			break;
+		}
 		ptask_wait_for_period();
 	}
 }
-
+/*--------------------------------------------------------------*/
+/*  MAIN process   */
+/*--------------------------------------------------------------*/
 int main(int argc, char const *argv[])
 {	
-	
 	init();
-	int i=0, scan;
+	int scan;
+	mti = 0;
+	i = 0;
+	tpars params;
+	aereo = load_bitmap("img/aereo.bmp", NULL);
+	boom = load_bitmap("img/boom.bmp", NULL);
+	ptask_param_init(params);
 	buf = create_bitmap(SCREEN_W, SCREEN_H);
-	BITMAP *sfondo = load_bitmap("img/sfondo.bmp", NULL);
-	clear_to_color(buf, makecol(0,0,0));
-	draw_sprite(buf, sfondo, 0, 600);
-	//make_p_b("img/aereo.bmp", "img/aa.bmp");
+	ptask_create_prio(background, PER, PRIO, NOW);
+	mti = ptask_create_prio(draw, PER, PRIO-MAXT-1, DEFERRED);
+	for(int k=0; k<MAXT; k++) tid[k]=0;
+	// make_p_b("img/Pow.bmp", "img/aa.bmp");
 	do{
 		scan = 0;
 		if(keypressed()) scan = readkey() >> 8;
 		if(scan == KEY_SPACE && i < MAXT){
-			ptask_create_prio(enemy, PER, PRIO, NOW);
+			ptask_param_period(params, PER, MILLI);
+			ptask_param_priority(params, PRIO);
+			ptask_param_activation(params, DEFERRED);
+			tid[i] = ptask_create_param(enemy, &params);
+			printf("Task: %d Priorità: %d\n",tid[i],PRIO);
 			i++;
 		}
-		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
 	}while(!key[KEY_ESC]);
 	allegro_exit();
 	return 0;
 }
-
-
+/*--------------------------------------------------------------*/
