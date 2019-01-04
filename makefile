@@ -17,7 +17,7 @@ OBJS = $(addsuffix .o, $(MAIN))
 #---------------------------------------------------
 # LIBS are the external libraries to be used
 #---------------------------------------------------
-LIBS = ./lib/libptask.a `pkg-config --libs allegro-5 allegro_font-5 allegro_image-5 allegro_ttf-5`
+LIBS = ./lib/libptask.a `allegro-config --libs`
 #---------------------------------------------------
 # Dependencies
 #---------------------------------------------------
