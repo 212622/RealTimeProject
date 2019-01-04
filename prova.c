@@ -28,6 +28,26 @@ void make_p_b(char *old, char *new){
 	}
 }
 /*--------------------------------------------------------------*/
+/*  Periodic task for camera detection   */
+/*--------------------------------------------------------------*/
+void camera(){
+	int x = 0, y = 0, v = 1, c, k, j;
+	int grey = makecol(0, 0, 0); 
+	while(1){
+		rect(screen, x, y + YCAM, XCAM + x, y, makecol(255, 0, 0));
+		if(x + XCAM > 1024) v = -1;
+		if(x == 0) v = 1;
+		x += 2 * v;
+		for(k = 0; k < XCAM; k++){
+			for(j = 0; j < YCAM; j++){
+				c = getpixel(buf, x+k, y+j);
+				if(c != grey) printf("TROVATO: %d %d\n",k,j);
+			}
+		}
+		ptask_wait_for_period();
+	}
+}
+/*--------------------------------------------------------------*/
 /*  Periodic task for drawing   */
 /*--------------------------------------------------------------*/
 void draw(){
@@ -93,10 +113,11 @@ int main(int argc, char const *argv[])
 	mti = 0;
 	i = 0;
 	tpars params;
-	aereo = load_bitmap("img/aereo.bmp", NULL);
-	boom = load_bitmap("img/boom.bmp", NULL);
 	ptask_param_init(params);
+	aereo = load_bitmap("img/aereo.bmp", NULL);
+	boom = load_bitmap("img/boom.bmp", NULL);	
 	buf = create_bitmap(SCREEN_W, SCREEN_H);
+	ptask_create_prio(camera, PER, PRIO + 1, NOW);
 	ptask_create_prio(background, PER, PRIO, NOW);
 	mti = ptask_create_prio(draw, PER, PRIO-MAXT-1, DEFERRED);
 	for(int k=0; k<MAXT; k++) tid[k]=0;

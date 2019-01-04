@@ -12,7 +12,9 @@
 /*--------------------------------------------------------------*/
 #define XWIN    1024                        // window x resolution
 #define YWIN    768                         // window y resolution
-#define MAXT    10                          // max number of tasks
+#define XCAM    200                         // camera y resolution
+#define YCAM    200                         // camera y resolution
+#define MAXT    5                           // max number of tasks
 #define PER     30                          // base period
 #define PRIO    50                          // task priority
 /*--------------------------------------------------------------*/
