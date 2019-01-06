@@ -17,93 +17,124 @@
 /*--------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*--------------------------------------------------------------*/
-#define XCAM    200                         // camera y resolution
-#define YCAM    200                         // camera y resolution
+#define XCAM    200						// camera y resolution
+#define YCAM    200						// camera y resolution
 /*--------------------------------------------------------------*/
-#define MAXT    5                           // max number of tasks
-#define PER     30                          // base period
-#define PRIO    50                          // task priority
+#define MAXT    5						// max number of enemy tasks
+#define PER 	50						// base period
+#define PRIO    50						// task priority
+/*--------------------------------------------------------------*/
+#define WAIT	0
+#define ACTIVE	1
+#define BOOM	2
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
-BITMAP  *aereo, *boom;						// images
-int tid[MAXT], mti, i;                      // tasks indexes
+int		tid[MAXT];						// enemy task IDs
+int		i;                      		// number of active enemy task
+int		enemy_x[MAXT], enemy_y[MAXT];	// coordinates of enemies
+int		aereo_h;						// height of bitmap aereo
+int		aereo_w;						// width of bitmap aereo
+int 	state[MAXT];					// enemy state
+int		camera_x, camera_y;				// coordinates of camera
+BITMAP	*sfondo, *aereo, *boom;			// images
 /*--------------------------------------------------------------*/
 /*  Periodic task for camera detection   */
 /*--------------------------------------------------------------*/
-void camera(void) {
-	int x = 0, y = 0, v = 1, c, k, j;
-	int grey = makecol(0, 0, 0);
+void camera() {
+int v, c, k, j, black, found;
 	
+	camera_x = camera_y = 0;
+	found = 0;
+	v = 1;
+	black = makecol(0, 0, 0);
+
 	while (1) {
-		rect(screen, x, y + YCAM, XCAM + x, y, makecol(255, 0, 0));
-		if (x + XCAM > 1024) v = -1;
-		if (x == 0) v = 1;
-		x += 2 * v;
-		for (k = 0; k<XCAM; k++) {
+		if (camera_x + XCAM >= SCREEN_W) v = -1;
+		if (camera_x <= 0) v = 1;
+
+		camera_x += 2 * v;
+
+		for (k=0; k<XCAM; k++) {
 			for (j=0; j<YCAM; j++) {
-				c = getpixel(buf, x + k, y + j);
-				if (c != grey) printf("TROVATO: %d %d\n", k, j);
+				c = getpixel(buf, camera_x + k, camera_y + j);
+				if (c != black) found = 1;
 			}
 		}
+
+		if (found == 1) {
+			printf("TROVATO: %d %d\n", k, j);
+			found = 0;
+		}
+
 		ptask_wait_for_period();
 	}
 }
 /*--------------------------------------------------------------*/
 /*  Periodic task for drawing   */
 /*--------------------------------------------------------------*/
-void draw(void) {
-	while (1) {
-		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
-		ptask_wait_for_period();
-	}
-}
-/*--------------------------------------------------------------*/
-/*  Periodic task for background   */
-/*--------------------------------------------------------------*/
-void background(void) {
-	BITMAP *sfondo = load_bitmap("img/sfondo.bmp", NULL);
-	if (sfondo == NULL) {
-		printf("file not found\n");
-		exit(1);
-	}
+void draw() {
+int k, view;
 	
+	view = 0;
+
 	while (1) {
+		printf("\nTask draw: id %d, priority %d\n", ptask_get_index(), PRIO);
+
 		clear_to_color(buf, makecol(0, 0, 0));
 		draw_sprite(buf, sfondo, 0, 600);
-		
-		for (int k=0; k<MAXT; k++)
-			 if (tid[k] != 0) ptask_activate(tid[k]);
-		if (mti != 0) ptask_activate(mti);
 
+		for (k=0; k<MAXT; k++) {
+			if (state[k] == ACTIVE)
+				draw_sprite(buf, aereo, enemy_x[k], enemy_y[k]);
+			else if (state[k] == BOOM) {
+				draw_sprite(buf, boom, enemy_x[k], enemy_y[k]);
+				if (view == 3) {
+					view = 0;
+					state[k] = WAIT;
+					i--;
+				}
+				else
+					view++;
+			}
+		}
+
+		rect(buf, camera_x, camera_y + YCAM, camera_x + XCAM, camera_y, makecol(255, 0, 0));
+
+		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
 		ptask_wait_for_period();
 	}
 }
 /*--------------------------------------------------------------*/
 /*  Periodic task for enemy   */
 /*--------------------------------------------------------------*/
-void enemy(void) {
-	float speed = 5;
-	float x = rand() % 1024, y = 0, alfa = rand() % 3;
-	int a;
+void enemy() {
+float alfa, speed, angle;
+int tid;
 	
-	// speed = 2 + rand()%20;
+	tid = ptask_get_index();
+	enemy_x[tid - 1] = rand() % (1024 - aereo_w);
+	enemy_y[tid - 1] = 0;
+	alfa = (rand() % 3) - 1;
+	speed = (rand() % 3) + 8;
+	angle = (rand() % 3) + 1;
+
 	while (1) {
-		// alfa usata per decidere se il razzo si sposta a destra sinistra o centrale
-		if (alfa == 0) a = 1;
-		else if (alfa == 1) a = -1;
-		else if (alfa == 2) a = 0;
-		
+		printf("Task enemy: id %d, priority %d, state %d\n", ptask_get_index(), PRIO, state[tid - 1]);
+
 		// se il razzo non è arrivato alla citta scende, altrimenti scoppia
-		if (x < 1024 && x > 0 && y < 600 - (aereo->h)) {
-			y = y + speed;
-			x = x - ((a * speed) / 5);
-			draw_sprite(buf, aereo, x, y);
+		if (enemy_x[tid - 1] < (1024 - aereo_w) && enemy_x[tid - 1] >= 0 && enemy_y[tid - 1] < (600 - aereo_h)) {
+			enemy_y[tid - 1] += speed;
+			enemy_x[tid - 1] -= (alfa * angle);
 		}
 		else {
-			draw_sprite(buf, boom, x + 65 - (boom->w), y);
-			i--;
-			break;	// DA CAMBIARE
+			state[tid - 1] = BOOM;
+			ptask_wait_for_activation();
+			enemy_x[tid - 1] = rand() % (1024 - aereo_w);
+			enemy_y[tid - 1] = 0;
+			alfa = (rand() % 3) - 1;
+			speed = (rand() % 3) + 8;
+			angle = (rand() % 3) + 1;
 		}
 		ptask_wait_for_period();
 	}
@@ -111,41 +142,65 @@ void enemy(void) {
 /*--------------------------------------------------------------*/
 /*  MAIN process   */
 /*--------------------------------------------------------------*/
-int main(void) {	
-	int scan, k;
-	tpars params;
+int main() {	
+int scan, k, one;
+tpars params;
 	
 	i = 0;
-	for (k=0; k<MAXT; k++) tid[k] = 0;
+	for (k=0; k<MAXT; k++) tid[k] = -1;
+	for (k=0; k<MAXT; k++) enemy_x[k] = -1;
+	for (k=0; k<MAXT; k++) enemy_y[k] = -1;
+	for (k=0; k<MAXT; k++) state[k] = -1;
 	srand(time(NULL));
 	
 	init();
+
+	sfondo = load_bitmap("img/sfondo.bmp", NULL);
+	if (sfondo == NULL) {
+		printf("file not found\n");
+		exit(1);
+	}
 	aereo = load_bitmap("img/aereo.bmp", NULL);
 	if (aereo == NULL) {
 		printf("file not found\n");
 		exit(1);
 	}
+	aereo_h = aereo->h;
+	aereo_w = aereo->w;
 	boom = load_bitmap("img/boom.bmp", NULL);
 	if (boom == NULL) {
 		printf("file not found\n");
 		exit(1);
 	}
 	
-	ptask_create_prio(camera, PER, PRIO + 1, NOW);
-	ptask_create_prio(background, PER, PRIO, NOW);
-	mti = ptask_create_prio(draw, PER, PRIO - MAXT - 1, DEFERRED);
+	ptask_create_prio(draw, PER, PRIO + 2, NOW);
 	
+	for (k=0; k<MAXT; k++) {
+		ptask_param_init(params);
+		ptask_param_period(params, PER, MILLI);
+		ptask_param_priority(params, PRIO);
+		ptask_param_activation(params, DEFERRED);
+		tid[k] = ptask_create_param(enemy, &params);
+		// printf("tid[%d] = %d\n", k, tid[k]);
+		state[k] = WAIT;
+	}
+
+	ptask_create_prio(camera, PER, PRIO - 1, NOW);
+
 	do {
 		scan = 0;
 		if (keypressed()) scan = readkey() >> 8;
 		if (scan == KEY_SPACE && i < MAXT) {
-			ptask_param_init(params);
-			ptask_param_period(params, PER, MILLI);
-			ptask_param_priority(params, PRIO);
-			ptask_param_activation(params, DEFERRED);
-			tid[i] = ptask_create_param(enemy, &params);
-			printf("Task: %d Priorità: %d\n", tid[i], PRIO);
-			i++;
+			for (k=0; k<MAXT; k++) {
+				if (state[k] == WAIT && one == 0) {
+					// printf("attivo task %d\n", tid[k]);
+					one++;
+					state[k] = ACTIVE;
+					ptask_activate(tid[k]);
+					i++;
+				}
+			}
+			one = 0;
 		}
 	} while (!key[KEY_ESC]);
 	
