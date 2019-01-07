@@ -33,7 +33,7 @@ void init(void) {
     install_keyboard();
     set_color_depth(32);
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, XWIN, YWIN, 0, 0);
-    ptask_init(SCHED_FIFO, GLOBAL, PRIO_INHERITANCE);
+    ptask_init(SCHED_RR, GLOBAL, PRIO_INHERITANCE);
 	buf = create_bitmap(SCREEN_W, SCREEN_H);
 }
 /*--------------------------------------------------------------*/
