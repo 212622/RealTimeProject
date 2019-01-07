@@ -63,7 +63,24 @@ int		x, y;		// video coordinates
 		for (j=0; j<VRES; j++) {
 			x = x0 - (HRES / 2) + i;
 			y = y0 - (VRES / 2) + j;
-			putpixel(screen, x, y, image[i][j]);
+			putpixel(buf, x, y, image[i][j]);
 	}
+}
+/*--------------------------------------------------------------*/
+void save_image(int x0, int y0, char *path) {
+int		i, j;		// image indexes
+int		x, y;		// video coordinates
+BITMAP	*img;
+	
+	img = create_bitmap(HRES, VRES);
+
+	for (i=0; i<HRES; i++)
+		for (j=0; j<VRES; j++) {
+			x = x0 - (HRES / 2) + i;
+			y = y0 - (VRES / 2) + j;
+			putpixel(img, x, y, image[i][j]);
+	}
+
+	save_bitmap(path, img, NULL);
 }
 /*--------------------------------------------------------------*/

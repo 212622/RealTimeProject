@@ -37,11 +37,9 @@ BITMAP	*sfondo, *aereo, *boom;			// images
 // Task that periodically gets images from position
 // (XCAM,YCAM) and displays them in position (XD,YD)
 //------------------------------------------------------
-void *cameratask() {
+void cameratask() {
 	while (1) {
-		get_image(camera_x + 100, camera_y + 100);
 		// get_image(XCAM, YCAM);
-		put_image(SCREEN_W - 100, SCREEN_H - 100);
 		// put_image(XD, YD);
 		ptask_wait_for_period();
 	}
@@ -50,12 +48,11 @@ void *cameratask() {
 /*  Periodic task for camera detection   */
 /*--------------------------------------------------------------*/
 void camera() {
-int v;
-// int v, c, k, j, black;
+int v, c, k, j, found;
 	
 	camera_x = camera_y = 0;
 	v = 1;
-	// black = makecol(0, 0, 0);
+	found = 0;
 
 	while (1) {
 		if (camera_x + VRES >= SCREEN_W) v = -1;
@@ -64,16 +61,21 @@ int v;
 		camera_x += 2 * v;
 
 		get_image(camera_x + 100, camera_y + 100);
-		// get_image(XCAM, YCAM);
-		put_image(SCREEN_W - 100, SCREEN_H - 100);
-		// put_image(XD, YD);
+		// non stampa bordino rosso
 		
-		// for (j=1; j<HRES; j++) {
-		// 	for (k=1; k<VRES; k++) {
-		// 		c = getpixel(screen, camera_x + k, camera_y + j);
-		// 		if (c != black) printf("TROVATO: %d %d\n", k, j);
-		// 	}
-		// }
+		for (j=1; j<HRES; j++) {
+			for (k=1; k<VRES; k++) {
+				c = getpixel(screen, camera_x + k, camera_y + j);
+				if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0)) {
+					if (found ==  0) {
+						save_image(100, 100, "camera/image.bmp");
+						found = 1;
+					}
+					// printf("TROVATO: %d %d\n", k, j);
+				}
+			}
+		}
+
 		ptask_wait_for_period();
 	}
 }
@@ -107,6 +109,7 @@ int k, view;
 		}
 
 		rect(buf, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
+		put_image(SCREEN_W - 100, SCREEN_H - 100);
 
 		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
 		ptask_wait_for_period();

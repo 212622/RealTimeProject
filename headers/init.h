@@ -19,6 +19,7 @@ extern void make_pink_background(char *old, char *new);
 extern void init(void);
 extern void get_image(int x0, int y0);
 extern void put_image(int x0, int y0);
+extern void save_image(int x0, int y0, char *path);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
