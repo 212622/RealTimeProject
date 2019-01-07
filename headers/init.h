@@ -8,17 +8,22 @@
 /*--------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*--------------------------------------------------------------*/
-#define XWIN    1024                        // window x resolution
-#define YWIN    768                         // window y resolution
+#define XWIN    1024                    // window x resolution
+#define YWIN    768                     // window y resolution
+#define HRES	200                     // camera height resolution
+#define VRES	200                     // camera width resolution
 /*--------------------------------------------------------------*/
 /*  FUNCTION PROTOTYPES   */
 /*--------------------------------------------------------------*/
 extern void make_pink_background(char *old, char *new);
 extern void init(void);
+extern void get_image(int x0, int y0);
+extern void put_image(int x0, int y0);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
-BITMAP  *buf;						// double buffering
+BITMAP  *buf;						    // double buffering
+int 	image[HRES][VRES]; 				// global image buffer
 /*--------------------------------------------------------------*/
 
 #endif // INIT_H

@@ -17,9 +17,6 @@
 /*--------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*--------------------------------------------------------------*/
-#define XCAM    200						// camera y resolution
-#define YCAM    200						// camera y resolution
-/*--------------------------------------------------------------*/
 #define MAXT    5						// max number of enemy tasks
 #define PER 	30						// base period
 #define PRIO    50						// task priority
@@ -36,28 +33,47 @@ int		enemy_x[MAXT], enemy_y[MAXT];	// coordinates of enemies
 int 	state[MAXT];					// enemy state
 int		camera_x, camera_y;				// coordinates of camera
 BITMAP	*sfondo, *aereo, *boom;			// images
+//------------------------------------------------------
+// Task that periodically gets images from position
+// (XCAM,YCAM) and displays them in position (XD,YD)
+//------------------------------------------------------
+void *cameratask() {
+	while (1) {
+		get_image(camera_x + 100, camera_y + 100);
+		// get_image(XCAM, YCAM);
+		put_image(SCREEN_W - 100, SCREEN_H - 100);
+		// put_image(XD, YD);
+		ptask_wait_for_period();
+	}
+}
 /*--------------------------------------------------------------*/
 /*  Periodic task for camera detection   */
 /*--------------------------------------------------------------*/
 void camera() {
-int v, c, k, j, black;
+int v;
+// int v, c, k, j, black;
 	
 	camera_x = camera_y = 0;
 	v = 1;
-	black = makecol(0, 0, 0);
+	// black = makecol(0, 0, 0);
 
 	while (1) {
-		if (camera_x + XCAM >= SCREEN_W) v = -1;
+		if (camera_x + VRES >= SCREEN_W) v = -1;
 		if (camera_x <= 0) v = 1;
 
 		camera_x += 2 * v;
 
-		for (j=1; j<YCAM; j++) {
-			for (k=1; k<XCAM; k++) {
-				c = getpixel(buf, camera_x + k, camera_y + j);
-				if (c != black) printf("TROVATO: %d %d\n", k, j);
-			}
-		}
+		get_image(camera_x + 100, camera_y + 100);
+		// get_image(XCAM, YCAM);
+		put_image(SCREEN_W - 100, SCREEN_H - 100);
+		// put_image(XD, YD);
+		
+		// for (j=1; j<HRES; j++) {
+		// 	for (k=1; k<VRES; k++) {
+		// 		c = getpixel(screen, camera_x + k, camera_y + j);
+		// 		if (c != black) printf("TROVATO: %d %d\n", k, j);
+		// 	}
+		// }
 		ptask_wait_for_period();
 	}
 }
@@ -90,7 +106,7 @@ int k, view;
 			}
 		}
 
-		rect(buf, camera_x, camera_y + YCAM, camera_x + XCAM, camera_y, makecol(255, 0, 0));
+		rect(buf, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
 
 		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
 		ptask_wait_for_period();
