@@ -18,11 +18,11 @@ int         pink, white;
 	imgp = create_bitmap(img->w, img->h);
 	
 	for (x=0; x<img->w; x++) {
-			for (y=0; y<img->h; y++) {
-				c = getpixel(img, x, y);
-				if (c == white) c = pink;
-				putpixel(imgp, x, y, c);
-			}
+		for (y=0; y<img->h; y++) {
+			c = getpixel(img, x, y);
+			if (c == white) c = pink;
+			putpixel(imgp, x, y, c);
+		}
 		get_palette(pal);
 		save_bitmap(new, imgp, pal);
 	}
@@ -84,3 +84,35 @@ BITMAP	*img;
 	save_bitmap(path, img, NULL);
 }
 /*--------------------------------------------------------------*/
+int control_image(char *old) {
+BITMAP		*img;
+int         x, y, c;
+int 		count = 0;
+	
+	img = load_bitmap(old, NULL);
+	
+	for (x=0; x<img->w; x++) {
+			for (y=0; y<img->h; y++) {
+				c = getpixel(img, x, y);
+				if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0)) count++;
+			}
+	}
+return count;
+}
+//------------------------------------------------------
+// GET COUNT PIXEL
+//------------------------------------------------------
+int get_count(int x0, int y0) {
+int		i, j;		// image indexes
+int		x, y;		// video coordinates
+int count = 0;
+
+	for (i=0; i<HRES; i++)
+		for (j=0; j<VRES; j++) {
+			x = x0 - (HRES / 2) + i;
+			y = y0 - (VRES / 2) + j;
+			image[i][j] = getpixel(screen, x, y);
+			if(getpixel(screen, x, y) != makecol(0,0,0) && getpixel(screen, x, y) != makecol(255,0,0)) count++;
+	}
+return count;
+}

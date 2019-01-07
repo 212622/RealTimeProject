@@ -48,11 +48,12 @@ void cameratask() {
 /*  Periodic task for camera detection   */
 /*--------------------------------------------------------------*/
 void camera() {
-int v, c, k, j, found;
+int v, c, k, j, found, count;
 	
 	camera_x = camera_y = 0;
 	v = 1;
 	found = 0;
+	count=0;
 
 	while (1) {
 		if (camera_x + VRES >= SCREEN_W) v = -1;
@@ -60,22 +61,30 @@ int v, c, k, j, found;
 
 		camera_x += 2 * v;
 
-		get_image(camera_x + 100, camera_y + 100);
+		//get_image(camera_x + 100, camera_y + 100);
+
+		count = get_count(camera_x + 100, camera_y + 100);
+		if (found ==  0 && count > 1000) {
+			save_image(100, 100, "camera/image.bmp");
+			found = 1;
+			printf("FOUND : %d COUNT : %d\n",found,control_image("camera/image.bmp"));
+		}
 		// non stampa bordino rosso
-		
+		/*
 		for (j=1; j<HRES; j++) {
 			for (k=1; k<VRES; k++) {
 				c = getpixel(screen, camera_x + k, camera_y + j);
 				if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0)) {
 					if (found ==  0) {
 						save_image(100, 100, "camera/image.bmp");
-						found = 1;
+						if(control_image("camera/image.bmp") > 1000) found = 1;
+						printf("FOUND : %d COUNT : %d\n",found,control_image("camera/image.bmp"));
 					}
 					// printf("TROVATO: %d %d\n", k, j);
 				}
 			}
 		}
-
+		*/
 		ptask_wait_for_period();
 	}
 }
