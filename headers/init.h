@@ -20,8 +20,9 @@ extern void init(void);
 extern void get_image(int x0, int y0);
 extern void put_image(int x0, int y0);
 extern void save_image(int x0, int y0, char *path);
-extern int control_image(char *old);
-extern int get_count(int x0, int y0);
+// extern int control_image(char *path);
+extern int count_pixel(char *path);
+extern int get_image_count(int x0, int y0);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/

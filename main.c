@@ -18,7 +18,7 @@
 /*  GLOBAL CONSTRANTS   */
 /*--------------------------------------------------------------*/
 #define MAXT    5						// max number of enemy tasks
-#define PER 	30						// base period
+#define PER 	20						// base period
 #define PRIO    50						// task priority
 /*--------------------------------------------------------------*/
 #define WAIT	0
@@ -33,58 +33,51 @@ int		enemy_x[MAXT], enemy_y[MAXT];	// coordinates of enemies
 int 	state[MAXT];					// enemy state
 int		camera_x, camera_y;				// coordinates of camera
 BITMAP	*sfondo, *aereo, *boom;			// images
-//------------------------------------------------------
-// Task that periodically gets images from position
-// (XCAM,YCAM) and displays them in position (XD,YD)
-//------------------------------------------------------
-void cameratask() {
-	while (1) {
-		// get_image(XCAM, YCAM);
-		// put_image(XD, YD);
-		ptask_wait_for_period();
-	}
-}
 /*--------------------------------------------------------------*/
 /*  Periodic task for camera detection   */
 /*--------------------------------------------------------------*/
 void camera() {
-int v, c, k, j, found, count;
+int v, found, count;
+// int c, k, j, npixel;
 	
 	camera_x = camera_y = 0;
 	v = 1;
-	found = 0;
-	count=0;
+	found = count = 0;
 
 	while (1) {
 		if (camera_x + VRES >= SCREEN_W) v = -1;
 		if (camera_x <= 0) v = 1;
 
-		camera_x += 2 * v;
+		// non stampa bordino rosso
 
-		//get_image(camera_x + 100, camera_y + 100);
-
-		count = get_count(camera_x + 100, camera_y + 100);
+		// con camera_x+100 vede il bordo sinistro, con camera_x+101 vede il bordo destro
+		// con camera_y+100 vede il bordo sopra, con camera_y+101 vede il bordo sotto
+		count = get_image_count(camera_x + 100, camera_y + 100);
 		if (found ==  0 && count > 1000) {
 			save_image(100, 100, "camera/image.bmp");
 			found = 1;
-			printf("FOUND : %d COUNT : %d\n",found,control_image("camera/image.bmp"));
+			printf("FOUND: COUNT = %d\n", count);
 		}
-		// non stampa bordino rosso
+
+		camera_x += 2 * v;
+		
 		/*
+		found = npixel = 0;
 		for (j=1; j<HRES; j++) {
 			for (k=1; k<VRES; k++) {
 				c = getpixel(screen, camera_x + k, camera_y + j);
 				if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0)) {
-					if (found ==  0) {
+					npixel++;
+					if (found ==  0 && npixel > 1300) {
 						save_image(100, 100, "camera/image.bmp");
-						if(control_image("camera/image.bmp") > 1000) found = 1;
-						printf("FOUND : %d COUNT : %d\n",found,control_image("camera/image.bmp"));
+						found = 1;
 					}
 					// printf("TROVATO: %d %d\n", k, j);
 				}
 			}
 		}
 		*/
+
 		ptask_wait_for_period();
 	}
 }

@@ -74,8 +74,8 @@ BITMAP	*img;
 	
 	img = create_bitmap(HRES, VRES);
 
-	for (i=0; i<HRES; i++)
-		for (j=0; j<VRES; j++) {
+	for (i=1; i<HRES; i++)
+		for (j=1; j<VRES; j++) {
 			x = x0 - (HRES / 2) + i;
 			y = y0 - (VRES / 2) + j;
 			putpixel(img, x, y, image[i][j]);
@@ -84,35 +84,55 @@ BITMAP	*img;
 	save_bitmap(path, img, NULL);
 }
 /*--------------------------------------------------------------*/
-int control_image(char *old) {
-BITMAP		*img;
-int         x, y, c;
-int 		count = 0;
+// int control_image(char *path) {
+int count_pixel(char *path) {
+BITMAP	*img;
+int		count, x, y, c;
 	
-	img = load_bitmap(old, NULL);
+	img = load_bitmap(path, NULL);
+	count = 0;
 	
 	for (x=0; x<img->w; x++) {
-			for (y=0; y<img->h; y++) {
-				c = getpixel(img, x, y);
-				if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0)) count++;
-			}
+		for (y=0; y<img->h; y++) {
+			c = getpixel(img, x, y);
+			if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0))
+				count++;
+		}
 	}
-return count;
+
+	return count;
 }
 //------------------------------------------------------
-// GET COUNT PIXEL
+// Like GET_IMAGE but also return the number of
+// non-black and non-red pixels
 //------------------------------------------------------
-int get_count(int x0, int y0) {
+int get_image_count(int x0, int y0) {
 int		i, j;		// image indexes
 int		x, y;		// video coordinates
-int count = 0;
+int 	count = 0;
 
 	for (i=0; i<HRES; i++)
 		for (j=0; j<VRES; j++) {
 			x = x0 - (HRES / 2) + i;
 			y = y0 - (VRES / 2) + j;
 			image[i][j] = getpixel(screen, x, y);
-			if(getpixel(screen, x, y) != makecol(0,0,0) && getpixel(screen, x, y) != makecol(255,0,0)) count++;
-	}
-return count;
+			if(image[i][j] != makecol(0,0,0) && image[i][j] != makecol(255,0,0))
+				count++;
+		}
+
+	return count;
 }
+//------------------------------------------------------
+// Task that periodically gets images from position
+// (XCAM,YCAM) and displays them in position (XD,YD)
+//------------------------------------------------------
+// void cameratask() {
+// 	while (1) {
+// 		get_image(camera_x + 100, camera_y + 100);
+// 		// get_image(XCAM, YCAM);
+// 		put_image(SCREEN_W - 100, SCREEN_H - 100);
+// 		// put_image(XD, YD);
+// 		ptask_wait_for_period();
+// 	}
+// }
+/*--------------------------------------------------------------*/
