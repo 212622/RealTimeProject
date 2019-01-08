@@ -33,32 +33,49 @@ int		enemy_x[MAXT], enemy_y[MAXT];	// coordinates of enemies
 int 	state[MAXT];					// enemy state
 int		camera_x, camera_y;				// coordinates of camera
 BITMAP	*sfondo, *aereo, *boom;			// images
+int     line_x1, line_x2, line_y1, line_y2;
 /*--------------------------------------------------------------*/
 /*  Periodic task for camera detection   */
 /*--------------------------------------------------------------*/
 void camera() {
-int v, found, count;
+int v, found, count, name, x1, x2, y1, y2;
+int centroide[5][2];
+char *img[5] = {"camera/image1.bmp","camera/image2.bmp","camera/image3.bmp","camera/image4.bmp","camera/image5.bmp"};
 // int c, k, j, npixel;
 	
 	camera_x = 0;
 	camera_y = 2;
 	v = 1;
-	found = count = 0;
+	found = count = name = 0;
 
 	while (1) {
 		if (camera_x + VRES >= XWORLD) v = -1;
 		if (camera_x <= 0) v = 1;
-
 		// con camera_x+100 vede il bordo sinistro, con camera_x+101 vede il bordo destro
 		// con camera_y+100 vede il bordo sopra, con camera_y+101 vede il bordo sotto
 		count = get_image_count(camera_x + (VRES / 2), camera_y + (HRES /  2));
 		if (found ==  0 && count > 1000) {
-			save_image(VRES / 2, HRES /  2, "camera/image.bmp");
-			found = 1;
-			printf("FOUND: COUNT = %d\n", count);
+			save_image(VRES / 2, HRES /  2, img[name]);
+			get_centroid(centroide, name, camera_x, camera_y);
+			// printf("Image : %s Centroide : %d %d\n", img[name], centroide[name][0], centroide[name][1]);
+			if (name == 4) {
+				 found = 1;
+				 printf("FOUND: COUNT = %d\n", count);
+				 x1 = centroide[0][0];
+				 y1 = centroide[0][1];
+				 x2 = centroide[4][0];
+				 y2 = centroide[4][1];
+				 line_x1 = x1;
+				 line_y1 = y1;
+				 line_y2 = YWORLD - sfondo->h;
+				 if(y1 == y2) y2++;
+				 line_x2 = (((line_y2 - y1) / (y2 - y1)) * (x2 - x1)) + x1;
+				 name = 0;
+			}
+			else name++;
 		}
-
-		camera_x += 2 * v;
+		camera_x += 5 * v;
+		if(key[KEY_ENTER]) found = 0;
 		
 		/*
 		found = npixel = 0;
@@ -112,6 +129,8 @@ int k, view;
 
 		rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
 		rect(bufw, 0, YWORLD - 1, XWORLD, 0, makecol(0, 0, 255));
+		// printf("LINEA : %d %d %d %d\n", line_x1, line_y1, line_x2, line_y2);
+		line(bufw, line_x1, line_y1, line_x2, line_y2, makecol(255, 0, 0));
 
 		// Menu area
 		clear_to_color(bufm, makecol(0, 0, 0));

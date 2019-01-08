@@ -52,7 +52,7 @@ int		x, y;		// video coordinates
 			x = x0 - (VRES / 2) + i;
 			y = y0 - (HRES / 2) + j;
 			image[i][j] = getpixel(buf, x, y);
-	}
+		}
 }
 //------------------------------------------------------
 // PUT_IMAGE displays the image stored in image[][]
@@ -67,7 +67,7 @@ int		x, y;		// video coordinates
 			x = x0 - (VRES / 2) + i;
 			y = y0 - (HRES / 2) + j;
 			putpixel(bufs, x, y, image[i][j]);
-	}
+		}
 }
 /*--------------------------------------------------------------*/
 void save_image(int x0, int y0, char *path) {
@@ -82,7 +82,7 @@ BITMAP	*img;
 			x = x0 - (VRES / 2) + i;
 			y = y0 - (HRES / 2) + j;
 			putpixel(img, x, y, image[i][j]);
-	}
+		}
 
 	save_bitmap(path, img, NULL);
 }
@@ -137,4 +137,29 @@ int 	count = 0;
 // 		ptask_wait_for_period();
 // 	}
 // }
+/*--------------------------------------------------------------*/
+void get_centroid(int centroide[][2], int name, int camera_x, int camera_y) {
+int		x, y;		// video coordinates
+int		c;
+int 	min_x, max_x, min_y, max_y;
+
+	max_x = max_y = 0;
+	min_x = VRES;
+	min_y = HRES;
+
+	for (x=0; x<VRES; x++)
+		for (y=0; y<HRES; y++) {
+			c = image[x][y];
+			if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0)) {
+				if (x < min_x) min_x = x;
+				else if (x > max_x) max_x = x;
+
+				if (y < min_y) min_y = y;
+				else if (y > max_y) max_y = y;
+			}	
+		}
+
+	centroide[name][0] = camera_x + min_x + ((max_x - min_x) / 2);
+	centroide[name][1] = camera_y + min_y + ((max_y - min_y) / 2);
+}
 /*--------------------------------------------------------------*/
