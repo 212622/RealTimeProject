@@ -40,21 +40,20 @@ void camera() {
 int v, found, count;
 // int c, k, j, npixel;
 	
-	camera_x = camera_y = 0;
+	camera_x = 0;
+	camera_y = 2;
 	v = 1;
 	found = count = 0;
 
 	while (1) {
-		if (camera_x + VRES >= SCREEN_W) v = -1;
+		if (camera_x + VRES >= XWORLD) v = -1;
 		if (camera_x <= 0) v = 1;
-
-		// non stampa bordino rosso
 
 		// con camera_x+100 vede il bordo sinistro, con camera_x+101 vede il bordo destro
 		// con camera_y+100 vede il bordo sopra, con camera_y+101 vede il bordo sotto
-		count = get_image_count(camera_x + 100, camera_y + 100);
+		count = get_image_count(camera_x + (VRES / 2), camera_y + (HRES /  2));
 		if (found ==  0 && count > 1000) {
-			save_image(100, 100, "camera/image.bmp");
+			save_image(VRES / 2, HRES /  2, "camera/image.bmp");
 			found = 1;
 			printf("FOUND: COUNT = %d\n", count);
 		}
@@ -92,14 +91,15 @@ int k, view;
 	while (1) {
 		//printf("\nTask draw: id %d, priority %d\n", ptask_get_index(), PRIO);
 
-		clear_to_color(buf, makecol(0, 0, 0));
-		draw_sprite(buf, sfondo, 0, 600);
+		// Graphic world
+		clear_to_color(bufw, makecol(0, 0, 0));
+		draw_sprite(bufw, sfondo, 0, YWORLD - sfondo->h);
 
 		for (k=0; k<MAXT; k++) {
 			if (state[k] == ACTIVE)
-				draw_sprite(buf, aereo, enemy_x[k], enemy_y[k]);
+				draw_sprite(bufw, aereo, enemy_x[k], enemy_y[k]);
 			else if (state[k] == BOOM) {
-				draw_sprite(buf, boom, enemy_x[k], enemy_y[k]);
+				draw_sprite(bufw, boom, enemy_x[k], enemy_y[k]);
 				if (view == 3) {
 					view = 0;
 					state[k] = WAIT;
@@ -110,10 +110,25 @@ int k, view;
 			}
 		}
 
-		rect(buf, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
-		put_image(SCREEN_W - 100, SCREEN_H - 100);
+		rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
+		rect(bufw, 0, YWORLD - 1, XWORLD, 0, makecol(0, 0, 255));
+
+		// Menu area
+		clear_to_color(bufm, makecol(0, 0, 0));
+		rect(bufm, 0, YMENU, XMENU, 0, makecol(0, 0, 255));
+
+		// Status window
+		clear_to_color(bufs, makecol(0, 0, 0));
+		put_image(XSTATUS - (VRES / 2) - 12, YSTATUS - (HRES / 2) - 12);
+		rect(bufs, 12, YSTATUS - 12, XSTATUS - 12, YSTATUS - HRES - 12, makecol(255, 0, 0));
+		rect(bufs, 0, YSTATUS - 1, XSTATUS - 1, 0, makecol(0, 0, 255));
+
+		blit(bufm, buf, 0, 0, 0, 0, bufm->w, bufm->h);
+		blit(bufw, buf, 0, 0, 0, YMENU, bufw->w, bufw->h);
+		blit(bufs, buf, 0, 0, XMENU, 0, bufs->w, bufs->h);
 
 		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
+
 		ptask_wait_for_period();
 	}
 }
@@ -125,7 +140,7 @@ float alfa, speed, angle;
 int tid;
 	
 	tid = ptask_get_index();
-	enemy_x[tid - 1] = rand() % (1024 - aereo->w);
+	enemy_x[tid - 1] = rand() % (XWORLD - aereo->w);
 	enemy_y[tid - 1] = 0;
 	alfa = (rand() % 3) - 1;
 	speed = (rand() % 3) + 8;
@@ -135,14 +150,14 @@ int tid;
 		//printf("Task enemy: id %d, priority %d, state %d\n", ptask_get_index(), PRIO, state[tid - 1]);
 
 		// se il razzo non è arrivato alla citta scende, altrimenti scoppia
-		if (enemy_x[tid - 1] < (1024 - aereo->w) && enemy_x[tid - 1] >= 0 && enemy_y[tid - 1] < (600 - aereo->h)) {
+		if (enemy_x[tid - 1] < (XWORLD - aereo->w) && enemy_x[tid - 1] >= 0 && enemy_y[tid - 1] < (YWORLD - sfondo->h - aereo->h)) {
 			enemy_y[tid - 1] += speed;
 			enemy_x[tid - 1] -= (alfa * angle);
 		}
 		else {
 			state[tid - 1] = BOOM;
 			ptask_wait_for_activation();
-			enemy_x[tid - 1] = rand() % (1024 - aereo->w);
+			enemy_x[tid - 1] = rand() % (XWORLD - aereo->w);
 			enemy_y[tid - 1] = 0;
 			alfa = (rand() % 3) - 1;
 			speed = (rand() % 3) + 8;

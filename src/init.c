@@ -6,6 +6,18 @@
 /*--------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*--------------------------------------------------------------*/
+void init() {
+	allegro_init();
+    install_keyboard();
+    set_color_depth(32);
+    set_gfx_mode(GFX_AUTODETECT_WINDOWED, XWIN, YWIN, 0, 0);
+    ptask_init(SCHED_RR, GLOBAL, PRIO_INHERITANCE);
+	buf = create_bitmap(SCREEN_W, SCREEN_H);
+	bufm = create_bitmap(XMENU, YMENU);
+	bufw = create_bitmap(XWORLD, YWORLD);
+	bufs = create_bitmap(XSTATUS, YSTATUS);
+}
+/*--------------------------------------------------------------*/
 void make_pink_background(char *old, char *new) {
 BITMAP		*img, *imgp;		// pointers to bitmap
 PALETTE     pal;                // color palette
@@ -27,15 +39,6 @@ int         pink, white;
 		save_bitmap(new, imgp, pal);
 	}
 }
-/*--------------------------------------------------------------*/
-void init() {
-	allegro_init();
-    install_keyboard();
-    set_color_depth(32);
-    set_gfx_mode(GFX_AUTODETECT_WINDOWED, XWIN, YWIN, 0, 0);
-    ptask_init(SCHED_RR, GLOBAL, PRIO_INHERITANCE);
-	buf = create_bitmap(SCREEN_W, SCREEN_H);
-}
 //------------------------------------------------------
 // GET_IMAGE reads an area of the screen centered in
 // (x0,y0) and stores it into image[][]
@@ -44,11 +47,11 @@ void get_image(int x0, int y0) {
 int		i, j;		// image indexes
 int		x, y;		// video coordinates
 
-	for (i=0; i<HRES; i++)
-		for (j=0; j<VRES; j++) {
-			x = x0 - (HRES / 2) + i;
-			y = y0 - (VRES / 2) + j;
-			image[i][j] = getpixel(screen, x, y);
+	for (i=0; i<VRES; i++)
+		for (j=0; j<HRES; j++) {
+			x = x0 - (VRES / 2) + i;
+			y = y0 - (HRES / 2) + j;
+			image[i][j] = getpixel(buf, x, y);
 	}
 }
 //------------------------------------------------------
@@ -59,11 +62,11 @@ void put_image(int x0, int y0) {
 int		i, j;		// image indexes
 int		x, y;		// video coordinates
 
-	for (i=0; i<HRES; i++)
-		for (j=0; j<VRES; j++) {
-			x = x0 - (HRES / 2) + i;
-			y = y0 - (VRES / 2) + j;
-			putpixel(buf, x, y, image[i][j]);
+	for (i=0; i<VRES; i++)
+		for (j=0; j<HRES; j++) {
+			x = x0 - (VRES / 2) + i;
+			y = y0 - (HRES / 2) + j;
+			putpixel(bufs, x, y, image[i][j]);
 	}
 }
 /*--------------------------------------------------------------*/
@@ -74,17 +77,16 @@ BITMAP	*img;
 	
 	img = create_bitmap(HRES, VRES);
 
-	for (i=1; i<HRES; i++)
-		for (j=1; j<VRES; j++) {
-			x = x0 - (HRES / 2) + i;
-			y = y0 - (VRES / 2) + j;
+	for (i=1; i<VRES; i++)
+		for (j=1; j<HRES; j++) {
+			x = x0 - (VRES / 2) + i;
+			y = y0 - (HRES / 2) + j;
 			putpixel(img, x, y, image[i][j]);
 	}
 
 	save_bitmap(path, img, NULL);
 }
 /*--------------------------------------------------------------*/
-// int control_image(char *path) {
 int count_pixel(char *path) {
 BITMAP	*img;
 int		count, x, y, c;
@@ -111,11 +113,11 @@ int		i, j;		// image indexes
 int		x, y;		// video coordinates
 int 	count = 0;
 
-	for (i=0; i<HRES; i++)
-		for (j=0; j<VRES; j++) {
-			x = x0 - (HRES / 2) + i;
-			y = y0 - (VRES / 2) + j;
-			image[i][j] = getpixel(screen, x, y);
+	for (i=0; i<VRES; i++)
+		for (j=0; j<HRES; j++) {
+			x = x0 - (VRES / 2) + i;
+			y = y0 - (HRES / 2) + j;
+			image[i][j] = getpixel(bufw, x, y);
 			if(image[i][j] != makecol(0,0,0) && image[i][j] != makecol(255,0,0))
 				count++;
 		}
