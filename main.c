@@ -169,7 +169,7 @@ int k, view;
 		// Graphic world
 		clear_to_color(bufw, makecol(0, 0, 0));
 		draw_sprite(bufw, sfondo, 0, YWORLD - sfondo->h);
-		draw_sprite(bufw, patriot, (XWORLD / 2) - (patriot->w / 2), YWORLD - patriot->h);
+		draw_sprite(bufw, patriot, (XWORLD / 2) - (patriot->w / 2) + 10, YWORLD - patriot->h - 20);
 
 		for (k=0; k<MAXT; k++) {
 			if (state[k] == ACTIVE)
@@ -237,7 +237,7 @@ int tid;
 	angle = (rand() % 3) + 1;
 	crash = 0;
 	while (1) {
-		//printf("Task enemy: id %d, priority %d, state %d\n", ptask_get_index(), PRIO, state[tid - 1]);
+		printf("Task enemy: id %d, priority %d, state %d\n", ptask_get_index(), PRIO, state[tid - 1]);
 
 		// se il razzo non è arrivato alla citta scende, altrimenti scoppia
 		if (crash == 0 && enemy_x[tid - 1] < (XWORLD - aereo->w) && enemy_x[tid - 1] >= 0 && enemy_y[tid - 1] < (YWORLD - sfondo->h - aereo->h)) {
@@ -265,18 +265,18 @@ int tid_al;
 	
 	tid_al = ptask_get_index();
 	ally_x[tid_al - 6] = (XWORLD / 2);
-	ally_y[tid_al - 6] = YWORLD - patriot->h;
+	ally_y[tid_al - 6] = YWORLD - patriot->h - 20;
 	//alfa = (line_y2 - ally_y[tid_al - 6]) / (line_x2 - ally_x[tid_al - 6]);
 	alfa = 0;
 	if (ally_x[tid_al - 6] < line_x2) alfa = 5;
 	if (ally_x[tid_al - 6] > line_x2) alfa = -5;
-	printf("line_x2: %d x: %d line_y2: %d y: %d alfa: %f\n",line_x2, ally_x[tid_al - 6], line_y2,ally_y[tid_al - 6], alfa);	
+	//printf("line_x2: %d x: %d line_y2: %d y: %d alfa: %f\n",line_x2, ally_x[tid_al - 6], line_y2,ally_y[tid_al - 6], alfa);	
 	speed = (5 * (411 - centroid[0][1])) / 516;
 	stop = 0;
 	crash = 0;
 
 	while (1) {
-		//printf("Task ally: id %d, priority %d, state %d\n", ptask_get_index(), PRIO, state_al[tid_al - 1]);
+		printf("Task ally: id %d, priority %d, state %d\n", ptask_get_index(), PRIO, state_al[tid_al - 1]);
 
 		if (alfa < 0){
 			if (ally_x[tid_al - 6] < line_x2) stop = 1;
@@ -292,7 +292,7 @@ int tid_al;
 		ally_y[tid_al - 6] -= speed/2;
 
 		crash = get_crash(ally_x[tid_al - 6], ally_y[tid_al - 6]);
-		printf("crash : %d\n", crash);
+		//printf("crash : %d\n", crash);
 
 		if (crash == 1 || ally_y[tid_al - 6] < 300){
 			state_al[tid_al - 6] = BOOM;
@@ -300,8 +300,8 @@ int tid_al;
 			ally_x[tid_al - 6] = (XWORLD / 2);
 			ally_y[tid_al - 6] = YWORLD - patriot->h;
 			alfa = 0;
-			if (ally_x[tid_al - 6] < line_x2) alfa = 1;
-			if (ally_x[tid_al - 6] > line_x2) alfa = -1;
+			if (ally_x[tid_al - 6] < line_x2) alfa = 5;
+			if (ally_x[tid_al - 6] > line_x2) alfa = -5;
 			speed = (5 * (411 - centroid[0][1])) / 516;
 			crash = 0;
 		}		
@@ -327,7 +327,7 @@ tpars params;
 	
 	init();
 	
-	sfondo = load_bitmap("img/sfondo.bmp", NULL);
+	sfondo = load_bitmap("img/sfondo3.bmp", NULL);
 	if (sfondo == NULL) {
 		printf("file not found\n");
 		exit(1);
