@@ -24,6 +24,7 @@
 #define WAIT	0
 #define ACTIVE	1
 #define BOOM	2
+#define CAMOV	5						// camera movements
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
@@ -38,78 +39,118 @@ int		camera_x, camera_y;				// coordinates of camera
 BITMAP	*sfondo, *aereo, *boom, *razzo, *patriot;	// images
 int     line_x1, line_x2, line_y1, line_y2;
 int 	crash;
+int centroid[CAMOV][2];
 /*--------------------------------------------------------------*/
 /*  Periodic task for camera detection   */
 /*--------------------------------------------------------------*/
 void camera() {
-int v, found, count, name, x1, x2, y1, y2, k, k_old;
-int centroide[5][2];
-char *img[5] = {"camera/image1.bmp","camera/image2.bmp","camera/image3.bmp","camera/image4.bmp","camera/image5.bmp"};
+int v, count, old_x, old_y, k;
+// int centroid[5][2], x1, x2, y1, y2, found, name;
+int tracking;
+char *img[CAMOV] = {"camera/image1.bmp", "camera/image2.bmp", "camera/image3.bmp", "camera/image4.bmp", "camera/image5.bmp"};
 // int c, k, j, npixel;
 	
 	camera_x = 0;
 	camera_y = 2;
 	v = 1;
-	found = count = name = k = 0;
-	k_old = -1;
+	// found = name = 0;
+	count = 0;
+	k = 0;
+
+	tracking = 0;
+	old_x = old_y = 0;
 
 	while (1) {
-		if (camera_x + VRES >= XWORLD) v = -1;
-		if (camera_x <= 0) v = 1;
-		// con camera_x+100 vede il bordo sinistro, con camera_x+101 vede il bordo destro
-		// con camera_y+100 vede il bordo sopra, con camera_y+101 vede il bordo sotto
+		// if (camera_x + VRES >= XWORLD) v = -1;
+		// if (camera_x <= 0) v = 1;
+
+		// centroide ok (no pixel non neri non aereo, tolte righe rosse)
+		// rifare calcolo linea. spostamento camera. tipo 3
+		// no found o invio o altro. riavviare automaticamente
+
+		// Image scanning & thresholding: read the pixel color in a given window and discard the pixel with dark color
 		count = get_image_count(camera_x + (VRES / 2), camera_y + (HRES /  2));
-		if (found ==  0 && count > 1000) {
-			save_image(VRES / 2, HRES /  2, img[name]);
-			get_centroid(centroide, name, camera_x, camera_y);
-			// printf("Image : %s Centroide : %d %d\n", img[name], centroide[name][0], centroide[name][1]);
-			if (name == 2) {
-				 found = 1;
-				 printf("FOUND: COUNT = %d\n", count);
-				 x1 = centroide[0][0];
-				 y1 = centroide[0][1];
-				 x2 = centroide[2][0];
-				 y2 = centroide[2][1];
-				 line_x1 = x1;
-				 line_y1 = y1;
-				 line_y2 = 300;
-				 if(y1 == y2) y2++;
-				 line_x2 = (((line_y2 - y1) / (y2 - y1)) * (x2 - x1)) + x1;
-				 name = 0;
-			}
-			else name++;
-		}
-		camera_x += 5 * v;
 
-		if (key[KEY_ENTER]) {
-			found = 0;
-		}
-		
-		if (found == 1){
-			if (k < MAXT && k != k_old){
-				state_al[k] = ACTIVE;
-				ptask_activate(tid_al[k]);
-				i++;
-				k_old = k;
+		if (tracking == 0) {
+			if (count >= 1000) {
+				tracking = 1;
+			}
+			else {
+				if (camera_x <= 0) v = 1;
+				else if (camera_x + VRES >= XWORLD) v = -1;
+
+				camera_x += 5 * v;
 			}
 		}
+		if (tracking >= 1) {
+			if (tracking <= CAMOV) {
+				save_image(VRES / 2, HRES / 2, img[tracking - 1]);
 
-		/*
-		found = npixel = 0;
-		for (j=1; j<HRES; j++) {
-			for (k=1; k<VRES; k++) {
-				c = getpixel(screen, camera_x + k, camera_y + j);
-				if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0)) {
-					npixel++;
-					if (found ==  0 && npixel > 1300) {
-						save_image(100, 100, "camera/image.bmp");
-						found = 1;
-					}
-					// printf("TROVATO: %d %d\n", k, j);
+				// Centroid computation: compute the centroid of pixels with light color
+				get_centroid(centroid, tracking - 1, camera_x, camera_y);
+
+				// Camera control: control the camera axes to move to the centroid
+				camera_x = centroid[tracking - 1][0] - (VRES / 2);
+				camera_y = centroid[tracking - 1][1] - (HRES / 2);
+				if (camera_x < 0) camera_x = 0;
+				if (camera_x > XWORLD - VRES) camera_x = XWORLD - VRES;
+				if (camera_y < 0) camera_y = 2;
+
+				tracking++;
+			}
+
+			if (tracking > CAMOV) {
+				// Compute line and prediction
+				old_x = centroid[CAMOV - 2][0];
+				old_y = centroid[CAMOV - 2][1];
+				line_x1 = centroid[CAMOV - 1][0];
+				line_y1 = centroid[CAMOV - 1][1];
+
+				line_y2 = 300;
+				if (old_x == line_x1) line_x1++;
+				if (old_y == line_y1) line_y1++;
+				line_x2 = (((line_y2 - old_y) / (line_y1 - old_y)) * (line_x1 - old_x)) + old_x;
+
+				if (k < MAXT) {
+					state_al[k] = ACTIVE;
+					ptask_activate(tid_al[k]);
+					i++;
+					k++;
 				}
+				else k = 0;
+
+				tracking = 0;
+
+				camera_x = 0;
+				camera_y = 2;
 			}
 		}
-		*/
+
+		// if (found ==  0 && count > 1000) {
+		// 	save_image(VRES / 2, HRES /  2, img[name]);
+
+			// get_centroid(centroid, name, camera_x, camera_y);
+
+			// camera_x += 5 * v;
+
+			// printf("Image : %s Centroide : %d %d\n", img[name], centroid[name][0], centroid[name][1]);
+		// 	if (name == 4) {
+		// 		found = 1;
+		// 		printf("FOUND: COUNT = %d\n", count);
+		// 		x1 = centroid[0][0];
+		// 		y1 = centroid[0][1];
+		// 		x2 = centroid[4][0];
+		// 		y2 = centroid[4][1];
+		// 		line_x1 = x1;
+		// 		line_y1 = y1;
+		// 		line_y2 = YWORLD - sfondo->h;
+		// 		if(y1 == y2) y2++; // no. riga orizzontale, non bisogna disegnare
+		// 		line_x2 = (((line_y2 - y1) / (y2 - y1)) * (x2 - x1)) + x1;
+		// 		name = 0;
+		// 	}
+		// 	else name++;
+		// }
+		// if(key[KEY_ENTER]) found = 0;
 
 		ptask_wait_for_period();
 	}
@@ -225,12 +266,12 @@ int tid_al;
 	tid_al = ptask_get_index();
 	ally_x[tid_al - 6] = (XWORLD / 2);
 	ally_y[tid_al - 6] = YWORLD - patriot->h;
-	alfa = (line_y2 - ally_y[tid_al - 6]) / (line_x2 - ally_x[tid_al - 6]);
+	//alfa = (line_y2 - ally_y[tid_al - 6]) / (line_x2 - ally_x[tid_al - 6]);
+	alfa = 0;
+	if (ally_x[tid_al - 6] < line_x2) alfa = 5;
+	if (ally_x[tid_al - 6] > line_x2) alfa = -5;
 	printf("line_x2: %d x: %d line_y2: %d y: %d alfa: %f\n",line_x2, ally_x[tid_al - 6], line_y2,ally_y[tid_al - 6], alfa);	
-	//alfa = 0;
-	//if (ally_x[tid_al - 6] < line_x2) alfa = (line_y2 - ally_y[tid_al - 6]) / (line_x2 - ally_x[tid_al - 6]);
-	//if (ally_x[tid_al - 6] > line_x2) alfa = -5;
-	speed = 5;
+	speed = (5 * (411 - centroid[0][1])) / 516;
 	stop = 0;
 	crash = 0;
 
@@ -238,22 +279,22 @@ int tid_al;
 		//printf("Task ally: id %d, priority %d, state %d\n", ptask_get_index(), PRIO, state_al[tid_al - 1]);
 
 		if (alfa < 0){
-			if (ally_x[tid_al - 6] > line_x2) stop = 1;
+			if (ally_x[tid_al - 6] < line_x2) stop = 1;
 		}
 		else{
-			if (ally_x[tid_al - 6] < line_x2) stop = 1;
+			if (ally_x[tid_al - 6] > line_x2) stop = 1;
 		}
 
 		if (ally_y[tid_al - 6] < 300) stop = 1;
 
-		if (stop == 0) ally_x[tid_al - 6] -= alfa;
+		if (stop == 0) ally_x[tid_al - 6] += alfa;
 
 		ally_y[tid_al - 6] -= speed/2;
 
 		crash = get_crash(ally_x[tid_al - 6], ally_y[tid_al - 6]);
 		printf("crash : %d\n", crash);
 
-		if (crash == 1){
+		if (crash == 1 || ally_y[tid_al - 6] < 300){
 			state_al[tid_al - 6] = BOOM;
 			ptask_wait_for_activation();
 			ally_x[tid_al - 6] = (XWORLD / 2);
@@ -261,7 +302,7 @@ int tid_al;
 			alfa = 0;
 			if (ally_x[tid_al - 6] < line_x2) alfa = 1;
 			if (ally_x[tid_al - 6] > line_x2) alfa = -1;
-			speed = 4;
+			speed = (5 * (411 - centroid[0][1])) / 516;
 			crash = 0;
 		}		
 		ptask_wait_for_period();
@@ -334,7 +375,7 @@ tpars params;
 		state_al[k] = WAIT;
 	}
 
-	ptask_create_prio(camera, PER, PRIO - 1, NOW);
+	ptask_create_prio(camera, PER, PRIO, NOW);
 
 	do {
 		scan = 0;

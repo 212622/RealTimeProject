@@ -111,16 +111,20 @@ int		count, x, y, c;
 int get_image_count(int x0, int y0) {
 int		i, j;		// image indexes
 int		x, y;		// video coordinates
-int 	count = 0;
+int 	c, count = 0;
 
-	for (i=0; i<VRES; i++)
+	for (i=0; i<VRES; i++) {
 		for (j=0; j<HRES; j++) {
 			x = x0 - (VRES / 2) + i;
 			y = y0 - (HRES / 2) + j;
-			image[i][j] = getpixel(bufw, x, y);
+			c = getpixel(bufw, x, y);
+			if (c == makecol(255, 0, 0) || c == makecol(0, 0, 255))
+				c = makecol(0, 0, 0);
+			image[i][j] = c;
 			if(image[i][j] != makecol(0,0,0) && image[i][j] != makecol(255,0,0))
 				count++;
 		}
+	}
 
 	return count;
 }
