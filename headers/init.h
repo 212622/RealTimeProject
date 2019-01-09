@@ -28,6 +28,7 @@ extern void put_image(int x0, int y0);
 extern void save_image(int x0, int y0, char *path);
 extern int count_pixel(char *path);
 extern int get_image_count(int x0, int y0);
+extern int get_crash(int x0, int y0);
 extern void get_centroid(int centroide[][2] , int name, int camera_x, int camera_y);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */

@@ -163,3 +163,13 @@ int 	min_x, max_x, min_y, max_y;
 	centroide[name][1] = camera_y + min_y + ((max_y - min_y) / 2);
 }
 /*--------------------------------------------------------------*/
+int get_crash(int x0, int y0){
+	int crash, crash_point, c;
+
+	crash = 0;
+	crash_point = y0 - 1;
+	c = getpixel(bufw, x0, crash_point);
+	if(c != makecol(0, 0, 0) && c != makecol(255, 0, 0)) crash = 1;
+	return crash;
+}
+/*--------------------------------------------------------------*/
