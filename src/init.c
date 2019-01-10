@@ -11,7 +11,7 @@ void init() {
     install_keyboard();
     set_color_depth(32);
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, XWIN, YWIN, 0, 0);
-    ptask_init(SCHED_RR, GLOBAL, PRIO_INHERITANCE);
+    ptask_init(SCHED_FIFO, GLOBAL, PRIO_INHERITANCE);
 	buf = create_bitmap(SCREEN_W, SCREEN_H);
 	bufm = create_bitmap(XMENU, YMENU);
 	bufw = create_bitmap(XWORLD, YWORLD);
@@ -47,12 +47,13 @@ void get_image(int x0, int y0) {
 int		i, j;		// image indexes
 int		x, y;		// video coordinates
 
-	for (i=0; i<VRES; i++)
+	for (i=0; i<VRES; i++) {
 		for (j=0; j<HRES; j++) {
 			x = x0 - (VRES / 2) + i;
 			y = y0 - (HRES / 2) + j;
-			image[i][j] = getpixel(buf, x, y);
+			image[i][j] = getpixel(bufw, x, y);
 		}
+	}
 }
 //------------------------------------------------------
 // PUT_IMAGE displays the image stored in image[][]
@@ -62,12 +63,13 @@ void put_image(int x0, int y0) {
 int		i, j;		// image indexes
 int		x, y;		// video coordinates
 
-	for (i=0; i<VRES; i++)
+	for (i=0; i<VRES; i++) {
 		for (j=0; j<HRES; j++) {
 			x = x0 - (VRES / 2) + i;
 			y = y0 - (HRES / 2) + j;
 			putpixel(bufs, x, y, image[i][j]);
 		}
+	}
 }
 /*--------------------------------------------------------------*/
 void save_image(int x0, int y0, char *path) {
@@ -77,12 +79,13 @@ BITMAP	*img;
 	
 	img = create_bitmap(HRES, VRES);
 
-	for (i=1; i<VRES; i++)
-		for (j=1; j<HRES; j++) {
+	for (i=0; i<VRES; i++) {
+		for (j=0; j<HRES; j++) {
 			x = x0 - (VRES / 2) + i;
 			y = y0 - (HRES / 2) + j;
 			putpixel(img, x, y, image[i][j]);
 		}
+	}
 
 	save_bitmap(path, img, NULL);
 }
@@ -141,8 +144,11 @@ int 	c, count = 0;
 // 		ptask_wait_for_period();
 // 	}
 // }
-/*--------------------------------------------------------------*/
-void get_centroid(int centroide[][2], int name, int camera_x, int camera_y) {
+//------------------------------------------------------
+// GET_CENTROID do the centroid computation:
+// compute the centroid of pixels with light color
+//------------------------------------------------------
+void get_centroid(int centroid[][2], int camera_x, int camera_y) {
 int		x, y;		// video coordinates
 int		c;
 int 	min_x, max_x, min_y, max_y;
@@ -151,7 +157,11 @@ int 	min_x, max_x, min_y, max_y;
 	min_x = VRES;
 	min_y = HRES;
 
-	for (x=0; x<VRES; x++)
+	// elimino i vecchi valori e faccio spazio per i nuovi
+	centroid[0][0] = centroid[1][0];
+	centroid[0][1] = centroid[1][1];
+
+	for (x=0; x<VRES; x++) {
 		for (y=0; y<HRES; y++) {
 			c = image[x][y];
 			if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0)) {
@@ -162,9 +172,10 @@ int 	min_x, max_x, min_y, max_y;
 				else if (y > max_y) max_y = y;
 			}	
 		}
+	}
 
-	centroide[name][0] = camera_x + min_x + ((max_x - min_x) / 2);
-	centroide[name][1] = camera_y + min_y + ((max_y - min_y) / 2);
+	centroid[1][0] = camera_x + min_x + ((max_x - min_x) / 2);
+	centroid[1][1] = camera_y + min_y + ((max_y - min_y) / 2);
 }
 /*--------------------------------------------------------------*/
 int get_crash(int x0, int y0){

@@ -18,6 +18,7 @@
 #define YMENU   100
 #define XSTATUS 224
 #define YSTATUS 768
+#define ALLEGRO_NO_FIX_ALIASES 				/* fix for the new version of glibc */
 /*--------------------------------------------------------------*/
 /*  FUNCTION PROTOTYPES   */
 /*--------------------------------------------------------------*/
@@ -28,8 +29,7 @@ extern void put_image(int x0, int y0);
 extern void save_image(int x0, int y0, char *path);
 extern int count_pixel(char *path);
 extern int get_image_count(int x0, int y0);
-extern int get_crash(int x0, int y0);
-extern void get_centroid(int centroide[][2] , int name, int camera_x, int camera_y);
+extern void get_centroid(int centroid[][2], int camera_x, int camera_y);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
