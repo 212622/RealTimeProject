@@ -1,12 +1,14 @@
-/*--------------------------------------------------------------*/
-/*  Patriots																															*/
-/*	Real Time Project by Tomas Torricelli and Lorenzo Cuoghi																			*/
-/*																																		*/
-/*	This project simulate a physical system or the behavior of active agents interacting with each other and with the environment		*/
-/*	Simulate a set of Patriot defense missiles that identify enemy targets, predict their trajectories and are launched to catch them 	*/
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
+/*  Patriots															*/															
+/*	Real Time Project by Tomas Torricelli and Lorenzo Cuoghi			*/																
+/*																		*/																
+/*	This project simulate a physical system or the behavior of active 	*/
+/*	agents interacting with each other and with the environment			*/
+/*	Simulate a set of Patriot defense missiles that identify enemy 		*/
+/*	targets, predict their trajectories and are launched to catch them 	*/
+/*----------------------------------------------------------------------*/
 /*  HEADER FILES        */
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
@@ -15,35 +17,35 @@
 #include "ptask.h"
 #include "pmutex.h"
 #include "init.h"
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 #define MAXT    5							// max number of enemy tasks
 #define PER 	20							// base period
 #define PRIO    80							// task priority
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 #define WAIT	0							// stop enemy state
 #define ACTIVE	1							// moving enemy state
 #define BOOM	2							// explosion enemy state
-/*--------------------------------------------------------------*/
-#define CAMOV	20							// camera movements
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
+#define CAMOV	50							// camera movements
+/*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 int		tid[MAXT];							// enemy task IDs
 int		i;                      			// number of active enemy task
 int		enemy_x[MAXT], enemy_y[MAXT];		// coordinates of enemies
 int 	state[MAXT];						// enemy state
 int		camera_x, camera_y;					// coordinates of camera
 int     line_x1, line_x2, line_y1, line_y2;	// coordinates of predict line
-BITMAP	*sfondo, *aereo, *boom, *patriot;				// images
+BITMAP	*sfondo, *aereo, *boom, *patriot;	// images
 
 pthread_mutex_t mcam;						// camera mutex
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 /*  Periodic task for camera detection   */
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 void camera() {
-int v = 1, count = 0, old_x = 0, old_y = 0, n = 0;
+int v = 1, count = 0, old_x = 0, old_y = 0, n = 0, cam_x_old = 0;
 int centroid[2][2] = {{0, 0}, {0, 0}}, tracking = 0;
 char *img[2] = {"camera/image1.bmp", "camera/image2.bmp"};
 	
@@ -52,13 +54,18 @@ char *img[2] = {"camera/image1.bmp", "camera/image2.bmp"};
 
 	while (1) {
 
-		// Image scanning & thresholding: read the pixel color in a given window and discard the pixel with dark color
+		// Image scanning & thresholding: read the pixel color in a given
+		// window and discard the pixel with dark color
 		pthread_mutex_lock(&mcam);
 		count = get_image_count(camera_x + (VRES / 2), camera_y + (HRES /  2));
 		pthread_mutex_unlock(&mcam);
-
+		
 		if (tracking == 0) {
-			if (count > 0) tracking = 1;
+			if (count > 0) {
+				// printf("camera_x = %d\ncamera_y = %d\ntracking = %d\n", camera_x, camera_y, tracking);
+				tracking = 1;
+				cam_x_old = camera_x;
+			}
 			else {
 				if (camera_x <= 0) v = 1;
 				else if (camera_x + VRES >= XWORLD) v = -1;
@@ -72,7 +79,8 @@ char *img[2] = {"camera/image1.bmp", "camera/image2.bmp"};
 				if (n == 0) n++;
 				else n--;
 
-				// Centroid computation: compute the centroid of pixels with light color
+				// Centroid computation: compute the centroid of pixels with
+				// light color
 				pthread_mutex_lock(&mcam);
 				get_centroid(centroid, camera_x, camera_y);
 				pthread_mutex_unlock(&mcam);
@@ -86,13 +94,18 @@ char *img[2] = {"camera/image1.bmp", "camera/image2.bmp"};
 				if (camera_y < 0) camera_y = 2;
 				pthread_mutex_unlock(&mcam);
 
+				if (tracking == 30) {
+					old_x = centroid[0][0];
+					old_y = centroid[0][1];
+				}
+
 				tracking++;
 			}
 
-			if (tracking == CAMOV + 1) {
+			if (tracking > CAMOV) {
 				// Compute line and prediction
-				old_x = centroid[0][0];
-				old_y = centroid[0][1];
+				//old_x = centroid[0][0];
+				//old_y = centroid[0][1];
 				pthread_mutex_lock(&mcam);
 				line_x1 = centroid[1][0];
 				line_y1 = centroid[1][1];
@@ -102,22 +115,23 @@ char *img[2] = {"camera/image1.bmp", "camera/image2.bmp"};
 				if (old_y == line_y1) line_y1++;
 				line_x2 = (((line_y2 - old_y) / (line_y1 - old_y)) * (line_x1 - old_x)) + old_x;
 				pthread_mutex_unlock(&mcam);
-
-				tracking = 0;
+				printf("centroide1 : %d, %d\ncentroide2 : %d, %d \n\n", old_x, old_y, line_x1, line_y1);
 
 				pthread_mutex_lock(&mcam);
-				camera_x = 0;
+				camera_x = cam_x_old;
 				camera_y = 2;
 				pthread_mutex_unlock(&mcam);
+
+				tracking = 0;
 			}
 		}
 
 		ptask_wait_for_period();
 	}
 }
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 /*  Periodic task for drawing   */
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 void draw() {
 int k, view;
 	
@@ -171,9 +185,9 @@ int k, view;
 		ptask_wait_for_period();
 	}
 }
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 /*  Periodic task for enemy   */
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 void enemy() {
 float alfa, speed, angle;
 int tid;
@@ -205,9 +219,9 @@ int tid;
 		ptask_wait_for_period();
 	}
 }
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 /*  MAIN process   */
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 int main() {	
 int scan, k, one, ntasks = 0;
 tpars params;
@@ -245,7 +259,7 @@ int max_proc = ptask_getnumcores(); /* max number of procs  */
 		exit(1);
 	}
 	
-	ptask_create_prio(draw, PER, PRIO, NOW);
+	ptask_create_prio(draw, PER / 3, PRIO, NOW);
 	ntasks++;
 	
 	for (k=0; k<MAXT; k++) {
@@ -264,7 +278,7 @@ int max_proc = ptask_getnumcores(); /* max number of procs  */
 		ntasks++;
 	}
 
-	ptask_create_prio(camera, PER, PRIO - ntasks, NOW);
+	ptask_create_prio(camera, PER / 2, PRIO - ntasks, NOW);
 	ntasks++;
 
 	do {
@@ -287,4 +301,4 @@ int max_proc = ptask_getnumcores(); /* max number of procs  */
 	allegro_exit();
 	return 0;
 }
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
