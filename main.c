@@ -36,7 +36,7 @@ int		enemy_x[MAXT], enemy_y[MAXT];		// coordinates of enemies
 int 	state[MAXT];						// enemy state
 int		camera_x, camera_y;					// coordinates of camera
 int     line_x1, line_x2, line_y1, line_y2;	// coordinates of predict line
-BITMAP	*sfondo, *aereo, *boom;				// images
+BITMAP	*sfondo, *aereo, *boom, *patriot;				// images
 
 pthread_mutex_t mcam;						// camera mutex
 /*--------------------------------------------------------------*/
@@ -98,7 +98,7 @@ char *img[2] = {"camera/image1.bmp", "camera/image2.bmp"};
 				line_y1 = centroid[1][1];
 
 				line_y2 = YWORLD - sfondo->h;
-				if (old_x == line_x1) line_x1++;
+				//if (old_x == line_x1) line_x1++;
 				if (old_y == line_y1) line_y1++;
 				line_x2 = (((line_y2 - old_y) / (line_y1 - old_y)) * (line_x1 - old_x)) + old_x;
 				pthread_mutex_unlock(&mcam);
@@ -131,6 +131,7 @@ int k, view;
 		// Graphic world
 		clear_to_color(bufw, makecol(0, 0, 0));
 		draw_sprite(bufw, sfondo, 0, YWORLD - sfondo->h);
+		draw_sprite(bufw, patriot, (XWORLD / 2) - (patriot->w / 2) + 10, YWORLD - patriot->h - 20);
 
 		for (k=0; k<MAXT; k++) {
 			if (state[k] == ACTIVE)
@@ -223,7 +224,7 @@ int max_proc = ptask_getnumcores(); /* max number of procs  */
 	init();
 	pmux_create_pi(&mcam);
 
-	sfondo = load_bitmap("img/sfondo.bmp", NULL);
+	sfondo = load_bitmap("img/sfondo3.bmp", NULL);
 	if (sfondo == NULL) {
 		printf("file not found\n");
 		exit(1);
@@ -235,6 +236,11 @@ int max_proc = ptask_getnumcores(); /* max number of procs  */
 	}
 	boom = load_bitmap("img/boom.bmp", NULL);
 	if (boom == NULL) {
+		printf("file not found\n");
+		exit(1);
+	}
+	patriot = load_bitmap("img/patriot.bmp", NULL);
+	if (patriot == NULL) {
 		printf("file not found\n");
 		exit(1);
 	}

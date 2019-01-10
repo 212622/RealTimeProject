@@ -124,7 +124,7 @@ int 	c, count = 0;
 			if (c == makecol(255, 0, 0) || c == makecol(0, 0, 255))
 				c = makecol(0, 0, 0);
 			image[i][j] = c;
-			if(image[i][j] != makecol(0,0,0) && image[i][j] != makecol(255,0,0))
+			if(image[i][j] != makecol(0,0,0))
 				count++;
 		}
 	}
@@ -164,7 +164,7 @@ int 	min_x, max_x, min_y, max_y;
 	for (x=0; x<VRES; x++) {
 		for (y=0; y<HRES; y++) {
 			c = image[x][y];
-			if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0)) {
+			if (c != makecol(0, 0, 0)) {
 				if (x < min_x) min_x = x;
 				else if (x > max_x) max_x = x;
 
