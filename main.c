@@ -39,7 +39,7 @@ int 	state[MAXT];						// enemy state
 int		camera_x, camera_y;					// coordinates of camera
 int     line_x1, line_x2, line_y1, line_y2;	// coordinates of predict line
 BITMAP	*sfondo, *aereo, *boom, *patriot;	// images
-
+float angle[MAXT], alfa[MAXT];
 pthread_mutex_t mcam;						// camera mutex
 /*----------------------------------------------------------------------*/
 /*  Periodic task for camera detection   */
@@ -149,7 +149,8 @@ int k, view;
 
 		for (k=0; k<MAXT; k++) {
 			if (state[k] == ACTIVE)
-				draw_sprite(bufw, aereo, enemy_x[k], enemy_y[k]);
+				//draw_sprite(bufw, aereo, enemy_x[k], enemy_y[k]);
+				rotate_sprite(bufw, aereo, enemy_x[k], enemy_y[k], ftofix(alfa[k] * angle[k]));
 			else if (state[k] == BOOM) {
 				draw_sprite(bufw, boom, enemy_x[k], enemy_y[k]);
 				if (view == 3) {
@@ -189,15 +190,15 @@ int k, view;
 /*  Periodic task for enemy   */
 /*----------------------------------------------------------------------*/
 void enemy() {
-float alfa, speed, angle;
+float speed;//, angle, alfa;
 int tid;
 	
 	tid = ptask_get_index();
 	enemy_x[tid - 1] = rand() % (XWORLD - aereo->w);
 	enemy_y[tid - 1] = 0;
-	alfa = (rand() % 3) - 1;
+	alfa[tid - 1] = (rand() % 3) - 1;
 	speed = (rand() % 3) + 8;
-	angle = (rand() % 3) + 1;
+	angle[tid - 1] = (rand() % 3) + 1;
 
 	while (1) {
 		//printf("Task enemy: id %d, priority %d, state %d\n", ptask_get_index(), PRIO, state[tid - 1]);
@@ -205,16 +206,16 @@ int tid;
 		// se il razzo non è arrivato alla citta scende, altrimenti scoppia
 		if (enemy_x[tid - 1] < (XWORLD - aereo->w) && enemy_x[tid - 1] >= 0 && enemy_y[tid - 1] < (YWORLD - sfondo->h - aereo->h)) {
 			enemy_y[tid - 1] += speed;
-			enemy_x[tid - 1] -= (alfa * angle);
+			enemy_x[tid - 1] -= (alfa[tid - 1] * angle[tid - 1]);
 		}
 		else {
 			state[tid - 1] = BOOM;
 			ptask_wait_for_activation();
 			enemy_x[tid - 1] = rand() % (XWORLD - aereo->w);
 			enemy_y[tid - 1] = 0;
-			alfa = (rand() % 3) - 1;
+			alfa[tid - 1] = (rand() % 3) - 1;
 			speed = (rand() % 3) + 8;
-			angle = (rand() % 3) + 1;
+			angle[tid - 1] = (rand() % 3) + 1;
 		}
 		ptask_wait_for_period();
 	}
