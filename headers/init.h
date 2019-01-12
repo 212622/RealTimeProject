@@ -13,11 +13,11 @@
 #define HRES	200                     // camera height resolution
 #define VRES	200                     // camera width resolution
 #define XWORLD  800
-#define YWORLD  668
+#define YWORLD  650
 #define XMENU   800
-#define YMENU   100
-#define XSTATUS 224
-#define YSTATUS 768
+#define YMENU   90
+#define XSTATUS 195
+#define YSTATUS 750
 #define ALLEGRO_NO_FIX_ALIASES 				/* fix for the new version of glibc */
 /*--------------------------------------------------------------*/
 /*  FUNCTION PROTOTYPES   */

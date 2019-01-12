@@ -164,22 +164,22 @@ int k, view;
 		}
 
 		rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
-		rect(bufw, 0, YWORLD - 1, XWORLD, 0, makecol(0, 0, 255));
+		rect(bufw, 0, YWORLD - 1, XWORLD - 1, 0, makecol(0, 0, 255));
 		line(bufw, line_x1, line_y1, line_x2, line_y2, makecol(255, 0, 0));
 
 		// Menu area
 		clear_to_color(bufm, makecol(0, 0, 0));
-		rect(bufm, 0, YMENU, XMENU, 0, makecol(0, 0, 255));
+		rect(bufm, 0, YMENU - 1, XMENU - 1, 0, makecol(0, 0, 255));
 
 		// Status window
 		clear_to_color(bufs, makecol(0, 0, 0));
 		put_image(12 + (VRES / 2), YMENU + (HRES / 2) + 2);
-		rect(bufs, 12, YMENU + HRES + 2, XSTATUS - 12, YMENU + 2, makecol(255, 0, 0));
+		//rect(bufs, 12, YMENU + HRES + 2, XSTATUS - 12, YMENU + 2, makecol(255, 0, 0));
 		rect(bufs, 0, YSTATUS - 1, XSTATUS - 1, 0, makecol(0, 0, 255));
 
-		blit(bufm, buf, 0, 0, 0, 0, bufm->w, bufm->h);
-		blit(bufw, buf, 0, 0, 0, YMENU, bufw->w, bufw->h);
-		blit(bufs, buf, 0, 0, XMENU, 0, bufs->w, bufs->h);
+		blit(bufm, buf, 0, 0, 10, 10, bufm->w, bufm->h);
+		blit(bufw, buf, 0, 0, 10, YMENU + 20, bufw->w, bufw->h);
+		blit(bufs, buf, 0, 0, XMENU + 20, 10, bufs->w, bufs->h);
 
 		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
 
