@@ -169,13 +169,13 @@ int k, view;
 
 		// Menu area
 		clear_to_color(bufm, makecol(0, 0, 0));
-		rect(bufm, 0, YMENU - 1, XMENU - 1, 0, makecol(0, 0, 255));
+		rect(bufm, 0, YMENU - 1, XMENU - 1, 0, makecol(255, 255, 24));
 
 		// Status window
 		clear_to_color(bufs, makecol(0, 0, 0));
 		put_image(12 + (VRES / 2), YMENU + (HRES / 2) + 2);
 		//rect(bufs, 12, YMENU + HRES + 2, XSTATUS - 12, YMENU + 2, makecol(255, 0, 0));
-		rect(bufs, 0, YSTATUS - 1, XSTATUS - 1, 0, makecol(0, 0, 255));
+		rect(bufs, 0, YSTATUS - 1, XSTATUS - 1, 0, makecol(128, 0, 128));
 
 		blit(bufm, buf, 0, 0, 10, 10, bufm->w, bufm->h);
 		blit(bufw, buf, 0, 0, 10, YMENU + 20, bufw->w, bufw->h);
