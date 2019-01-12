@@ -55,9 +55,6 @@ void draw(void) {
 	int k, view = 0;
 
 	while (1) {
-		//printf("\nTask draw: id %d, priority %d\n", ptask_get_index(), PRIO);
-
-		clear_to_color(buf, makecol(0, 0, 0));
 
 		// Graphic world
 		clear_to_color(bufw, makecol(0, 0, 0));
@@ -82,26 +79,28 @@ void draw(void) {
 		}
 
 		rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
-		// rect(bufw, 0, YWORLD - 1, XWORLD, 0, makecol(0, 0, 255));
-		rect(bufw, 0, YWORLD - 1, XWORLD - 1, 0, makecol(0, 0, 255));
+		// rect(bufw, 0, YWORLD - 1, XWORLD - 1, 0, makecol(0, 0, 255));
 		line(bufw, line_x1, line_y1, line_x2, line_y2, makecol(255, 0, 0));
 
 		// Menu area
 		clear_to_color(bufm, makecol(0, 0, 0));
-		// rect(bufm, 0, YMENU, XMENU, 0, makecol(0, 0, 255));
-		rect(bufm, 0, YMENU - 1, XMENU - 1, 0, makecol(255, 255, 24));
+		// rect(bufm, 0, YMENU - 1, XMENU - 1, 0, makecol(255, 255, 24));
 
 		// Status window
 		clear_to_color(bufs, makecol(0, 0, 0));
-		// rect(bufs, 0, YSTATUS - 1, XSTATUS - 1, 0, makecol(0, 0, 255));
-		rect(bufs, 0, YSTATUS - 1, XSTATUS - 1, 0, makecol(128, 0, 128));
+		// rect(bufs, 0, YSTATUS - 1, XSTATUS - 1, 0, makecol(128, 0, 128));
 
-		// blit(bufm, buf, 0, 0, 0, 0, bufm->w, bufm->h);
-		blit(bufm, buf, 0, 0, 10, 10, bufm->w, bufm->h);
-		// blit(bufw, buf, 0, 0, 0, YMENU, bufw->w, bufw->h);
-		blit(bufw, buf, 0, 0, 10, YMENU + 20, bufw->w, bufw->h);
-		// blit(bufs, buf, 0, 0, XMENU, 0, bufs->w, bufs->h);
-		blit(bufs, buf, 0, 0, XMENU + 20, 10, bufs->w, bufs->h);
+		clear_to_color(buf, makecol(0, 0, 0));
+		// blit(bufm, buf, 0, 0, BORDER, BORDER, bufm->w, bufm->h);
+		blit(bufm, buf, 0, 0, BORDER + 1, BORDER + 1, bufm->w, bufm->h);
+		// blit(bufw, buf, 0, 0, BORDER, YMENU + (BORDER * 2), bufw->w, bufw->h);
+		blit(bufw, buf, 0, 0, BORDER + 1, YMENU + (BORDER * 2) + 3, bufw->w, bufw->h);
+		// blit(bufs, buf, 0, 0, XMENU + (BORDER * 2), BORDER, bufs->w, bufs->h);
+		blit(bufs, buf, 0, 0, XMENU + (BORDER * 2) + 3, BORDER + 1, bufs->w, bufs->h);
+
+		rect(buf, BORDER, SCREEN_H - BORDER, XWORLD + BORDER + 1, YMENU + (BORDER * 2) + 2, makecol(0, 0, 255));
+		rect(buf, BORDER, YMENU + BORDER + 1, XMENU + BORDER + 1, BORDER, makecol(255, 255, 24));
+		rect(buf, XWORLD + (BORDER * 2) + 2, SCREEN_H - BORDER, SCREEN_W - BORDER, BORDER, makecol(128, 0, 128));
 
 		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
 

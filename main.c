@@ -37,7 +37,7 @@ int get_image_count(int x0, int y0) {
 			x = x0 - (VRES / 2) + i;
 			y = y0 - (HRES / 2) + j;
 			c = getpixel(bufw, x, y);
-			if (c == makecol(255, 0, 0) || c == makecol(0, 0, 255))
+			if (c == makecol(255, 0, 0))
 				c = makecol(0, 0, 0);
 			pthread_mutex_lock(&mcam);
 			image[i][j] = c;
@@ -58,7 +58,7 @@ void camera(void) {
 	
 	pthread_mutex_lock(&mcam);
 	camera_x = 0;
-	camera_y = 2;
+	camera_y = 0;
 	pthread_mutex_unlock(&mcam);
 
 	while (1) {
@@ -97,7 +97,7 @@ void camera(void) {
 				camera_y = centroid[1][1] - (HRES / 2);
 				if (camera_x < 0) camera_x = 0;
 				if (camera_x > XWORLD - VRES) camera_x = XWORLD - VRES;
-				if (camera_y < 0) camera_y = 2;
+				if (camera_y < 0) camera_y = 0;
 				pthread_mutex_unlock(&mcam);
 
 				if (tracking == CAMOV - 5) {
@@ -126,7 +126,7 @@ void camera(void) {
 				camera_x = cam_x_old + (v * VRES);
 				if (camera_x > XWORLD - VRES) camera_x = XWORLD - VRES;
 				if (camera_x < 0) camera_x = 0;
-				camera_y = 2;
+				camera_y = 0;
 				pthread_mutex_unlock(&mcam);
 
 				tracking = 0;
@@ -191,14 +191,16 @@ int main(void) {
 		- camera cattura piu volte lo stesso aereo
 
 		- un file c per ogni task
-		- struct per parametri enemy, unico mutex per la struct
-		- rivedere bordi divisione schermo
+		- struct per parametri enemy, unico mutex per la struct?
 		- suddividere in funzioni più piccole
 		- makefile unico obj per i task
+		- ricontrollare posizione patriot
 
 		- lunghezza commenti divisiorie
 		- variabili globali extern?
 		- confronta con ball
+		- direzione decisa con frecce?
+		- vedi slide_per_progetto
 	*/
 
 	// graphic task creation
