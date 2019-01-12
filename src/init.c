@@ -6,23 +6,19 @@
 /*--------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*--------------------------------------------------------------*/
-void init() {
+void init(void) {
 	allegro_init();
     install_keyboard();
     set_color_depth(32);
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, XWIN, YWIN, 0, 0);
     ptask_init(SCHED_FIFO, GLOBAL, PRIO_INHERITANCE);
-	buf = create_bitmap(SCREEN_W, SCREEN_H);
-	bufm = create_bitmap(XMENU, YMENU);
-	bufw = create_bitmap(XWORLD, YWORLD);
-	bufs = create_bitmap(XSTATUS, YSTATUS);
 }
 /*--------------------------------------------------------------*/
 void make_pink_background(char *old, char *new) {
-BITMAP		*img, *imgp;		// pointers to bitmap
-PALETTE     pal;                // color palette
-int         x, y, c;
-int         pink, white;
+	BITMAP		*img, *imgp;		// pointers to bitmap
+	PALETTE     pal;                // color palette
+	int         x, y, c;
+	int         pink, white;
 	
 	white = makecol(255, 255, 255);
 	pink = makecol(255, 0, 255);
@@ -43,39 +39,39 @@ int         pink, white;
 // GET_IMAGE reads an area of the screen centered in
 // (x0,y0) and stores it into image[][]
 //------------------------------------------------------
-void get_image(int x0, int y0) {
-int		i, j;		// image indexes
-int		x, y;		// video coordinates
+// void get_image(int x0, int y0) {
+// 	int		i, j;		// image indexes
+// 	int		x, y;		// video coordinates
 
-	for (i=0; i<VRES; i++) {
-		for (j=0; j<HRES; j++) {
-			x = x0 - (VRES / 2) + i;
-			y = y0 - (HRES / 2) + j;
-			image[i][j] = getpixel(bufw, x, y);
-		}
-	}
-}
+// 	for (i=0; i<VRES; i++) {
+// 		for (j=0; j<HRES; j++) {
+// 			x = x0 - (VRES / 2) + i;
+// 			y = y0 - (HRES / 2) + j;
+// 			image[i][j] = getpixel(bufw, x, y);
+// 		}
+// 	}
+// }
 //------------------------------------------------------
 // PUT_IMAGE displays the image stored in image[][]
 // in an area centered in (x0,y0)
 //------------------------------------------------------
-void put_image(int x0, int y0) {
-int		i, j;		// image indexes
-int		x, y;		// video coordinates
+// void put_image(int x0, int y0) {
+// 	int		i, j;		// image indexes
+// 	int		x, y;		// video coordinates
 
-	for (i=0; i<VRES; i++) {
-		for (j=0; j<HRES; j++) {
-			x = x0 - (VRES / 2) + i;
-			y = y0 - (HRES / 2) + j;
-			putpixel(bufs, x, y, image[i][j]);
-		}
-	}
-}
+// 	for (i=0; i<VRES; i++) {
+// 		for (j=0; j<HRES; j++) {
+// 			x = x0 - (VRES / 2) + i;
+// 			y = y0 - (HRES / 2) + j;
+// 			putpixel(bufs, x, y, image[i][j]);
+// 		}
+// 	}
+// }
 /*--------------------------------------------------------------*/
 void save_image(int x0, int y0, char *path) {
-int		i, j;		// image indexes
-int		x, y;		// video coordinates
-BITMAP	*img;
+	int		i, j;		// image indexes
+	int		x, y;		// video coordinates
+	BITMAP	*img;
 	
 	img = create_bitmap(HRES, VRES);
 
@@ -91,8 +87,8 @@ BITMAP	*img;
 }
 /*--------------------------------------------------------------*/
 int count_pixel(char *path) {
-BITMAP	*img;
-int		count, x, y, c;
+	BITMAP	*img;
+	int		count, x, y, c;
 	
 	img = load_bitmap(path, NULL);
 	count = 0;
@@ -101,30 +97,6 @@ int		count, x, y, c;
 		for (y=0; y<img->h; y++) {
 			c = getpixel(img, x, y);
 			if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0))
-				count++;
-		}
-	}
-
-	return count;
-}
-//------------------------------------------------------
-// Like GET_IMAGE but also return the number of
-// non-black and non-red pixels
-//------------------------------------------------------
-int get_image_count(int x0, int y0) {
-int		i, j;		// image indexes
-int		x, y;		// video coordinates
-int 	c, count = 0;
-
-	for (i=0; i<VRES; i++) {
-		for (j=0; j<HRES; j++) {
-			x = x0 - (VRES / 2) + i;
-			y = y0 - (HRES / 2) + j;
-			c = getpixel(bufw, x, y);
-			if (c == makecol(255, 0, 0) || c == makecol(0, 0, 255))
-				c = makecol(0, 0, 0);
-			image[i][j] = c;
-			if(image[i][j] != makecol(0,0,0))
 				count++;
 		}
 	}
@@ -149,9 +121,9 @@ int 	c, count = 0;
 // compute the centroid of pixels with light color
 //------------------------------------------------------
 void get_centroid(int centroid[][2], int camera_x, int camera_y) {
-int		x, y;		// video coordinates
-int		c;
-int 	min_x, max_x, min_y, max_y;
+	int		x, y;		// video coordinates
+	int		c;
+	int 	min_x, max_x, min_y, max_y;
 
 	max_x = max_y = 0;
 	min_x = VRES;
@@ -176,15 +148,5 @@ int 	min_x, max_x, min_y, max_y;
 
 	centroid[1][0] = camera_x + min_x + ((max_x - min_x) / 2);
 	centroid[1][1] = camera_y + min_y + ((max_y - min_y) / 2);
-}
-/*--------------------------------------------------------------*/
-int get_crash(int x0, int y0){
-	int crash, crash_point, c;
-
-	crash = 0;
-	crash_point = y0 - 1;
-	c = getpixel(bufw, x0, crash_point);
-	if(c != makecol(0, 0, 0) && c != makecol(255, 0, 0)) crash = 1;
-	return crash;
 }
 /*--------------------------------------------------------------*/

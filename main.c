@@ -1,11 +1,11 @@
 /*----------------------------------------------------------------------*/
-/*  Patriots															*/															
-/*	Real Time Project by Tomas Torricelli and Lorenzo Cuoghi			*/																
-/*																		*/																
-/*	This project simulate a physical system or the behavior of active 	*/
-/*	agents interacting with each other and with the environment			*/
-/*	Simulate a set of Patriot defense missiles that identify enemy 		*/
-/*	targets, predict their trajectories and are launched to catch them 	*/
+/*  Patriots																										*/
+/*	Real Time Project by Tomas Torricelli and Lorenzo Cuoghi														*/
+/*																													*/
+/*	This project simulate a physical system or the behavior of active agents										*/
+/* 	interacting with each other and with the environment.															*/
+/*	Simulate a set of Patriot defense missiles that identify enemy targets, predict their							*/
+/* 	trajectories and are launched to catch them. 																	*/
 /*----------------------------------------------------------------------*/
 /*  HEADER FILES        */
 /*----------------------------------------------------------------------*/
@@ -17,52 +17,58 @@
 #include "ptask.h"
 #include "pmutex.h"
 #include "init.h"
-/*----------------------------------------------------------------------*/
-/*  GLOBAL CONSTRANTS   */
-/*----------------------------------------------------------------------*/
-#define MAXT    5							// max number of enemy tasks
-#define PER 	20							// base period
-#define PRIO    80							// task priority
-/*----------------------------------------------------------------------*/
-#define WAIT	0							// stop enemy state
-#define ACTIVE	1							// moving enemy state
-#define BOOM	2							// explosion enemy state
-/*----------------------------------------------------------------------*/
-#define CAMOV	50							// camera movements
-/*----------------------------------------------------------------------*/
-/*  GLOBAL VARIABLES   */
-/*----------------------------------------------------------------------*/
-int		tid[MAXT];							// enemy task IDs
-int		i;                      			// number of active enemy task
-int		enemy_x[MAXT], enemy_y[MAXT];		// coordinates of enemies
-int 	state[MAXT];						// enemy state
-int		camera_x, camera_y;					// coordinates of camera
-int     line_x1, line_x2, line_y1, line_y2;	// coordinates of predict line
-BITMAP	*sfondo, *aereo, *boom, *patriot;	// images
-float angle[MAXT], alfa[MAXT];
-pthread_mutex_t mcam;						// camera mutex
+#include "draw.h"
+#include "enemy.h"
+/*--------------------------------------------------------------*/
+/*  FUNCTION PROTOTYPES   */
+/*--------------------------------------------------------------*/
+int get_image_count(int x0, int y0);
+//------------------------------------------------------
+// Like GET_IMAGE but also return the number of
+// non-black and non-red pixels
+//------------------------------------------------------
+int get_image_count(int x0, int y0) {
+	int		i, j;		// image indexes
+	int		x, y;		// video coordinates
+	int 	c, count = 0;
+
+	for (i=0; i<VRES; i++) {
+		for (j=0; j<HRES; j++) {
+			x = x0 - (VRES / 2) + i;
+			y = y0 - (HRES / 2) + j;
+			c = getpixel(bufw, x, y);
+			if (c == makecol(255, 0, 0) || c == makecol(0, 0, 255))
+				c = makecol(0, 0, 0);
+			pthread_mutex_lock(&mcam);
+			image[i][j] = c;
+			pthread_mutex_unlock(&mcam);
+			if(image[i][j] != makecol(0, 0, 0))
+				count++;
+		}
+	}
+
+	return count;
+}
 /*----------------------------------------------------------------------*/
 /*  Periodic task for camera detection   */
 /*----------------------------------------------------------------------*/
-void camera() {
-int v = 1, count = 0, old_x = 0, old_y = 0, n = 0, cam_x_old = 0;
-int centroid[2][2] = {{0, 0}, {0, 0}}, tracking = 0;
-char *img[2] = {"camera/image1.bmp", "camera/image2.bmp"};
+void camera(void) {
+	int v = 1, count = 0, old_x = 0, old_y = 0, cam_x_old = 0;
+	int centroid[2][2] = {{0, 0}, {0, 0}}, tracking = 0;
 	
+	pthread_mutex_lock(&mcam);
 	camera_x = 0;
 	camera_y = 2;
+	pthread_mutex_unlock(&mcam);
 
 	while (1) {
-
+		
 		// Image scanning & thresholding: read the pixel color in a given
 		// window and discard the pixel with dark color
-		pthread_mutex_lock(&mcam);
 		count = get_image_count(camera_x + (VRES / 2), camera_y + (HRES /  2));
-		pthread_mutex_unlock(&mcam);
-		
+
 		if (tracking == 0) {
 			if (count > 0) {
-				// printf("camera_x = %d\ncamera_y = %d\ntracking = %d\n", camera_x, camera_y, tracking);
 				tracking = 1;
 				cam_x_old = camera_x;
 			}
@@ -70,20 +76,20 @@ char *img[2] = {"camera/image1.bmp", "camera/image2.bmp"};
 				if (camera_x <= 0) v = 1;
 				else if (camera_x + VRES >= XWORLD) v = -1;
 
-				camera_x += 5 * v;
+				pthread_mutex_lock(&mcam);
+				camera_x += v * VRES;
+				if (camera_x < 0) camera_x = 0;
+				if (camera_x > XWORLD - VRES) camera_x = XWORLD - VRES;
+				pthread_mutex_unlock(&mcam);
 			}
 		}
+
 		if (tracking >= 1) {
 			if (tracking <= CAMOV) {
-				save_image(VRES / 2, HRES / 2, img[n]);
-				if (n == 0) n++;
-				else n--;
 
 				// Centroid computation: compute the centroid of pixels with
 				// light color
-				pthread_mutex_lock(&mcam);
 				get_centroid(centroid, camera_x, camera_y);
-				pthread_mutex_unlock(&mcam);
 
 				// Camera control: control the camera axes to move to the centroid
 				pthread_mutex_lock(&mcam);
@@ -94,7 +100,7 @@ char *img[2] = {"camera/image1.bmp", "camera/image2.bmp"};
 				if (camera_y < 0) camera_y = 2;
 				pthread_mutex_unlock(&mcam);
 
-				if (tracking == 30) {
+				if (tracking == CAMOV - 5) {
 					old_x = centroid[0][0];
 					old_y = centroid[0][1];
 				}
@@ -111,14 +117,15 @@ char *img[2] = {"camera/image1.bmp", "camera/image2.bmp"};
 				line_y1 = centroid[1][1];
 
 				line_y2 = YWORLD - sfondo->h;
-				//if (old_x == line_x1) line_x1++;
 				if (old_y == line_y1) line_y1++;
 				line_x2 = (((line_y2 - old_y) / (line_y1 - old_y)) * (line_x1 - old_x)) + old_x;
 				pthread_mutex_unlock(&mcam);
-				printf("centroide1 : %d, %d\ncentroide2 : %d, %d \n\n", old_x, old_y, line_x1, line_y1);
+				// printf("centroide1 : %d, %d\ncentroide2 : %d, %d \n\n", old_x, old_y, line_x1, line_y1);
 
 				pthread_mutex_lock(&mcam);
-				camera_x = cam_x_old;
+				camera_x = cam_x_old + (v * VRES);
+				if (camera_x > XWORLD - VRES) camera_x = XWORLD - VRES;
+				if (camera_x < 0) camera_x = 0;
 				camera_y = 2;
 				pthread_mutex_unlock(&mcam);
 
@@ -130,175 +137,131 @@ char *img[2] = {"camera/image1.bmp", "camera/image2.bmp"};
 	}
 }
 /*----------------------------------------------------------------------*/
-/*  Periodic task for drawing   */
+/*  Periodic task for commands   */
 /*----------------------------------------------------------------------*/
-void draw() {
-int k, view;
-	
-	view = 0;
+void commands(void) {
+	int scan, one = 0, k;
 
 	while (1) {
-		//printf("\nTask draw: id %d, priority %d\n", ptask_get_index(), PRIO);
-
-		clear_to_color(buf, makecol(0, 0, 0));
-
-		// Graphic world
-		clear_to_color(bufw, makecol(0, 0, 0));
-		draw_sprite(bufw, sfondo, 0, YWORLD - sfondo->h);
-		draw_sprite(bufw, patriot, (XWORLD / 2) - (patriot->w / 2) + 10, YWORLD - patriot->h - 20);
-
-		for (k=0; k<MAXT; k++) {
-			if (state[k] == ACTIVE)
-				//draw_sprite(bufw, aereo, enemy_x[k], enemy_y[k]);
-				rotate_sprite(bufw, aereo, enemy_x[k], enemy_y[k], ftofix(alfa[k] * angle[k]));
-			else if (state[k] == BOOM) {
-				draw_sprite(bufw, boom, enemy_x[k], enemy_y[k]);
-				if (view == 3) {
-					view = 0;
-					state[k] = WAIT;
-					i--;
+		scan = 0;
+		if (keypressed()) scan = readkey() >> 8;
+		if (scan == KEY_SPACE && n_act < MAXE) {
+			for (k=0; k<MAXE; k++) {
+				if (state[k] == WAIT && one == 0) {
+					// printf("attivo task %d\n", tid[k]);
+					one++;
+					pthread_mutex_lock(&men);
+					state[k] = ACTIVE;
+					n_act++;
+					pthread_mutex_unlock(&men);
+					ptask_activate(tid[k]);
 				}
-				else
-					view++;
 			}
+			one = 0;
 		}
 
-		rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
-		rect(bufw, 0, YWORLD - 1, XWORLD - 1, 0, makecol(0, 0, 255));
-		line(bufw, line_x1, line_y1, line_x2, line_y2, makecol(255, 0, 0));
-
-		// Menu area
-		clear_to_color(bufm, makecol(0, 0, 0));
-		rect(bufm, 0, YMENU - 1, XMENU - 1, 0, makecol(255, 255, 24));
-
-		// Status window
-		clear_to_color(bufs, makecol(0, 0, 0));
-		put_image(12 + (VRES / 2), YMENU + (HRES / 2) + 2);
-		//rect(bufs, 12, YMENU + HRES + 2, XSTATUS - 12, YMENU + 2, makecol(255, 0, 0));
-		rect(bufs, 0, YSTATUS - 1, XSTATUS - 1, 0, makecol(128, 0, 128));
-
-		blit(bufm, buf, 0, 0, 10, 10, bufm->w, bufm->h);
-		blit(bufw, buf, 0, 0, 10, YMENU + 20, bufw->w, bufw->h);
-		blit(bufs, buf, 0, 0, XMENU + 20, 10, bufs->w, bufs->h);
-
-		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
-
-		ptask_wait_for_period();
-	}
-}
-/*----------------------------------------------------------------------*/
-/*  Periodic task for enemy   */
-/*----------------------------------------------------------------------*/
-void enemy() {
-float speed;//, angle, alfa;
-int tid;
-	
-	tid = ptask_get_index();
-	enemy_x[tid - 1] = rand() % (XWORLD - aereo->w);
-	enemy_y[tid - 1] = 0;
-	alfa[tid - 1] = (rand() % 3) - 1;
-	speed = (rand() % 3) + 8;
-	angle[tid - 1] = (rand() % 3) + 1;
-
-	while (1) {
-		//printf("Task enemy: id %d, priority %d, state %d\n", ptask_get_index(), PRIO, state[tid - 1]);
-
-		// se il razzo non è arrivato alla citta scende, altrimenti scoppia
-		if (enemy_x[tid - 1] < (XWORLD - aereo->w) && enemy_x[tid - 1] >= 0 && enemy_y[tid - 1] < (YWORLD - sfondo->h - aereo->h)) {
-			enemy_y[tid - 1] += speed;
-			enemy_x[tid - 1] -= (alfa[tid - 1] * angle[tid - 1]);
-		}
-		else {
-			state[tid - 1] = BOOM;
-			ptask_wait_for_activation();
-			enemy_x[tid - 1] = rand() % (XWORLD - aereo->w);
-			enemy_y[tid - 1] = 0;
-			alfa[tid - 1] = (rand() % 3) - 1;
-			speed = (rand() % 3) + 8;
-			angle[tid - 1] = (rand() % 3) + 1;
-		}
 		ptask_wait_for_period();
 	}
 }
 /*----------------------------------------------------------------------*/
 /*  MAIN process   */
 /*----------------------------------------------------------------------*/
-int main() {	
-int scan, k, one, ntasks = 0;
-tpars params;
-int last_proc = 0;                  /* last assigned processor      */
-int max_proc = ptask_getnumcores(); /* max number of procs  */
+int main(void) {	
+	int k, ntasks = 0;						// temporary variable
+	int last_proc = 0;                  	// last assigned processor
+	int max_proc = ptask_getnumcores();		// max number of procs
+	tpars params;
 	
-	i = 0;
-	for (k=0; k<MAXT; k++) tid[k] = -1;
-	for (k=0; k<MAXT; k++) enemy_x[k] = -1;
-	for (k=0; k<MAXT; k++) enemy_y[k] = -1;
-	for (k=0; k<MAXT; k++) state[k] = -1;
+	n_act = 0;
+	for (k=0; k<MAXE; k++) tid[k] = -1;
+	for (k=0; k<MAXE; k++) enemy_x[k] = -1;
+	for (k=0; k<MAXE; k++) enemy_y[k] = -1;
+	for (k=0; k<MAXE; k++) state[k] = -1;
 	srand(time(NULL));
 	
 	init();
 	pmux_create_pi(&mcam);
+	pmux_create_pi(&men);
 
-	sfondo = load_bitmap("img/sfondo3.bmp", NULL);
-	if (sfondo == NULL) {
-		printf("file not found\n");
-		exit(1);
-	}
-	aereo = load_bitmap("img/aereo.bmp", NULL);
-	if (aereo == NULL) {
-		printf("file not found\n");
-		exit(1);
-	}
-	boom = load_bitmap("img/boom.bmp", NULL);
-	if (boom == NULL) {
-		printf("file not found\n");
-		exit(1);
-	}
-	patriot = load_bitmap("img/patriot.bmp", NULL);
-	if (patriot == NULL) {
-		printf("file not found\n");
-		exit(1);
-	}
+	load_img();
 	
-	ptask_create_prio(draw, PER / 3, PRIO, NOW);
+	/*	
+		Problemi: 
+		- alcuni sbagli di direzione => Immagine salvata male
+		- camera cattura piu volte lo stesso aereo
+
+		- un file c per ogni task
+		- struct per parametri enemy, unico mutex per la struct
+		- rivedere bordi divisione schermo
+		- suddividere in funzioni più piccole
+		- makefile unico obj per i task
+
+		- lunghezza commenti divisiorie
+		- variabili globali extern?
+		- confronta con ball
+	*/
+
+	// graphic task creation
+	ptask_param_init(params);
+	ptask_param_period(params, PER / 3, MILLI);
+	ptask_param_deadline(params, PER / 3, MILLI);
+	ptask_param_priority(params, PRIO);
+	ptask_param_activation(params, NOW);
+	// a round robin assignment
+	ptask_param_processor(params, last_proc);
+	last_proc++;
+	if (last_proc >= max_proc)
+		last_proc = 0;
+	ptask_create_param(draw, &params);
 	ntasks++;
 	
-	for (k=0; k<MAXT; k++) {
+	// enemy task creation
+	for (k=0; k<MAXE; k++) {
 		ptask_param_init(params);
 		ptask_param_period(params, PER, MILLI);
+		ptask_param_deadline(params, PER, MILLI);
 		ptask_param_priority(params, PRIO - ntasks);
-		ptask_param_activation(params, DEFERRED);
-		/* a round robin assignment */
+		ptask_param_activation(params, NOW);
 		ptask_param_processor(params, last_proc);
 		last_proc++;
 		if (last_proc >= max_proc)
 			last_proc = 0;
+		pthread_mutex_lock(&men);
 		tid[k] = ptask_create_param(enemy, &params);
-		// printf("tid[%d] = %d\n", k, tid[k]);
 		state[k] = WAIT;
+		pthread_mutex_unlock(&men);
+		// printf("tid[%d] = %d\n", k, tid[k]);
 		ntasks++;
 	}
 
-	ptask_create_prio(camera, PER / 2, PRIO - ntasks, NOW);
+	// camera task creation
+	ptask_param_init(params);
+	ptask_param_period(params, PER / 2, MILLI);
+	ptask_param_deadline(params, PER / 2, MILLI);
+	ptask_param_priority(params, PRIO - ntasks);
+	ptask_param_activation(params, NOW);
+	ptask_param_processor(params, last_proc);
+	last_proc++;
+	if (last_proc >= max_proc)
+		last_proc = 0;
+	ptask_create_param(camera, &params);
 	ntasks++;
 
-	do {
-		scan = 0;
-		if (keypressed()) scan = readkey() >> 8;
-		if (scan == KEY_SPACE && i < MAXT) {
-			for (k=0; k<MAXT; k++) {
-				if (state[k] == WAIT && one == 0) {
-					// printf("attivo task %d\n", tid[k]);
-					one++;
-					state[k] = ACTIVE;
-					ptask_activate(tid[k]);
-					i++;
-				}
-			}
-			one = 0;
-		}
-	} while (!key[KEY_ESC]);
-	
+	// commands task creation
+	ptask_param_init(params);
+	ptask_param_period(params, PER * 2, MILLI);
+	ptask_param_deadline(params, PER * 2, MILLI);
+	ptask_param_priority(params, PRIO - ntasks);
+	ptask_param_activation(params, NOW);
+	ptask_param_processor(params, last_proc);
+	last_proc++;
+	if (last_proc >= max_proc)
+		last_proc = 0;
+	ptask_create_param(commands, &params);
+	ntasks++;
+
+	while (!key[KEY_ESC]);
+
 	allegro_exit();
 	return 0;
 }
