@@ -77,7 +77,7 @@ void draw(void) {
 		pthread_mutex_lock(&mdraw);
 		clear_to_color(bufw, makecol(0, 0, 0));
 		draw_sprite(bufw, sfondo, 0, YWORLD - sfondo->h);
-		draw_sprite(bufw, patriot, (XWORLD / 2) - (patriot->w / 2) + 10, YWORLD - patriot->h - 20);
+		draw_sprite(bufw, patriot, (XWORLD / 2) - (patriot->w / 2) + BORDER, YWORLD - patriot->h - (BORDER * 2));
 		pthread_mutex_unlock(&mdraw);
 
 		for (k=0; k<MAXE; k++) {
@@ -118,10 +118,12 @@ void draw(void) {
 
 		// Menu area
 		clear_to_color(bufm, makecol(0, 0, 0));
+		textout_ex(bufm, font, "PATRIOT MISSILE LAUNCHER DEFENSE", (XMENU / 3) + BORDER, BORDER, makecol(255, 255, 255), -1);
 		// rect(bufm, 0, YMENU - 1, XMENU - 1, 0, makecol(255, 255, 24));
 
 		// Status window
 		clear_to_color(bufs, makecol(0, 0, 0));
+		 textprintf_ex(bufs, font, BORDER, BORDER, makecol(255, 255, 255), -1, "ACTIVE TASK: %d", n_act);
 		// rect(bufs, 0, YSTATUS - 1, XSTATUS - 1, 0, makecol(128, 0, 128));
 
 		clear_to_color(buf, makecol(0, 0, 0));
