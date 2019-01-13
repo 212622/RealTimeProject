@@ -5,76 +5,84 @@
 #include "ptask.h"
 #include "camera.h"
 #include "draw.h"
+/*--------------------------------------------------------------*/
+/*  GLOBAL VARIABLES   */
+/*--------------------------------------------------------------*/
+int 	image[HRES][VRES]; 				    // global image buffer
+int		camera_x, camera_y;					// coordinates of camera
+int     line_x1, line_x2, line_y1, line_y2;	// coordinates of predict line
+
+pthread_mutex_t mcam;						// camera mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/
 // GET_IMAGE reads an area of the screen centered in
 // (x0,y0) and stores it into image[][]
 /*----------------------------------------------------------------------*/
-void get_image(int x0, int y0) {
-	int		i, j;		// image indexes
-	int		x, y;		// video coordinates
+// void get_image(int x0, int y0) {
+// 	int		i, j;		// image indexes
+// 	int		x, y;		// video coordinates
 
-	for (i=0; i<VRES; i++) {
-		for (j=0; j<HRES; j++) {
-			x = x0 - (VRES / 2) + i;
-			y = y0 - (HRES / 2) + j;
-			image[i][j] = getpixel(bufw, x, y);
-		}
-	}
-}
+// 	for (i=0; i<VRES; i++) {
+// 		for (j=0; j<HRES; j++) {
+// 			x = x0 - (VRES / 2) + i;
+// 			y = y0 - (HRES / 2) + j;
+// 			image[i][j] = getpixel(bufw, x, y);
+// 		}
+// 	}
+// }
 /*----------------------------------------------------------------------*/
 // PUT_IMAGE displays the image stored in image[][]
 // in an area centered in (x0,y0)
 /*----------------------------------------------------------------------*/
-void put_image(int x0, int y0) {
-	int		i, j;		// image indexes
-	int		x, y;		// video coordinates
+// void put_image(int x0, int y0) {
+// 	int		i, j;		// image indexes
+// 	int		x, y;		// video coordinates
 
-	for (i=0; i<VRES; i++) {
-		for (j=0; j<HRES; j++) {
-			x = x0 - (VRES / 2) + i;
-			y = y0 - (HRES / 2) + j;
-			putpixel(bufs, x, y, image[i][j]);
-		}
-	}
-}
+// 	for (i=0; i<VRES; i++) {
+// 		for (j=0; j<HRES; j++) {
+// 			x = x0 - (VRES / 2) + i;
+// 			y = y0 - (HRES / 2) + j;
+// 			putpixel(bufs, x, y, image[i][j]);
+// 		}
+// 	}
+// }
 /*----------------------------------------------------------------------*/
-void save_image(int x0, int y0, char *path) {
-	int		i, j;		// image indexes
-	int		x, y;		// video coordinates
-	BITMAP	*img;
+// void save_image(int x0, int y0, char *path) {
+// 	int		i, j;		// image indexes
+// 	int		x, y;		// video coordinates
+// 	BITMAP	*img;
 	
-	img = create_bitmap(HRES, VRES);
+// 	img = create_bitmap(HRES, VRES);
 
-	for (i=0; i<VRES; i++) {
-		for (j=0; j<HRES; j++) {
-			x = x0 - (VRES / 2) + i;
-			y = y0 - (HRES / 2) + j;
-			putpixel(img, x, y, image[i][j]);
-		}
-	}
+// 	for (i=0; i<VRES; i++) {
+// 		for (j=0; j<HRES; j++) {
+// 			x = x0 - (VRES / 2) + i;
+// 			y = y0 - (HRES / 2) + j;
+// 			putpixel(img, x, y, image[i][j]);
+// 		}
+// 	}
 
-	save_bitmap(path, img, NULL);
-}
+// 	save_bitmap(path, img, NULL);
+// }
 /*----------------------------------------------------------------------*/
-int count_pixel(char *path) {
-	BITMAP	*img;
-	int		count, x, y, c;
+// int count_pixel(char *path) {
+// 	BITMAP	*img;
+// 	int		count, x, y, c;
 	
-	img = load_bitmap(path, NULL);
-	count = 0;
+// 	img = load_bitmap(path, NULL);
+// 	count = 0;
 	
-	for (x=0; x<img->w; x++) {
-		for (y=0; y<img->h; y++) {
-			c = getpixel(img, x, y);
-			if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0))
-				count++;
-		}
-	}
+// 	for (x=0; x<img->w; x++) {
+// 		for (y=0; y<img->h; y++) {
+// 			c = getpixel(img, x, y);
+// 			if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0))
+// 				count++;
+// 		}
+// 	}
 
-	return count;
-}
+// 	return count;
+// }
 /*----------------------------------------------------------------------*/
 // GET_IMAGE_COUNT reads an area of the screen centered in
 // (x0,y0) and stores it into image[][] and also return
@@ -196,8 +204,8 @@ void camera(void) {
 
 			if (tracking > CAMOV) {
 				// Compute line and prediction
-				//old_x = centroid[0][0];
-				//old_y = centroid[0][1];
+				// old_x = centroid[0][0];
+				// old_y = centroid[0][1];
 				pthread_mutex_lock(&mcam);
 				line_x1 = centroid[1][0];
 				line_y1 = centroid[1][1];

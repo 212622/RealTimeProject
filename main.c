@@ -40,6 +40,7 @@ int main(void) {
 	init();
 	pmux_create_pi(&mcam);
 	pmux_create_pi(&men);
+	pmux_create_pi(&mdraw);
 
 	load_img();
 	
@@ -49,11 +50,9 @@ int main(void) {
 		- camera cattura piu volte lo stesso aereo
 
 		Features:
-		- un file c per ogni task
 		- struct per parametri enemy, unico mutex per la struct?
 		- suddividere in funzioni più piccole
 		- ricontrollare posizione patriot
-		- rotazione con coeff. angolare
 
 		Extra (forse);
 		- lunghezza commenti divisiorie

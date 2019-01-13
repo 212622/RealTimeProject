@@ -1,12 +1,25 @@
 /*----------------------------------------------------------------------*/
 /*  HEADER FILES        */
 /*----------------------------------------------------------------------*/
+#include <math.h>
 #include <pthread.h>
 #include "ptask.h"
 #include "init.h"
 #include "draw.h"
 #include "enemy.h"
 #include "camera.h"
+/*----------------------------------------------------------------------*/
+/*  GLOBAL CONSTRANTS   */
+/*----------------------------------------------------------------------*/
+#define PI 3.14159265
+/*----------------------------------------------------------------------*/
+/*  GLOBAL VARIABLES   */
+/*----------------------------------------------------------------------*/
+BITMAP  *buf;						        // global buffer
+BITMAP  *bufm, *bufw, *bufs;                // double buffering
+BITMAP	*sfondo, *aereo, *boom, *patriot;	// images
+
+pthread_mutex_t mdraw;						// draw mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/
@@ -55,17 +68,32 @@ void load_img(void) {
 /*----------------------------------------------------------------------*/
 void draw(void) {
 	int k, view = 0;
+	float m, rad, gr360, gr256, angle;
+	// float correction;
 
 	while (1) {
 
 		// Graphic world
+		pthread_mutex_lock(&mdraw);
 		clear_to_color(bufw, makecol(0, 0, 0));
 		draw_sprite(bufw, sfondo, 0, YWORLD - sfondo->h);
 		draw_sprite(bufw, patriot, (XWORLD / 2) - (patriot->w / 2) + 10, YWORLD - patriot->h - 20);
+		pthread_mutex_unlock(&mdraw);
 
 		for (k=0; k<MAXE; k++) {
-			if (state[k] == ACTIVE)
-				rotate_sprite(bufw, aereo, enemy_x[k], enemy_y[k], ftofix(alfa[k] * angle[k]));
+			if (state[k] == ACTIVE) {
+				m = en_angle[k];
+				rad = atan(m);
+				gr360 = (rad * 180) / PI;
+				// correction = gr360 - 90;
+				if (gr360 < 0) gr360 += 180;
+				gr256 = (256 * gr360) / 360;
+				angle = ftofix(gr256);
+				// printf("m = %f, rad = %f, gr360 = %f, gr256 = %f, angle = %f\n", m, rad, gr360, gr256, angle);
+				pthread_mutex_lock(&mdraw);
+				rotate_sprite(bufw, aereo, enemy_x[k], enemy_y[k], angle);
+				pthread_mutex_unlock(&mdraw);
+			}
 			else if (state[k] == BOOM) {
 				draw_sprite(bufw, boom, enemy_x[k], enemy_y[k]);
 				if (view >= TEXP) {
@@ -80,9 +108,11 @@ void draw(void) {
 			}
 		}
 
+		pthread_mutex_lock(&mdraw);
 		rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
 		// rect(bufw, 0, YWORLD - 1, XWORLD - 1, 0, makecol(0, 0, 255));
 		line(bufw, line_x1, line_y1, line_x2, line_y2, makecol(255, 0, 0));
+		pthread_mutex_unlock(&mdraw);
 
 		// Menu area
 		clear_to_color(bufm, makecol(0, 0, 0));

@@ -20,14 +20,14 @@ extern void enemy(void);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
-int		enemy_x[MAXE], enemy_y[MAXE];		// coordinates of enemies
-int 	state[MAXE];						// enemy state
-int		tid[MAXE];							// enemy task IDs
-int		n_act;		                      	// number of active enemy tasks
-float   angle[MAXE];                        // rotation angle
-float   alfa[MAXE];                         // direction
+extern int      enemy_x[MAXE], enemy_y[MAXE];   // coordinates of enemies
+extern int      state[MAXE];                    // enemy state
+extern int      tid[MAXE];						// enemy task IDs
+extern int      n_act;		                    // number of active enemy tasks
+extern float    en_angle[MAXE];                    // rotation angle
+// extern float    alfa[MAXE];                     // direction
 
-pthread_mutex_t men;						// enemy mutex
+extern pthread_mutex_t men;						// enemy mutex
 /*--------------------------------------------------------------*/
 
 #endif // ENEMY_H

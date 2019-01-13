@@ -5,6 +5,7 @@
 /*  HEADER FILES        */
 /*--------------------------------------------------------------*/
 #include <allegro.h>
+#include "pmutex.h"
 /*--------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*--------------------------------------------------------------*/
@@ -32,9 +33,10 @@ extern void load_img(void);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
-BITMAP	*sfondo, *aereo, *boom, *patriot;	// images
-BITMAP  *buf;						        // global buffer
-BITMAP  *bufm, *bufw, *bufs;                // double buffering
+extern BITMAP   *sfondo, *aereo;            // images
+extern BITMAP   *bufw;                      // double buffering
+
+pthread_mutex_t mdraw;                      // draw mutex
 /*--------------------------------------------------------------*/
 
 #endif // DRAW_H
