@@ -3,11 +3,15 @@
 #---------------------------------------------------------
 MAIN = main
 #---------------------------------------------------------
+# Source files to be compiled when necessary
+#---------------------------------------------------------
+SRC = init draw enemy camera commands
+#---------------------------------------------------------
 # CC is the compiler to be used
 #---------------------------------------------------------
 CC = gcc
 #---------------------------------------------------------
-# Directories of source and object files
+# Directories of files
 #---------------------------------------------------------
 ODIR = ./obj
 SDIR = ./src
@@ -20,10 +24,7 @@ CFLAGS = -Wall -I$(HDIR) -L$(LDIR)
 #---------------------------------------------------------
 # OBJS are the object files to be linked
 #---------------------------------------------------------
-OBJ1 = init
-OBJ2 = enemy
-OBJ3 = draw
-OBJS = $(patsubst %, $(ODIR)/%, $(MAIN).o $(OBJ1).o $(OBJ2).o $(OBJ3).o)
+OBJS = $(patsubst %, $(ODIR)/%, $(addsuffix .o, $(MAIN) $(SRC)))
 #---------------------------------------------------------
 # LIBS are the external libraries to be used
 #---------------------------------------------------------
@@ -37,13 +38,7 @@ $(MAIN): $(OBJS)
 $(ODIR)/$(MAIN).o: $(MAIN).c
 	$(CC) -c $(CFLAGS) -o $@ $< $(LIBS)
 
-$(ODIR)/$(OBJ1).o: $(SDIR)/$(OBJ1).c
-	$(CC) -c $(CFLAGS) -o $@ $< $(LIBS)
-
-$(ODIR)/$(OBJ2).o: $(SDIR)/$(OBJ2).c
-	$(CC) -c $(CFLAGS) -o $@ $< $(LIBS)
-
-$(ODIR)/$(OBJ3).o: $(SDIR)/$(OBJ3).c
+$(ODIR)/%.o: $(SDIR)/%.c
 	$(CC) -c $(CFLAGS) -o $@ $< $(LIBS)
 
 #---------------------------------------------------------
