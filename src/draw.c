@@ -95,7 +95,9 @@ void draw(void) {
 				pthread_mutex_unlock(&mdraw);
 			}
 			else if (state[k] == BOOM) {
+				pthread_mutex_lock(&mdraw);
 				draw_sprite(bufw, boom, enemy_x[k], enemy_y[k]);
+				pthread_mutex_unlock(&mdraw);
 				if (view >= TEXP) {
 					view = 0;
 					pthread_mutex_lock(&men);

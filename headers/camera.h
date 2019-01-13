@@ -8,9 +8,9 @@
 /*--------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*--------------------------------------------------------------*/
-#define HRES	100                         // camera height resolution
-#define VRES	100                         // camera width resolution
-#define CAMOV	30							// camera movements
+#define HRES	100                                 // camera height resolution
+#define VRES	100                                 // camera width resolution
+#define CAMOV	30							        // camera movements
 /*--------------------------------------------------------------*/
 /*  FUNCTION PROTOTYPES   */
 /*--------------------------------------------------------------*/

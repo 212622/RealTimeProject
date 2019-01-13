@@ -5,14 +5,14 @@
 #include "ptask.h"
 #include "camera.h"
 #include "draw.h"
-/*--------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
-/*--------------------------------------------------------------*/
-int 	image[HRES][VRES]; 				    // global image buffer
-int		camera_x, camera_y;					// coordinates of camera
-int     line_x1, line_x2, line_y1, line_y2;	// coordinates of predict line
+/*----------------------------------------------------------------------*/
+int 	image[HRES][VRES]; 				        // global image buffer
+int		camera_x, camera_y;					    // coordinates of camera
+int     line_x1, line_x2, line_y1, line_y2;	    // coordinates of predict line
 
-pthread_mutex_t mcam;						// camera mutex
+pthread_mutex_t mcam;						    // camera mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/

@@ -36,7 +36,7 @@ extern void load_img(void);
 extern BITMAP   *sfondo, *aereo;            // images
 extern BITMAP   *bufw;                      // double buffering
 
-pthread_mutex_t mdraw;                      // draw mutex
+extern pthread_mutex_t mdraw;               // draw mutex
 /*--------------------------------------------------------------*/
 
 #endif // DRAW_H

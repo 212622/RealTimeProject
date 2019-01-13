@@ -48,18 +48,18 @@ int main(void) {
 		Problemi: 
 		- alcuni sbagli di direzione => Immagine salvata male
 		- camera cattura piu volte lo stesso aereo
-
-		Features:
-		- struct per parametri enemy, unico mutex per la struct?
+		
+		Rivedere:
 		- suddividere in funzioni più piccole
 		- ricontrollare posizione patriot
+		- mettere a posto commenti
 
-		Extra (forse);
-		- lunghezza commenti divisiorie
-		- variabili globali extern?
-		- confronta con ball
-		- direzione decisa con frecce?
-		- vedi slide_per_progetto
+		Features (forse):
+		- ally
+		- scritte menu
+		- controllo deadlines
+		- direzione decisa con frecce
+		- animazione esplosione
 	*/
 
 	// graphic task creation
@@ -91,7 +91,6 @@ int main(void) {
 		tid[k] = ptask_create_param(enemy, &params);
 		state[k] = WAIT;
 		pthread_mutex_unlock(&men);
-		// printf("tid[%d] = %d\n", k, tid[k]);
 		ntasks++;
 	}
 
