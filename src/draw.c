@@ -16,53 +16,51 @@
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
-BITMAP  *buf;						        // global buffer
-BITMAP  *bufm, *bufw, *bufs;                // double buffering
+BITMAP  *buf;						        		// global buffer
+BITMAP  *bufm, *bufw, *bufs;                		// double buffering
 BITMAP	*sfondo, *aereo, *boom, *patriot, *razzo;	// images
-int 	crash;
+int 	crash[MAXA];
 
-pthread_mutex_t mdraw;						// draw mutex
+pthread_mutex_t mdraw;								// draw mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/
-int get_crash(int x0, int y0) {
-	int crash, crash_point, c;
+// int get_crash(int x0, int y0) {
+// 	int crash, crash_point, c;
 
-	crash = 0;
-	
-	crash_point = y0 - 1;
-	c = getpixel(bufw, x0, crash_point);
-	if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0))
-		crash = 1;
-
-	return crash;
-}
-/*----------------------------------------------------------------------*/
-// int get_crash(void) {
-// 	int x0_en, y0_en, x1_en, y1_en, x0_al, y0_al, x1_al, y1_al, k, j;
 // 	crash = 0;
-// 	for(k=0; k<MAXE; k++) {
-// 		x0_en = enemy_x[k];
-// 		y0_en = enemy_y[k] - aereo->h;
-// 		x1_en = enemy_x[k] + aereo->w;
-// 		y1_en = y0_en;
-// 		for(j=0; j<MAXA; j++) {
-// 			x0_al = ally_x[j];
-// 			y0_al = ally_y[j];
-// 			x1_al = ally_x[j] + razzo->w;
-// 			y1_al = y0_al;
-
-// 			if (x0_al > x0_en && x0_al < x1_en) {
-// 				if (y0_al > y0_en) crash = 1;
-// 			}
-// 			else if (x1_al > x0_en && x1_al < x1_en) {
-// 				if (y0_al > y0_en) crash = 1;
-// 			}
-// 		}
-// 	}
+	
+// 	crash_point = y0 - 1;
+// 	c = getpixel(bufw, x0, crash_point);
+// 	if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0))
+// 		crash = 1;
 
 // 	return crash;
 // }
+/*----------------------------------------------------------------------*/
+void get_crash(int k) {
+	int x0_en, y0_en, x1_en, x0_al, y0_al, x1_al, j;
+	// int y1_al, y1_en;
+	crash[k] = 0;
+
+	x0_en = enemy_x[k];
+	y0_en = enemy_y[k] - aereo->h;
+	x1_en = enemy_x[k] + aereo->w;
+	// y1_en = y0_en;
+	for(j=0; j<MAXA; j++) {
+		x0_al = ally_x[j];
+		y0_al = ally_y[j];
+		x1_al = ally_x[j] + razzo->w;
+		// y1_al = y0_al;
+
+		if (x0_al > x0_en && x0_al < x1_en) {
+			if (y0_al > y0_en) crash[k] = 1;
+		}
+		else if (x1_al > x0_en && x1_al < x1_en) {
+			if (y0_al > y0_en) crash[k] = 1;
+		}
+	}
+}
 /*----------------------------------------------------------------------*/
 void load_img(void) {
 	buf = create_bitmap(SCREEN_W, SCREEN_H);
@@ -101,8 +99,8 @@ void load_img(void) {
 /*----------------------------------------------------------------------*/
 void draw(void) {
 	int k, view = 0;
-	float m, rad, gr360, gr256, angle, angle_al;
-	// float correction;
+	float angle_en, angle_al;
+
 	while (1) {
 
 		// Graphic world
@@ -114,16 +112,14 @@ void draw(void) {
 		
 		for (k=0; k<MAXE; k++) {
 			if (state[k] == ACTIVE) {
-				m = en_angle[k];
-				rad = atan(m);
-				gr360 = (rad * 180) / PI;
-				// correction = gr360 - 90;
-				if (gr360 < 0) gr360 += 180;
-				gr256 = (256 * gr360) / 360;
-				angle = ftofix(gr256);
+				angle_en = ((atan(en_angle[k]) * 180) / PI);
+				if (angle_en < 0) angle_en += 180;
+				angle_en = ftofix((256 * angle_en) / 360);
 				pthread_mutex_lock(&mdraw);
-				rotate_sprite(bufw, aereo, enemy_x[k], enemy_y[k], angle);
+				rotate_sprite(bufw, aereo, enemy_x[k], enemy_y[k], angle_en);
+				get_crash(k);
 				pthread_mutex_unlock(&mdraw);
+				printf("crash = %d %d %d\n", crash[0], crash[1], crash[2]);
 			}
 			else if (state[k] == BOOM) {
 				pthread_mutex_lock(&mdraw);

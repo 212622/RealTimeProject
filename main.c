@@ -56,15 +56,15 @@ int main(void) {
 		Problemi: 
 		- alcuni sbagli di direzione => Immagine salvata male
 		- camera cattura piu volte lo stesso aereo
-		- stampa aereo subito dopo esplosione
 		
 		Rivedere:
 		- suddividere in funzioni più piccole
-		- ricontrollare posizione patriot
 		- mettere a posto commenti
+		- linea fino in fondo e ricalcolo in ally?
 
 		Features (forse):
 		- ally
+		- previsione velocità
 		- scritte menu
 		- controllo deadlines
 		- direzione decisa con frecce

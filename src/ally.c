@@ -26,7 +26,7 @@ void ally(void) {
 	float x1, x2, y1, y2, speed = 5;
 	float m;
 
-	x1 = (XWORLD / 2) - (razzo->w / 2);
+	x1 = (XWORLD / 2) - (razzo->w / 2) + (BORDER * 3);
 	y1 = YWORLD - sfondo->h - razzo->h;
 
 	ptask_wait_for_activation();
@@ -34,9 +34,8 @@ void ally(void) {
 	y2 = line_y2;
 	m = (y2 - y1) / (x2 - x1);
 	while(1) {
-		// printf("crash : %d\n",get_crash(ally_x[tid] + (razzo->w / 2), ally_y[tid]));
-		// printf("x: %d, y: %d\n",ally_x[tid] + (razzo->w / 2), ally_y[tid]);
-		if (y1 > y2) {
+		// if (y1 > HRES + 1 && crash[tid] == 0) {
+		if (y1 > HRES + 1) {
 			pthread_mutex_lock(&mal);
 			ally_x[tid] = x1;
 			ally_y[tid] = y1;
@@ -49,14 +48,20 @@ void ally(void) {
 		else {
 			pthread_mutex_lock(&mal);
 			state_al[tid] = BOOM;
+			crash[tid] = 0;
 			pthread_mutex_unlock(&mal);
 
 			ptask_wait_for_activation();
-			x1 = (XWORLD / 2) - (razzo->w / 2);
+			x1 = (XWORLD / 2) - (razzo->w / 2) + (BORDER * 3);
 			y1 = YWORLD - sfondo->h - razzo->h;
 			x2 = line_x2;
 			y2 = line_y2;
 			m = (y2 - y1) / (x2 - x1);
+			pthread_mutex_lock(&mal);
+			ally_x[tid] = x1;
+			ally_y[tid] = y1;
+			al_angle[tid] = m;
+			pthread_mutex_unlock(&mal);
 		}
 		ptask_wait_for_period();
 	}

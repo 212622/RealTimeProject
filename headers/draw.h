@@ -6,6 +6,7 @@
 /*--------------------------------------------------------------*/
 #include <allegro.h>
 #include "pmutex.h"
+#include "ally.h"
 /*--------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*--------------------------------------------------------------*/
@@ -25,14 +26,14 @@
 /*  FUNCTION PROTOTYPES   */
 /*--------------------------------------------------------------*/
 extern void draw(void);
-extern int get_crash(int x0, int y0);
+extern void get_crash(int k);
 extern void load_img(void);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
 extern BITMAP   *sfondo, *aereo, *razzo;    // images
 extern BITMAP   *bufw;                      // double buffering
-extern int      crash;
+extern int      crash[MAXA];
 
 extern pthread_mutex_t mdraw;               // draw mutex
 /*--------------------------------------------------------------*/

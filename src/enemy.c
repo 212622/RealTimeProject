@@ -39,6 +39,7 @@ void enemy(void) {
 
 	ptask_wait_for_activation();
 	while (1) {
+		// if (y1 <= y2 && crash[tid] == 0) {
 		if (y1 <= y2) {
 			pthread_mutex_lock(&men);
 			enemy_x[tid] = x1;
@@ -52,10 +53,16 @@ void enemy(void) {
 		else {
 			pthread_mutex_lock(&men);
 			state[tid] = BOOM;
+			crash[tid] = 0;
 			pthread_mutex_unlock(&men);
 
 			ptask_wait_for_activation();
 			init_enemy(&x1, &x2, &y1, &y2, &m, &speed);
+			pthread_mutex_lock(&men);
+			enemy_x[tid] = x1;
+			enemy_y[tid] = y1;
+			en_angle[tid] = m;
+			pthread_mutex_unlock(&men);
 		}
 		
 		ptask_wait_for_period();
