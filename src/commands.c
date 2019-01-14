@@ -18,13 +18,12 @@ void commands(void) {
 		if (scan == KEY_SPACE && n_act < MAXE) {
 			for (k=0; k<MAXE; k++) {
 				if (state[k] == WAIT && one == 0) {
-					// printf("attivo task %d\n", tid[k]);
-					one++;
-					pthread_mutex_lock(&men);
-					state[k] = ACTIVE;
-					n_act++;
-					pthread_mutex_unlock(&men);
 					ptask_activate(tid[k]);
+					pthread_mutex_lock(&men);
+					n_act++;
+					state[k] = ACTIVE;
+					pthread_mutex_unlock(&men);
+					one++;
 				}
 			}
 			one = 0;

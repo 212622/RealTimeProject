@@ -25,7 +25,6 @@ extern int      state[MAXE];                    // enemy state
 extern int      tid[MAXE];						// enemy task IDs
 extern int      n_act;		                    // number of active enemy tasks
 extern float    en_angle[MAXE];                 // rotation angle
-// extern float    alfa[MAXE];                     // direction
 
 extern pthread_mutex_t men;						// enemy mutex
 /*--------------------------------------------------------------*/

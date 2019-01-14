@@ -16,74 +16,6 @@ pthread_mutex_t mcam;						    // camera mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/
-// GET_IMAGE reads an area of the screen centered in
-// (x0,y0) and stores it into image[][]
-/*----------------------------------------------------------------------*/
-// void get_image(int x0, int y0) {
-// 	int		i, j;		// image indexes
-// 	int		x, y;		// video coordinates
-
-// 	for (i=0; i<VRES; i++) {
-// 		for (j=0; j<HRES; j++) {
-// 			x = x0 - (VRES / 2) + i;
-// 			y = y0 - (HRES / 2) + j;
-// 			image[i][j] = getpixel(bufw, x, y);
-// 		}
-// 	}
-// }
-/*----------------------------------------------------------------------*/
-// PUT_IMAGE displays the image stored in image[][]
-// in an area centered in (x0,y0)
-/*----------------------------------------------------------------------*/
-// void put_image(int x0, int y0) {
-// 	int		i, j;		// image indexes
-// 	int		x, y;		// video coordinates
-
-// 	for (i=0; i<VRES; i++) {
-// 		for (j=0; j<HRES; j++) {
-// 			x = x0 - (VRES / 2) + i;
-// 			y = y0 - (HRES / 2) + j;
-// 			putpixel(bufs, x, y, image[i][j]);
-// 		}
-// 	}
-// }
-/*----------------------------------------------------------------------*/
-// void save_image(int x0, int y0, char *path) {
-// 	int		i, j;		// image indexes
-// 	int		x, y;		// video coordinates
-// 	BITMAP	*img;
-	
-// 	img = create_bitmap(HRES, VRES);
-
-// 	for (i=0; i<VRES; i++) {
-// 		for (j=0; j<HRES; j++) {
-// 			x = x0 - (VRES / 2) + i;
-// 			y = y0 - (HRES / 2) + j;
-// 			putpixel(img, x, y, image[i][j]);
-// 		}
-// 	}
-
-// 	save_bitmap(path, img, NULL);
-// }
-/*----------------------------------------------------------------------*/
-// int count_pixel(char *path) {
-// 	BITMAP	*img;
-// 	int		count, x, y, c;
-	
-// 	img = load_bitmap(path, NULL);
-// 	count = 0;
-	
-// 	for (x=0; x<img->w; x++) {
-// 		for (y=0; y<img->h; y++) {
-// 			c = getpixel(img, x, y);
-// 			if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0))
-// 				count++;
-// 		}
-// 	}
-
-// 	return count;
-// }
-/*----------------------------------------------------------------------*/
 // GET_IMAGE_COUNT reads an area of the screen centered in
 // (x0,y0) and stores it into image[][] and also return
 // the number of non-black pixels
@@ -181,8 +113,7 @@ void camera(void) {
 		if (tracking >= 1) {
 			if (tracking <= CAMOV) {
 
-				// Centroid computation: compute the centroid of pixels with
-				// light color
+				// Centroid computation: compute the centroid of pixels with light color
 				get_centroid(centroid, camera_x, camera_y);
 
 				// Camera control: control the camera axes to move to the centroid
@@ -214,7 +145,6 @@ void camera(void) {
 				if (old_y == line_y1) line_y1++;
 				line_x2 = (((line_y2 - old_y) / (line_y1 - old_y)) * (line_x1 - old_x)) + old_x;
 				pthread_mutex_unlock(&mcam);
-				// printf("centroide1 : %d, %d\ncentroide2 : %d, %d \n\n", old_x, old_y, line_x1, line_y1);
 
 				pthread_mutex_lock(&mcam);
 				camera_x = cam_x_old + (v * VRES);
@@ -230,17 +160,4 @@ void camera(void) {
 		ptask_wait_for_period();
 	}
 }
-/*----------------------------------------------------------------------*/
-// Task that periodically gets images from position
-// (XCAM,YCAM) and displays them in position (XD,YD)
-/*----------------------------------------------------------------------*/
-// void cameratask() {
-// 	while (1) {
-// 		get_image(camera_x + 100, camera_y + 100);
-// 		// get_image(XCAM, YCAM);
-// 		put_image(SCREEN_W - 100, SCREEN_H - 100);
-// 		// put_image(XD, YD);
-// 		ptask_wait_for_period();
-// 	}
-// }
 /*----------------------------------------------------------------------*/

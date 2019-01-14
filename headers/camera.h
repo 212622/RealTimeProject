@@ -17,10 +17,6 @@
 extern void camera(void);
 extern int get_image_count(int x0, int y0);
 extern void get_centroid(int centroid[][2], int camera_x, int camera_y);
-// extern void get_image(int x0, int y0);
-// extern void put_image(int x0, int y0);
-// extern void save_image(int x0, int y0, char *path);
-// extern int count_pixel(char *path);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/

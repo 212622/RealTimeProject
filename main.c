@@ -48,6 +48,7 @@ int main(void) {
 		Problemi: 
 		- alcuni sbagli di direzione => Immagine salvata male
 		- camera cattura piu volte lo stesso aereo
+		- stampa aereo subito dopo esplosione
 		
 		Rivedere:
 		- suddividere in funzioni più piccole

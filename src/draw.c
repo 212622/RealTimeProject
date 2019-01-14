@@ -89,7 +89,6 @@ void draw(void) {
 				if (gr360 < 0) gr360 += 180;
 				gr256 = (256 * gr360) / 360;
 				angle = ftofix(gr256);
-				// printf("m = %f, rad = %f, gr360 = %f, gr256 = %f, angle = %f\n", m, rad, gr360, gr256, angle);
 				pthread_mutex_lock(&mdraw);
 				rotate_sprite(bufw, aereo, enemy_x[k], enemy_y[k], angle);
 				pthread_mutex_unlock(&mdraw);
@@ -112,26 +111,20 @@ void draw(void) {
 
 		pthread_mutex_lock(&mdraw);
 		rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
-		// rect(bufw, 0, YWORLD - 1, XWORLD - 1, 0, makecol(0, 0, 255));
 		line(bufw, line_x1, line_y1, line_x2, line_y2, makecol(255, 0, 0));
 		pthread_mutex_unlock(&mdraw);
 
 		// Menu area
 		clear_to_color(bufm, makecol(0, 0, 0));
 		textout_ex(bufm, font, "PATRIOT MISSILE LAUNCHER DEFENSE", (XMENU / 3) + BORDER, BORDER, makecol(255, 255, 255), -1);
-		// rect(bufm, 0, YMENU - 1, XMENU - 1, 0, makecol(255, 255, 24));
 
 		// Status window
 		clear_to_color(bufs, makecol(0, 0, 0));
-		 textprintf_ex(bufs, font, BORDER, BORDER, makecol(255, 255, 255), -1, "ACTIVE TASK: %d", n_act);
-		// rect(bufs, 0, YSTATUS - 1, XSTATUS - 1, 0, makecol(128, 0, 128));
+		textprintf_ex(bufs, font, BORDER, BORDER, makecol(255, 255, 255), -1, "ACTIVE TASK: %d", n_act);
 
 		clear_to_color(buf, makecol(0, 0, 0));
-		// blit(bufm, buf, 0, 0, BORDER, BORDER, bufm->w, bufm->h);
 		blit(bufm, buf, 0, 0, BORDER + 1, BORDER + 1, bufm->w, bufm->h);
-		// blit(bufw, buf, 0, 0, BORDER, YMENU + (BORDER * 2), bufw->w, bufw->h);
 		blit(bufw, buf, 0, 0, BORDER + 1, YMENU + (BORDER * 2) + 3, bufw->w, bufw->h);
-		// blit(bufs, buf, 0, 0, XMENU + (BORDER * 2), BORDER, bufs->w, bufs->h);
 		blit(bufs, buf, 0, 0, XMENU + (BORDER * 2) + 3, BORDER + 1, bufs->w, bufs->h);
 
 		rect(buf, BORDER, SCREEN_H - BORDER, XWORLD + BORDER + 1, YMENU + (BORDER * 2) + 2, makecol(0, 0, 255));

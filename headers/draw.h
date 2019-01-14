@@ -12,11 +12,8 @@
 #define XWORLD  800
 #define YWORLD  650
 #define XMENU   800
-// #define YMENU   90
 #define YMENU   84
-// #define XSTATUS 195
 #define XSTATUS 190
-// #define YSTATUS 750
 #define YSTATUS 746
 /*--------------------------------------------------------------*/
 #define BORDER  10
