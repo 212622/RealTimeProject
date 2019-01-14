@@ -4,6 +4,10 @@
 /*--------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*--------------------------------------------------------------*/
+#define WAIT	0							// stop enemy/ally state
+#define ACTIVE	1							// moving enemy/ally state
+#define BOOM	2							// explosion enemy/ally state
+/*--------------------------------------------------------------*/
 #define XWIN    1024                        // window x resolution
 #define YWIN    768                         // window y resolution
 /*--------------------------------------------------------------*/

@@ -8,10 +8,6 @@
 /*--------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*--------------------------------------------------------------*/
-#define WAIT	0							    // stop enemy state
-#define ACTIVE	1							    // moving enemy state
-#define BOOM	2							    // explosion enemy state
-/*--------------------------------------------------------------*/
 #define MAXE    3							    // max number of enemy tasks
 /*--------------------------------------------------------------*/
 /*  FUNCTION PROTOTYPES   */

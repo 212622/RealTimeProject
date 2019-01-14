@@ -5,6 +5,8 @@
 #include "ptask.h"
 #include "camera.h"
 #include "draw.h"
+#include "ally.h"
+#include "init.h"
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
@@ -79,7 +81,7 @@ void get_centroid(int centroid[][2], int camera_x, int camera_y) {
 /*  Periodic task for camera detection   */
 /*----------------------------------------------------------------------*/
 void camera(void) {
-	int v = 1, count = 0, old_x = 0, old_y = 0, cam_x_old = 0;
+	int v = 1, count = 0, old_x = 0, old_y = 0, cam_x_old = 0, k, one = 0;
 	int centroid[2][2] = {{0, 0}, {0, 0}}, tracking = 0;
 	
 	pthread_mutex_lock(&mcam);
@@ -141,11 +143,26 @@ void camera(void) {
 				line_x1 = centroid[1][0];
 				line_y1 = centroid[1][1];
 
-				line_y2 = YWORLD - sfondo->h;
+				// line_y2 = YWORLD - sfondo->h;
+				line_y2 = YWORLD / 2;
 				if (old_y == line_y1) line_y1++;
 				line_x2 = (((line_y2 - old_y) / (line_y1 - old_y)) * (line_x1 - old_x)) + old_x;
 				pthread_mutex_unlock(&mcam);
 
+				// activate ally
+				for(k=0; k<MAXA; k++) {
+					if (state_al[k] == WAIT && one == 0) {
+						ptask_activate(tid_al[k]);
+						pthread_mutex_lock(&mal);
+						n_al_act++;
+						state_al[k] = ACTIVE;
+						pthread_mutex_unlock(&mal);
+						one++;
+					}
+				}
+				one = 0;
+
+				// initialize camera
 				pthread_mutex_lock(&mcam);
 				camera_x = cam_x_old + (v * VRES);
 				if (camera_x > XWORLD - VRES) camera_x = XWORLD - VRES;

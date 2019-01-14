@@ -5,7 +5,7 @@ MAIN = main
 #---------------------------------------------------------
 # Source files to be compiled when necessary
 #---------------------------------------------------------
-SRC = init draw enemy camera commands
+SRC = init draw enemy camera commands ally
 #---------------------------------------------------------
 # CC is the compiler to be used
 #---------------------------------------------------------

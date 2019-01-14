@@ -19,6 +19,7 @@
 #include "init.h"
 #include "draw.h"
 #include "enemy.h"
+#include "ally.h"
 #include "camera.h"
 #include "commands.h"
 /*----------------------------------------------------------------------*/
@@ -35,11 +36,18 @@ int main(void) {
 	for (k=0; k<MAXE; k++) enemy_x[k] = -1;
 	for (k=0; k<MAXE; k++) enemy_y[k] = -1;
 	for (k=0; k<MAXE; k++) state[k] = -1;
+
+	n_al_act = 0;
+	for (k=0; k<MAXA; k++) tid_al[k] = -1;
+	for (k=0; k<MAXA; k++) ally_x[k] = -1;
+	for (k=0; k<MAXA; k++) ally_y[k] = -1;
+	for (k=0; k<MAXA; k++) state_al[k] = -1;
 	srand(time(NULL));
 	
 	init();
 	pmux_create_pi(&mcam);
 	pmux_create_pi(&men);
+	pmux_create_pi(&mal);
 	pmux_create_pi(&mdraw);
 
 	load_img();
@@ -92,6 +100,24 @@ int main(void) {
 		tid[k] = ptask_create_param(enemy, &params);
 		state[k] = WAIT;
 		pthread_mutex_unlock(&men);
+		ntasks++;
+	}
+
+	// ally task creation
+	for (k=0; k<MAXA; k++) {
+		ptask_param_init(params);
+		ptask_param_period(params, PER, MILLI);
+		ptask_param_deadline(params, PER, MILLI);
+		ptask_param_priority(params, PRIO - ntasks);
+		ptask_param_activation(params, NOW);
+		ptask_param_processor(params, last_proc);
+		last_proc++;
+		if (last_proc >= max_proc)
+			last_proc = 0;
+		pthread_mutex_lock(&mal);
+		tid_al[k] = ptask_create_param(ally, &params);
+		state_al[k] = WAIT;
+		pthread_mutex_unlock(&mal);
 		ntasks++;
 	}
 

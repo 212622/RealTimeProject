@@ -30,8 +30,9 @@ extern void load_img(void);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
-extern BITMAP   *sfondo, *aereo;            // images
+extern BITMAP   *sfondo, *aereo, *razzo;    // images
 extern BITMAP   *bufw;                      // double buffering
+extern int      crash;
 
 extern pthread_mutex_t mdraw;               // draw mutex
 /*--------------------------------------------------------------*/
