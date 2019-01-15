@@ -33,9 +33,9 @@ void ally(void) {
 	ptask_wait_for_activation();
 	x2 = (((y2 - line_y1) / (line_y2 - line_y1)) * (line_x2 - line_x1)) + line_x1;
 	m = (y2 - y1) / (x2 - x1);
+	speed =  ((y1 - y2) / ((y2 - line_y1) / en_speed)) * 16;
 	while(1) {
 		if (y1 > HRES + 1 && crash_al[tid] == 0) {
-		// if (y1 > HRES + 1) {
 			pthread_mutex_lock(&mal);
 			ally_x[tid] = x1;
 			ally_y[tid] = y1;
@@ -65,7 +65,5 @@ void ally(void) {
 		}
 		ptask_wait_for_period();
 	}
-	
-
 }
 /*----------------------------------------------------------------------*/

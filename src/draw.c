@@ -26,24 +26,10 @@ pthread_mutex_t mdraw;								// draw mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/
-// int get_crash(int x0, int y0) {
-// 	int crash, crash_point, c;
-
-// 	crash = 0;
-	
-// 	crash_point = y0 - 1;
-// 	c = getpixel(bufw, x0, crash_point);
-// 	if (c != makecol(0, 0, 0) && c != makecol(255, 0, 0))
-// 		crash = 1;
-
-// 	return crash;
-// }
-/*----------------------------------------------------------------------*/
 void get_crash(int k) {
 	int x0_en, y0_en, x1_en, x0_al, y0_al, x1_al, j;
 	// int y1_al, y1_en;
-	crash_al[k] = 0;
-	crash_en[k] = 0;
+	crash_al[k] = crash_en[k] = 0;
 
 	x0_en = enemy_x[k];
 	y0_en = enemy_y[k] + aereo->h;
@@ -56,11 +42,8 @@ void get_crash(int k) {
 		// y1_al = y0_al;
 
 		if ((x0_al > x0_en && x0_al < x1_en) || (x1_al > x0_en && x1_al < x1_en))
-			if (y0_al < y0_en && y0_al > enemy_y[k]) crash_al[k] = crash_en[k] = 1;
-		
-		// else if (x1_al > x0_en && x1_al < x1_en) {
-		// 	if (y0_al < y0_en && y0_al > enemy_y[k]) crash_al[k] = crash_en[k] = 1;
-		// }
+			if (y0_al < y0_en && y0_al > enemy_y[k])
+				crash_al[k] = crash_en[k] = 1;
 	}
 }
 /*----------------------------------------------------------------------*/

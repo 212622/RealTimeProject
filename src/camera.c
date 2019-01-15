@@ -1,6 +1,8 @@
 /*----------------------------------------------------------------------*/
 /*  HEADER FILES        */
 /*----------------------------------------------------------------------*/
+#include <time.h>
+#include <math.h>
 #include <pthread.h>
 #include "ptask.h"
 #include "camera.h"
@@ -13,6 +15,8 @@
 int 	image[HRES][VRES]; 				        // global image buffer
 int		camera_x, camera_y;					    // coordinates of camera
 int     line_x1, line_x2, line_y1, line_y2;	    // coordinates of predict line
+int		en_time[2];
+float 	en_speed;
 
 pthread_mutex_t mcam;						    // camera mutex
 /*----------------------------------------------------------------------*/
@@ -82,7 +86,8 @@ void get_centroid(int centroid[][2], int camera_x, int camera_y) {
 /*----------------------------------------------------------------------*/
 void camera(void) {
 	int v = 1, count = 0, old_x = 0, old_y = 0, cam_x_old = 0, k, one = 0;
-	int centroid[2][2] = {{0, 0}, {0, 0}}, tracking = 0;
+	int centroid[2][2] = {{0, 0}, {0, 0}}, tracking = 0, ms = 0;
+	struct timespec spec;
 	
 	pthread_mutex_lock(&mcam);
 	camera_x = 0;
@@ -130,6 +135,13 @@ void camera(void) {
 				if (tracking == CAMOV - 5) {
 					old_x = centroid[0][0];
 					old_y = centroid[0][1];
+
+					clock_gettime(CLOCK_REALTIME, &spec);
+					ms = round(spec.tv_nsec / 1.0e6);
+
+					pthread_mutex_lock(&mcam);
+					en_time[0] = ms;
+					pthread_mutex_unlock(&mcam);
 				}
 
 				tracking++;
@@ -139,6 +151,15 @@ void camera(void) {
 				// Compute line and prediction
 				// old_x = centroid[0][0];
 				// old_y = centroid[0][1];
+
+				clock_gettime(CLOCK_REALTIME, &spec);
+				ms = round(spec.tv_nsec / 1.0e6);
+
+				pthread_mutex_lock(&mcam);
+				en_time[1] = ms;
+				en_speed = ((float)centroid[1][1] - (float)old_y) / (en_time[1] - en_time[0]);
+				pthread_mutex_unlock(&mcam);
+
 				pthread_mutex_lock(&mcam);
 				line_x1 = centroid[1][0];
 				line_y1 = centroid[1][1];

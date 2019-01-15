@@ -26,8 +26,7 @@ void init_enemy(float *x1, float *x2, float *y1, float *y2, float *m, float *spe
 	*y1 = 0;									// y di partenza
 	*y2 = YWORLD - sfondo->h - aereo->h;		// y di arrivo
 	*m = ((*y2) - (*y1)) / ((*x2) - (*x1));		// coeff. angolare
-	// *speed = (rand() % 3) + 8;
-	*speed = 8;
+	*speed = (rand() % 5) + 10;
 }
 /*----------------------------------------------------------------------*/
 /*  Periodic task for enemy   */
@@ -42,7 +41,6 @@ void enemy(void) {
 	ptask_wait_for_activation();
 	while (1) {
 		if (y1 <= y2 && crash_en[tid] == 0) {
-		// if (y1 <= y2) {
 			pthread_mutex_lock(&men);
 			enemy_x[tid] = x1;
 			enemy_y[tid] = y1;
