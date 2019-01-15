@@ -13,6 +13,7 @@ int		enemy_x[MAXE], enemy_y[MAXE];		// coordinates of enemies
 int 	state[MAXE];						// enemy state
 int		tid[MAXE];							// enemy task IDs
 int		n_act;		                      	// number of active enemy tasks
+float	en_tot, en_died, en_arrived;
 float   en_angle[MAXE];                     // rotation angle
 
 pthread_mutex_t men;						// enemy mutex
@@ -25,7 +26,8 @@ void init_enemy(float *x1, float *x2, float *y1, float *y2, float *m, float *spe
 	*y1 = 0;									// y di partenza
 	*y2 = YWORLD - sfondo->h - aereo->h;		// y di arrivo
 	*m = ((*y2) - (*y1)) / ((*x2) - (*x1));		// coeff. angolare
-	*speed = (rand() % 3) + 8;
+	// *speed = (rand() % 3) + 8;
+	*speed = 8;
 }
 /*----------------------------------------------------------------------*/
 /*  Periodic task for enemy   */
@@ -39,8 +41,8 @@ void enemy(void) {
 
 	ptask_wait_for_activation();
 	while (1) {
-		// if (y1 <= y2 && crash[tid] == 0) {
-		if (y1 <= y2) {
+		if (y1 <= y2 && crash_en[tid] == 0) {
+		// if (y1 <= y2) {
 			pthread_mutex_lock(&men);
 			enemy_x[tid] = x1;
 			enemy_y[tid] = y1;
@@ -51,9 +53,20 @@ void enemy(void) {
 			y1 += speed;
 		}
 		else {
+			if (crash_en[tid] == 1) {
+				pthread_mutex_lock(&men);
+				en_died++;
+				pthread_mutex_unlock(&men);
+			}
+			else{
+				pthread_mutex_lock(&men);
+				en_arrived++;
+				pthread_mutex_unlock(&men);
+			}
+
 			pthread_mutex_lock(&men);
 			state[tid] = BOOM;
-			crash[tid] = 0;
+			crash_en[tid] = 0;
 			pthread_mutex_unlock(&men);
 
 			ptask_wait_for_activation();

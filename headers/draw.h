@@ -7,6 +7,7 @@
 #include <allegro.h>
 #include "pmutex.h"
 #include "ally.h"
+#include "enemy.h"
 /*--------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*--------------------------------------------------------------*/
@@ -33,7 +34,8 @@ extern void load_img(void);
 /*--------------------------------------------------------------*/
 extern BITMAP   *sfondo, *aereo, *razzo;    // images
 extern BITMAP   *bufw;                      // double buffering
-extern int      crash[MAXA];
+extern int      crash_al[MAXA];
+extern int      crash_en[MAXE];
 
 extern pthread_mutex_t mdraw;               // draw mutex
 /*--------------------------------------------------------------*/

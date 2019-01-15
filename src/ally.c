@@ -22,20 +22,20 @@ pthread_mutex_t mal;						// ally mutex
 /*----------------------------------------------------------------------*/
 void ally(void) {
 
-	int tid = ptask_get_index() - 4;
-	float x1, x2, y1, y2, speed = 5;
+	int tid = ptask_get_index() - (MAXE + 1);
+	float x1, x2, y1, y2, speed = 8;
 	float m;
 
 	x1 = (XWORLD / 2) - (razzo->w / 2) + (BORDER * 3);
 	y1 = YWORLD - sfondo->h - razzo->h;
+	y2 = YWORLD / 2;
 
 	ptask_wait_for_activation();
-	x2 = line_x2;
-	y2 = line_y2;
+	x2 = (((y2 - line_y1) / (line_y2 - line_y1)) * (line_x2 - line_x1)) + line_x1;
 	m = (y2 - y1) / (x2 - x1);
 	while(1) {
-		// if (y1 > HRES + 1 && crash[tid] == 0) {
-		if (y1 > HRES + 1) {
+		if (y1 > HRES + 1 && crash_al[tid] == 0) {
+		// if (y1 > HRES + 1) {
 			pthread_mutex_lock(&mal);
 			ally_x[tid] = x1;
 			ally_y[tid] = y1;
@@ -48,14 +48,14 @@ void ally(void) {
 		else {
 			pthread_mutex_lock(&mal);
 			state_al[tid] = BOOM;
-			crash[tid] = 0;
+			crash_al[tid] = 0;
 			pthread_mutex_unlock(&mal);
 
 			ptask_wait_for_activation();
 			x1 = (XWORLD / 2) - (razzo->w / 2) + (BORDER * 3);
 			y1 = YWORLD - sfondo->h - razzo->h;
-			x2 = line_x2;
-			y2 = line_y2;
+			y2 = YWORLD / 2;
+			x2 = (((y2 - line_y1) / (line_y2 - line_y1)) * (line_x2 - line_x1)) + line_x1;
 			m = (y2 - y1) / (x2 - x1);
 			pthread_mutex_lock(&mal);
 			ally_x[tid] = x1;

@@ -143,8 +143,7 @@ void camera(void) {
 				line_x1 = centroid[1][0];
 				line_y1 = centroid[1][1];
 
-				// line_y2 = YWORLD - sfondo->h;
-				line_y2 = YWORLD / 2;
+				line_y2 = YWORLD - sfondo->h;
 				if (old_y == line_y1) line_y1++;
 				line_x2 = (((line_y2 - old_y) / (line_y1 - old_y)) * (line_x1 - old_x)) + old_x;
 				pthread_mutex_unlock(&mcam);
