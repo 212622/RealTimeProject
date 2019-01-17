@@ -6,6 +6,7 @@
 #include "init.h"
 #include "enemy.h"
 #include "draw.h"
+#include "camera.h"
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
@@ -26,7 +27,8 @@ void init_enemy(float *x1, float *x2, float *y1, float *y2, float *m, float *spe
 	*y1 = 0;									// y di partenza
 	*y2 = YWORLD - sfondo->h - aereo->h;		// y di arrivo
 	*m = ((*y2) - (*y1)) / ((*x2) - (*x1));		// coeff. angolare
-	*speed = (rand() % 5) + 10;
+	// *speed = (rand() % 5) + 10;
+	*speed = 15;
 }
 /*----------------------------------------------------------------------*/
 /*  Periodic task for enemy   */
@@ -37,9 +39,10 @@ void enemy(void) {
 	float m;
 
 	init_enemy(&x1, &x2, &y1, &y2, &m, &speed);
-
+	
 	ptask_wait_for_activation();
 	while (1) {
+		// printf("r : %f\n",speed / en_speed);
 		if (y1 <= y2 && crash_en[tid] == 0) {
 			pthread_mutex_lock(&men);
 			enemy_x[tid] = x1;

@@ -172,10 +172,10 @@ void camera(void) {
 				// activate ally
 				for(k=0; k<MAXA; k++) {
 					if (state_al[k] == WAIT && one == 0) {
-						ptask_activate(tid_al[k]);
 						pthread_mutex_lock(&mal);
 						n_al_act++;
 						state_al[k] = ACTIVE;
+						ptask_activate(tid_al[k]);
 						pthread_mutex_unlock(&mal);
 						one++;
 					}

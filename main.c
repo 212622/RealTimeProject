@@ -54,22 +54,20 @@ int main(void) {
 	
 	/*	
 		Problemi: 
-		- alcuni sbagli di direzione => Immagine salvata male
-		- camera cattura piu volte lo stesso aereo, se diminuisco la velocità di enemy è più evidente
-		- ogni tanto ally scoppia subito -> vattore di linee? o crash? o doppia cattura? -> conflitto indici tid
+		- ogni tanto ally scoppia subito -> conflitto indici tid
+		- calcolare più volte coeffang e velocità e tenerli quando sono costanti
 		
 		Rivedere:
 		- suddividere in funzioni più piccole
 		- mettere a posto commenti
-		- camera e linea commentata o linea solo quando stato active? vettore di linee?
 		- cambiare nomi variabili enemy
-		- 8 / 0.48 ? o calcolare più volte coeffang e velocità e tenerli quando sono costanti
+		- chiedi prof dubbio algebra puntatori
 
 		Features (forse):
-		- velocità indipendente dal periodo?
+		- pulsante per camera e linee visibili
 		- controllo deadlines
-		- direzione decisa con frecce
 		- animazione esplosione
+		- (Immagine salvata male)
 	*/
 
 	// graphic task creation

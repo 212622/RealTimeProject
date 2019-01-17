@@ -24,11 +24,11 @@ void commands(void) {
 		if (scan == KEY_SPACE && n_act < MAXE) {
 			for (k=0; k<MAXE; k++) {
 				if (state[k] == WAIT && one == 0) {
-					ptask_activate(tid[k]);
 					pthread_mutex_lock(&men);
 					en_tot++;
 					n_act++;
 					state[k] = ACTIVE;
+					ptask_activate(tid[k]);
 					pthread_mutex_unlock(&men);
 					one++;
 				}
