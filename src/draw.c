@@ -257,6 +257,7 @@ void draw(void) {
 		clear_to_color(bufm, makecol(0, 0, 0));
 		textout_ex(bufm, font, "PATRIOT MISSILE LAUNCHER DEFENSE V1.0", (XMENU / 3), BORDER, makecol(255, 255, 255), -1);
 		textout_ex(bufm, font, "Press SPACE for create enemy", (XMENU / 3) + (2 * BORDER), 4 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufm, font, "Press Q for camera and line", (XMENU / 3) + (2 * BORDER), 6 * BORDER, makecol(255, 255, 255), -1);
 
 		// Status window
 		clear_to_color(bufs, makecol(0, 0, 0));
