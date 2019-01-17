@@ -27,7 +27,6 @@
 /*  FUNCTION PROTOTYPES   */
 /*--------------------------------------------------------------*/
 extern void draw(void);
-extern void get_crash(int k);
 extern void load_img(void);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */

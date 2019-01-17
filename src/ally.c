@@ -52,8 +52,11 @@ void ally(void) {
 		else {
 			pthread_mutex_lock(&mal);
 			state_al[tid] = BOOM;
-			crash_al[tid] = 0;
 			pthread_mutex_unlock(&mal);
+
+			pthread_mutex_lock(&mdraw);
+			crash_al[tid] = 0;
+			pthread_mutex_unlock(&mdraw);
 
 			ptask_wait_for_activation();
 			x1 = (XWORLD / 2) - (razzo->w / 2) + (BORDER * 3);

@@ -26,26 +26,111 @@ pthread_mutex_t mdraw;								// draw mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/
-void get_crash(int k) {
-	int x0_en, y0_en, x1_en, x0_al, y0_al, x1_al, j;
-	// int y1_al, y1_en;
-	crash_al[k] = crash_en[k] = 0;
+// void get_crash_en(int k) {
+// 	int i;
+// 	int x0_en, x1_en, y_en;
+// 	int x0_al, x1_al, y_al;
 
-	x0_en = enemy_x[k];
-	y0_en = enemy_y[k] + aereo->h;
-	x1_en = enemy_x[k] + aereo->w;
-	// y1_en = y0_en;
-	for(j=0; j<MAXA; j++) {
-		x0_al = ally_x[j];
-		y0_al = ally_y[j];
-		x1_al = ally_x[j] + razzo->w;
-		// y1_al = y0_al;
+// 	x0_en = enemy_x[k];
+// 	x1_en = enemy_x[k] + aereo->w;
+// 	y_en = enemy_y[k] + aereo->h;
 
-		if ((x0_al > x0_en && x0_al < x1_en) || (x1_al > x0_en && x1_al < x1_en))
-			if (y0_al < y0_en && y0_al > enemy_y[k])
-				crash_al[k] = crash_en[k] = 1;
+// 	for(i=0; i<MAXA; i++) {
+// 		if (state_al[i] == ACTIVE) {
+// 			x0_al = ally_x[i];
+// 			x1_al = ally_x[i] + razzo->w;
+// 			y_al = ally_y[i];
+
+// 			if ((x0_al > x0_en && x0_al < x1_en) || (x1_al > x0_en && x1_al < x1_en)) {
+// 				if (y_al < y_en && y_al > enemy_y[k]) {
+// 					pthread_mutex_lock(&mdraw);
+// 					crash_en[k] = 1;
+// 					pthread_mutex_unlock(&mdraw);
+// 				}
+// 			}
+// 		}
+// 	}
+// }
+
+void get_crash_en(int k) {
+	int i;
+	int en_left, en_right, en_up, en_down;
+	int al_left, al_right, al_up, al_down;
+
+	en_left = enemy_x[k];
+	en_right = enemy_x[k] + aereo->w;
+	en_up = enemy_y[k];
+	en_down = enemy_y[k] + aereo->h;
+
+	for(i=0; i<MAXA; i++) {
+		if (state_al[i] == ACTIVE) {
+			al_left = ally_x[i];
+			al_right = ally_x[i] + razzo->w;
+			al_up = ally_y[i];
+			al_down = ally_y[i] + razzo->h;
+
+			if (((al_left > en_left && al_left < en_right) || (al_right > en_left && al_right < en_right)) &&
+				((al_up < en_down && al_up > en_up) || (al_down < en_down && al_up > en_up))) {
+				pthread_mutex_lock(&mdraw);
+				crash_en[k] = 1;
+				pthread_mutex_unlock(&mdraw);
+			}
+		}
 	}
 }
+/*----------------------------------------------------------------------*/
+void get_crash_al(int k) {
+	int i;
+	int en_left, en_right, en_up, en_down;
+	int al_left, al_right, al_up, al_down;
+
+	al_left = ally_x[k];
+	al_right = ally_x[k] + razzo->w;
+	al_up = ally_y[k];
+	al_down = ally_y[k] + razzo->h;
+	
+	for(i=0; i<MAXE; i++) {
+		if (state[i] == ACTIVE) {
+			en_left = enemy_x[i];
+			en_right = enemy_x[i] + aereo->w;
+			en_up = enemy_y[i];
+			en_down = enemy_y[i] + aereo->h;
+
+			if (((al_left > en_left && al_left < en_right) || (al_right > en_left && al_right < en_right)) &&
+				((al_up < en_down && al_up > en_up) || (al_down < en_down && al_up > en_up))) {
+				pthread_mutex_lock(&mdraw);
+				crash_al[k] = 1;
+				pthread_mutex_unlock(&mdraw);
+			}
+		}
+	}
+}
+
+// void get_crash_al(int k) {
+// 	int i;
+// 	int x0_en, x1_en, y_en;
+// 	int x0_al, x1_al, y_al;
+
+// 	x0_al = ally_x[k];
+// 	x1_al = ally_x[k] + razzo->w;
+// 	y_al = ally_y[k];
+	
+// 	for(i=0; i<MAXE; i++) {
+// 		if (state[i] == ACTIVE) {
+// 			x0_en = enemy_x[i];
+// 			x1_en = enemy_x[i] + aereo->w;
+// 			y_en = enemy_y[i] + aereo->h;
+
+// 			if ((x0_al > x0_en && x0_al < x1_en) || (x1_al > x0_en && x1_al < x1_en)) {
+// 				if (y_al < y_en && y_al > enemy_y[k]) {
+// 					pthread_mutex_lock(&mdraw);
+// 					crash_al[k] = 1;
+// 					pthread_mutex_unlock(&mdraw);
+// 				}
+// 			}
+// 		}
+// 	}
+// }
 /*----------------------------------------------------------------------*/
 void load_img(void) {
 	buf = create_bitmap(SCREEN_W, SCREEN_H);
@@ -86,6 +171,13 @@ void draw(void) {
 	int k, view = 0;
 	float angle_en, angle_al, defense_per = 0, attack_per = 0;
 
+	pthread_mutex_lock(&mdraw);
+	for (k=0; k<MAXE; k++)
+		crash_en[k] = 0;
+	for (k=0; k<MAXA; k++)
+		crash_al[k] = 0;
+	pthread_mutex_unlock(&mdraw);
+
 	while (1) {
 
 		// Graphic world
@@ -102,8 +194,8 @@ void draw(void) {
 				angle_en = ftofix((256 * angle_en) / 360);
 				pthread_mutex_lock(&mdraw);
 				rotate_sprite(bufw, aereo, enemy_x[k], enemy_y[k], angle_en);
-				get_crash(k);
 				pthread_mutex_unlock(&mdraw);
+				get_crash_en(k);
 			}
 			else if (state[k] == BOOM) {
 				pthread_mutex_lock(&mdraw);
@@ -129,6 +221,7 @@ void draw(void) {
 				pthread_mutex_lock(&mdraw);
 				rotate_sprite(bufw, razzo, ally_x[k], ally_y[k], angle_al);
 				pthread_mutex_unlock(&mdraw);
+				get_crash_al(k);
 			}
 			else if (state_al[k] == BOOM) {
 				pthread_mutex_lock(&mdraw);
@@ -145,6 +238,7 @@ void draw(void) {
 					view++;
 			}
 		}
+		
 		if ((en_arrived + en_died) != 0) {
 			defense_per = (en_died / (en_died + en_arrived)) * 100;
 			attack_per = (en_arrived / (en_died + en_arrived)) * 100;
