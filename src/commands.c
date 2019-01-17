@@ -9,10 +9,15 @@
 #include "init.h"
 #include "draw.h"
 /*----------------------------------------------------------------------*/
+/*  GLOBAL VARIABLES   */
+/*----------------------------------------------------------------------*/
+int  cam_line_view;
+/*----------------------------------------------------------------------*/
 /*  Periodic task for commands   */
 /*----------------------------------------------------------------------*/
 void commands(void) {
 	int scan, one = 0, k;
+	cam_line_view = 0;
 
 	pthread_mutex_lock(&men);
 	en_tot = en_died = 0;
@@ -34,6 +39,10 @@ void commands(void) {
 				}
 			}
 			one = 0;
+		}
+		else if (scan == KEY_Q) {
+			if (cam_line_view == 0) cam_line_view = 1;
+			else cam_line_view = 0;
 		}
 		
 		ptask_wait_for_period();

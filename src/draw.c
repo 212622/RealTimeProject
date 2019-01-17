@@ -9,6 +9,7 @@
 #include "enemy.h"
 #include "ally.h"
 #include "camera.h"
+#include "commands.h"
 /*----------------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*----------------------------------------------------------------------*/
@@ -244,11 +245,13 @@ void draw(void) {
 			attack_per = (en_arrived / (en_died + en_arrived)) * 100;
 		}
 		
-		// camera e linea traiettoria visibili
-		// pthread_mutex_lock(&mdraw);
-		// rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
-		// line(bufw, line_x1, line_y1, line_x2, line_y2, makecol(255, 0, 0));
-		// pthread_mutex_unlock(&mdraw);
+		if ( cam_line_view == 1) {
+			// camera e linea traiettoria visibili
+			pthread_mutex_lock(&mdraw);
+			rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
+			line(bufw, line_x1, line_y1, line_x2, line_y2, makecol(255, 0, 0));
+			pthread_mutex_unlock(&mdraw);
+		}
 
 		// Menu area
 		clear_to_color(bufm, makecol(0, 0, 0));
