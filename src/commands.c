@@ -12,6 +12,7 @@
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
 int  cam_line_view;
+int  command_deadline;
 /*----------------------------------------------------------------------*/
 /*  Periodic task for commands   */
 /*----------------------------------------------------------------------*/
@@ -45,6 +46,9 @@ void commands(void) {
 			else cam_line_view = 0;
 		}
 		
+		/* check for deadline miss */
+        if (ptask_deadline_miss()) command_deadline++;
+
 		ptask_wait_for_period();
 	}
 }

@@ -25,6 +25,7 @@ extern int		camera_x, camera_y;					// coordinates of camera
 extern int      line_x1, line_x2, line_y1, line_y2;	// coordinates of predict line
 extern int		en_time[2];
 extern float    en_speed;
+extern int      cam_deadline;
 
 extern pthread_mutex_t mcam;						// camera mutex
 /*--------------------------------------------------------------*/

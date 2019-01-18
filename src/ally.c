@@ -19,6 +19,7 @@ int 	state_al[MAXA];						// ally state
 int		tid_al[MAXA];						// ally task IDs
 int		n_al_act;		                    // number of active ally tasks
 float   al_angle[MAXA];                     // rotation angle
+int     al_deadline;
 
 pthread_mutex_t mal;						// ally mutex
 /*----------------------------------------------------------------------*/
@@ -70,6 +71,10 @@ void ally(void) {
 			al_angle[tid] = m;
 			pthread_mutex_unlock(&mal);
 		}
+
+		/* check for deadline miss */
+        if (ptask_deadline_miss()) al_deadline++;
+
 		ptask_wait_for_period();
 	}
 }

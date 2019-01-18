@@ -22,6 +22,7 @@ BITMAP  *bufm, *bufw, *bufs;                		// double buffering
 BITMAP	*sfondo, *aereo, *boom, *patriot, *razzo;	// images
 int 	crash_al[MAXA];
 int 	crash_en[MAXE];
+int     draw_deadline;
 
 pthread_mutex_t mdraw;								// draw mutex
 /*----------------------------------------------------------------------*/
@@ -170,7 +171,12 @@ void load_img(void) {
 /*----------------------------------------------------------------------*/
 void draw(void) {
 	int k, view = 0;
-	float angle_en, angle_al, defense_per = 0, attack_per = 0;
+	float angle_en, angle_al, defense_per = 100, attack_per = 0;
+	en_deadline = 0;
+	al_deadline = 0;
+	cam_deadline = 0;
+	draw_deadline = 0;
+	command_deadline = 0;
 
 	pthread_mutex_lock(&mdraw);
 	for (k=0; k<MAXE; k++)
@@ -244,7 +250,7 @@ void draw(void) {
 			defense_per = (en_died / (en_died + en_arrived)) * 100;
 			attack_per = (en_arrived / (en_died + en_arrived)) * 100;
 		}
-		
+
 		if ( cam_line_view == 1) {
 			// camera e linea traiettoria visibili
 			pthread_mutex_lock(&mdraw);
@@ -255,21 +261,36 @@ void draw(void) {
 
 		// Menu area
 		clear_to_color(bufm, makecol(0, 0, 0));
-		textout_ex(bufm, font, "PATRIOT MISSILE LAUNCHER DEFENSE V1.0", (XMENU / 3), BORDER, makecol(255, 255, 255), -1);
-		textout_ex(bufm, font, "Press SPACE for create enemy", (XMENU / 3) + (2 * BORDER), 4 * BORDER, makecol(255, 255, 255), -1);
-		textout_ex(bufm, font, "Press Q for camera and line", (XMENU / 3) + (2 * BORDER), 6 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufm, font, "-------------------------------------", (XMENU / 3), BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufm, font, "PATRIOT MISSILE LAUNCHER DEFENSE V1.0", (XMENU / 3), 2 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufm, font, "-------------------------------------", (XMENU / 3), 3 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufm, font, "Press SPACE for create enemy", (XMENU / 3) + (3 * BORDER), 4.5 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufm, font, "Press Q for camera and line", (XMENU / 3) + (3 * BORDER), 5.5 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufm, font, "Press ESC for quit", (XMENU / 3) + (3 * BORDER), 6.5 * BORDER, makecol(255, 255, 255), -1);
 
 		// Status window
 		clear_to_color(bufs, makecol(0, 0, 0));
-		textout_ex(bufs, font, "STATUS WINDOW", BORDER, 4 * BORDER, makecol(255, 255, 255), -1);
-		textout_ex(bufs, font, "---------------------", BORDER, 8 * BORDER, makecol(255, 255, 255), -1);
-		textprintf_ex(bufs, font, BORDER, 10 * BORDER, makecol(255, 255, 255), -1, "ACTIVE TASKS    : %d", n_act);
-		textprintf_ex(bufs, font, BORDER, 12 * BORDER, makecol(255, 255, 255), -1, "TOTAL ENEMY     : %.0f", en_tot);
-		textprintf_ex(bufs, font, BORDER, 14 * BORDER, makecol(255, 255, 255), -1, "ENEMY DESTROYED : %.0f", en_died);
-		textprintf_ex(bufs, font, BORDER, 16 * BORDER, makecol(255, 255, 255), -1, "ENEMY ARRIVED   : %.0f", en_arrived);
-		textout_ex(bufs, font, "---------------------", BORDER, 18 * BORDER, makecol(255, 255, 255), -1);
-		textprintf_ex(bufs, font, BORDER, 20 * BORDER, makecol(255, 255, 255), -1, "DEFNESE         : %.0f%%", defense_per);
-		textprintf_ex(bufs, font, BORDER, 22 * BORDER, makecol(255, 255, 255), -1, "ATTACK          : %.0f%%", attack_per);
+		textout_ex(bufs, font, "    STATUS WINDOW    ", BORDER, 5 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufs, font, "---------------------", BORDER, 10 * BORDER, makecol(255, 255, 255), -1);
+		textprintf_ex(bufs, font, BORDER, 12 * BORDER, makecol(255, 255, 255), -1, "ACTIVE TASKS    : %d", n_act);
+		textprintf_ex(bufs, font, BORDER, 14 * BORDER, makecol(255, 255, 255), -1, "TOTAL ENEMY     : %.0f", en_tot);
+		textprintf_ex(bufs, font, BORDER, 16 * BORDER, makecol(255, 255, 255), -1, "ENEMY DESTROYED : %.0f", en_died);
+		textprintf_ex(bufs, font, BORDER, 18 * BORDER, makecol(255, 255, 255), -1, "ENEMY ARRIVED   : %.0f", en_arrived);
+		textout_ex(bufs, font, "---------------------", BORDER, 20 * BORDER, makecol(255, 255, 255), -1);
+		textprintf_ex(bufs, font, BORDER, 22 * BORDER, makecol(255, 255, 255), -1, "DEFNESE         : %.0f%%", defense_per);
+		textprintf_ex(bufs, font, BORDER, 24 * BORDER, makecol(255, 255, 255), -1, "ATTACK          : %.0f%%", attack_per);
+		textout_ex(bufs, font, "---------------------", BORDER, 26 * BORDER, makecol(255, 255, 255), -1);
+		textprintf_ex(bufs, font, BORDER, 28 * BORDER, makecol(255, 255, 255), -1, "EN  DEADLINE MISS: %d", en_deadline);
+		textprintf_ex(bufs, font, BORDER, 30 * BORDER, makecol(255, 255, 255), -1, "AL  DEADLINE MISS: %d", al_deadline);
+		textprintf_ex(bufs, font, BORDER, 32 * BORDER, makecol(255, 255, 255), -1, "CAM DEADLINE MISS: %d", cam_deadline);
+		textprintf_ex(bufs, font, BORDER, 34 * BORDER, makecol(255, 255, 255), -1, "GRA DEADLINE MISS: %d", draw_deadline);
+		textprintf_ex(bufs, font, BORDER, 36 * BORDER, makecol(255, 255, 255), -1, "COM DEADLINE MISS: %d", command_deadline);
+		textout_ex(bufs, font, "---------------------", BORDER, 38 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufs, font, "#####################", BORDER, 56 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufs, font, "     CREATED BY      ", BORDER, 60 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufs, font, "  TORRICELLI TOMAS   ", BORDER, 64 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufs, font, "   CUOGHI LORENZO    ", BORDER, 66 * BORDER, makecol(255, 255, 255), -1);
+		textout_ex(bufs, font, "#####################", BORDER, 70 * BORDER, makecol(255, 255, 255), -1);
 		
 		clear_to_color(buf, makecol(0, 0, 0));
 		blit(bufm, buf, 0, 0, BORDER + 1, BORDER + 1, bufm->w, bufm->h);
@@ -281,6 +302,9 @@ void draw(void) {
 		rect(buf, XWORLD + (BORDER * 2) + 2, SCREEN_H - BORDER, SCREEN_W - BORDER, BORDER, makecol(128, 0, 128));
 
 		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
+
+		/* check for deadline miss */
+        if (ptask_deadline_miss()) draw_deadline++;
 
 		ptask_wait_for_period();
 	}

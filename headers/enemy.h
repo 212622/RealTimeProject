@@ -22,6 +22,7 @@ extern int      tid[MAXE];						// enemy task IDs
 extern int      n_act;		                    // number of active enemy tasks
 extern float    en_tot, en_died, en_arrived;
 extern float    en_angle[MAXE];                 // rotation angle
+extern int      en_deadline;
 
 extern pthread_mutex_t men;						// enemy mutex
 /*--------------------------------------------------------------*/

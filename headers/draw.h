@@ -35,6 +35,7 @@ extern BITMAP   *sfondo, *aereo, *razzo;    // images
 extern BITMAP   *bufw;                      // double buffering
 extern int      crash_al[MAXA];
 extern int      crash_en[MAXE];
+extern int      draw_deadline;
 
 extern pthread_mutex_t mdraw;               // draw mutex
 /*--------------------------------------------------------------*/

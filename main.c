@@ -76,6 +76,7 @@ int main(void) {
 	ptask_param_deadline(params, PER / 3, MILLI);
 	ptask_param_priority(params, PRIO);
 	ptask_param_activation(params, NOW);
+	ptask_param_measure(params);
 	// a round robin assignment
 	ptask_param_processor(params, last_proc);
 	last_proc++;
@@ -91,6 +92,7 @@ int main(void) {
 		ptask_param_deadline(params, PER, MILLI);
 		ptask_param_priority(params, PRIO - ntasks);
 		ptask_param_activation(params, NOW);
+		ptask_param_measure(params);
 		ptask_param_processor(params, last_proc);
 		last_proc++;
 		if (last_proc >= max_proc)
@@ -109,6 +111,7 @@ int main(void) {
 		ptask_param_deadline(params, PER, MILLI);
 		ptask_param_priority(params, PRIO - ntasks);
 		ptask_param_activation(params, NOW);
+		ptask_param_measure(params);
 		ptask_param_processor(params, last_proc);
 		last_proc++;
 		if (last_proc >= max_proc)
@@ -126,6 +129,7 @@ int main(void) {
 	ptask_param_deadline(params, PER / 2, MILLI);
 	ptask_param_priority(params, PRIO - ntasks);
 	ptask_param_activation(params, NOW);
+	ptask_param_measure(params);
 	ptask_param_processor(params, last_proc);
 	last_proc++;
 	if (last_proc >= max_proc)
@@ -139,6 +143,7 @@ int main(void) {
 	ptask_param_deadline(params, PER * 2, MILLI);
 	ptask_param_priority(params, PRIO - ntasks);
 	ptask_param_activation(params, NOW);
+	ptask_param_measure(params);
 	ptask_param_processor(params, last_proc);
 	last_proc++;
 	if (last_proc >= max_proc)

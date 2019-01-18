@@ -17,6 +17,7 @@ int		camera_x, camera_y;					    // coordinates of camera
 int     line_x1, line_x2, line_y1, line_y2;	    // coordinates of predict line
 int		en_time[2];
 float 	en_speed;
+int     cam_deadline;
 
 pthread_mutex_t mcam;						    // camera mutex
 /*----------------------------------------------------------------------*/
@@ -193,6 +194,9 @@ void camera(void) {
 				tracking = 0;
 			}
 		}
+
+		/* check for deadline miss */
+        if (ptask_deadline_miss()) cam_deadline++;
 
 		ptask_wait_for_period();
 	}
