@@ -38,12 +38,21 @@ void enemy(void) {
 	int tid = ptask_get_index() - 1;			// task index - 1
 	float x1, x2, y1, y2, speed;
 	float m;
+	// float r = 0, tot_r = 0, n_r = 0, new_r = 0;
 	
 	init_enemy(&x1, &x2, &y1, &y2, &m, &speed);
 	
 	ptask_wait_for_activation();
 	while (1) {
-		// printf("r : %f\n",speed / en_speed);
+		
+		// r = speed / en_speed;
+		// if (r > 0 && r < 100) {
+		// 	tot_r += r;
+		// 	n_r++;
+		// 	new_r = tot_r / n_r;
+		// }
+		// printf("new_r : %f\n", new_r);
+
 		if (y1 <= y2 && crash_en[tid] == 0) {
 			pthread_mutex_lock(&men);
 			enemy_x[tid] = x1;

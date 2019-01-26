@@ -52,11 +52,7 @@ int main(void) {
 
 	load_img();
 	
-	/*	
-		Problemi: 
-		- ogni tanto ally scoppia subito -> conflitto indici tid
-		- calcolare più volte coeffang e velocità e tenerli quando sono costanti
-		
+	/*		
 		Rivedere:
 		- suddividere in funzioni più piccole
 		- mettere a posto commenti
@@ -64,8 +60,6 @@ int main(void) {
 		- chiedi prof dubbio algebra puntatori
 
 		Features (forse):
-		- pulsante per camera e linee visibili
-		- controllo deadlines
 		- animazione esplosione
 		- (Immagine salvata male)
 	*/

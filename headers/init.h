@@ -17,7 +17,7 @@
 /*  FUNCTION PROTOTYPES   */
 /*--------------------------------------------------------------*/
 extern void init(void);
-extern void make_pink_background(char *old, char *new);
+extern void make_pink_background(char *oldimg, char *newimg);
 /*--------------------------------------------------------------*/
 
 #endif // INIT_H

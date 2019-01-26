@@ -28,32 +28,6 @@ pthread_mutex_t mdraw;								// draw mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/
-// void get_crash_en(int k) {
-// 	int i;
-// 	int x0_en, x1_en, y_en;
-// 	int x0_al, x1_al, y_al;
-
-// 	x0_en = enemy_x[k];
-// 	x1_en = enemy_x[k] + aereo->w;
-// 	y_en = enemy_y[k] + aereo->h;
-
-// 	for(i=0; i<MAXA; i++) {
-// 		if (state_al[i] == ACTIVE) {
-// 			x0_al = ally_x[i];
-// 			x1_al = ally_x[i] + razzo->w;
-// 			y_al = ally_y[i];
-
-// 			if ((x0_al > x0_en && x0_al < x1_en) || (x1_al > x0_en && x1_al < x1_en)) {
-// 				if (y_al < y_en && y_al > enemy_y[k]) {
-// 					pthread_mutex_lock(&mdraw);
-// 					crash_en[k] = 1;
-// 					pthread_mutex_unlock(&mdraw);
-// 				}
-// 			}
-// 		}
-// 	}
-// }
-
 void get_crash_en(int k) {
 	int i;
 	int en_left, en_right, en_up, en_down;
@@ -107,32 +81,6 @@ void get_crash_al(int k) {
 		}
 	}
 }
-
-// void get_crash_al(int k) {
-// 	int i;
-// 	int x0_en, x1_en, y_en;
-// 	int x0_al, x1_al, y_al;
-
-// 	x0_al = ally_x[k];
-// 	x1_al = ally_x[k] + razzo->w;
-// 	y_al = ally_y[k];
-	
-// 	for(i=0; i<MAXE; i++) {
-// 		if (state[i] == ACTIVE) {
-// 			x0_en = enemy_x[i];
-// 			x1_en = enemy_x[i] + aereo->w;
-// 			y_en = enemy_y[i] + aereo->h;
-
-// 			if ((x0_al > x0_en && x0_al < x1_en) || (x1_al > x0_en && x1_al < x1_en)) {
-// 				if (y_al < y_en && y_al > enemy_y[k]) {
-// 					pthread_mutex_lock(&mdraw);
-// 					crash_al[k] = 1;
-// 					pthread_mutex_unlock(&mdraw);
-// 				}
-// 			}
-// 		}
-// 	}
-// }
 /*----------------------------------------------------------------------*/
 void load_img(void) {
 	buf = create_bitmap(SCREEN_W, SCREEN_H);
@@ -172,6 +120,7 @@ void load_img(void) {
 void draw(void) {
 	int k, view = 0;
 	float angle_en, angle_al, defense_per = 100, attack_per = 0;
+
 	en_deadline = 0;
 	al_deadline = 0;
 	cam_deadline = 0;
@@ -251,7 +200,7 @@ void draw(void) {
 			attack_per = (en_arrived / (en_died + en_arrived)) * 100;
 		}
 
-		if ( cam_line_view == 1) {
+		if (cam_line_view == 1) {
 			// camera e linea traiettoria visibili
 			pthread_mutex_lock(&mdraw);
 			rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
@@ -303,7 +252,7 @@ void draw(void) {
 
 		blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
 
-		/* check for deadline miss */
+		// check for deadline miss
         if (ptask_deadline_miss()) draw_deadline++;
 
 		ptask_wait_for_period();

@@ -19,7 +19,7 @@ void init(void) {
     ptask_init(SCHED_FIFO, GLOBAL, PRIO_INHERITANCE);
 }
 /*----------------------------------------------------------------------*/
-void make_pink_background(char *old, char *new) {
+void make_pink_background(char *oldimg, char *newimg) {
 	BITMAP		*img, *imgp;		// pointers to bitmap
 	PALETTE     pal;                // color palette
 	int         x, y, c;
@@ -27,7 +27,7 @@ void make_pink_background(char *old, char *new) {
 	
 	white = makecol(255, 255, 255);
 	pink = makecol(255, 0, 255);
-	img = load_bitmap(old, NULL);
+	img = load_bitmap(oldimg, NULL);
 	imgp = create_bitmap(img->w, img->h);
 	
 	for (x=0; x<img->w; x++) {
@@ -37,7 +37,7 @@ void make_pink_background(char *old, char *new) {
 			putpixel(imgp, x, y, c);
 		}
 		get_palette(pal);
-		save_bitmap(new, imgp, pal);
+		save_bitmap(newimg, imgp, pal);
 	}
 }
 /*----------------------------------------------------------------------*/
