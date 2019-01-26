@@ -29,7 +29,7 @@ void init_enemy(float *x1, float *x2, float *y1, float *y2, float *m, float *spe
 	*y2 = YWORLD - sfondo->h - aereo->h;		// y di arrivo
 	*m = ((*y2) - (*y1)) / ((*x2) - (*x1));		// coeff. angolare
 	// *speed = (rand() % 5) + 10;
-	*speed = 8;
+	*speed = 9;
 }
 /*----------------------------------------------------------------------*/
 /*  Periodic task for enemy   */

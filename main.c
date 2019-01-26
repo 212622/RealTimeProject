@@ -52,7 +52,7 @@ int main(void) {
 
 	load_img();
 	
-	/*		
+	/*
 		Rivedere:
 		- suddividere in funzioni più piccole
 		- mettere a posto commenti
@@ -66,8 +66,8 @@ int main(void) {
 
 	// graphic task creation
 	ptask_param_init(params);
-	ptask_param_period(params, PER / 3, MILLI);
-	ptask_param_deadline(params, PER / 3, MILLI);
+	ptask_param_period(params, PER * 2/3, MILLI);
+	ptask_param_deadline(params, PER * 2/3, MILLI);
 	ptask_param_priority(params, PRIO);
 	ptask_param_activation(params, NOW);
 	ptask_param_measure(params);
@@ -119,8 +119,8 @@ int main(void) {
 
 	// camera task creation
 	ptask_param_init(params);
-	ptask_param_period(params, PER / 2, MILLI);
-	ptask_param_deadline(params, PER / 2, MILLI);
+	ptask_param_period(params, PER * 2/3, MILLI);
+	ptask_param_deadline(params, PER * 2/3, MILLI);
 	ptask_param_priority(params, PRIO - ntasks);
 	ptask_param_activation(params, NOW);
 	ptask_param_measure(params);
@@ -133,8 +133,8 @@ int main(void) {
 
 	// commands task creation
 	ptask_param_init(params);
-	ptask_param_period(params, PER * 2, MILLI);
-	ptask_param_deadline(params, PER * 2, MILLI);
+	ptask_param_period(params, PER, MILLI);
+	ptask_param_deadline(params, PER, MILLI);
 	ptask_param_priority(params, PRIO - ntasks);
 	ptask_param_activation(params, NOW);
 	ptask_param_measure(params);
