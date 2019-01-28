@@ -13,7 +13,6 @@ Simulate a set of Patriot defense missiles that identify enemy targets, predict 
 5. The system provides information on: number of active enemies and Patriots defense missiles, deadline misses, current statistics.
 
 ## Application Structure
-
 ![alt text](https://github.com/212622/RealTimeProject/blob/master/README/ApplicationStructure.png)
 ## Graphical layout
 
