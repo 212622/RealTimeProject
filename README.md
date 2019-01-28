@@ -46,11 +46,11 @@ The user can create a new enemy:
 1. Calculates trajectory and speed using camera's informations.
 2. Moves the Patriots defense missile to the target position.
 
-- ENEMY:
+- ENEMY
 1. Generates a random trajectory.
 2. Moves the plane using a fixed speed to the target position.
 
-- COMMAND:
+- COMMAND
 1. Takes users command
 2. Activates enemy task or exit the program or visualizes camera and trajectory depending on the pressed key.
 
