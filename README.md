@@ -52,7 +52,7 @@ The user can create a new enemy:
 
 - COMMAND
 1. Takes users command
-2. Activates enemy task or exit the program or visualizes camera and trajectory depending on the pressed key.
+2. Activates enemy task or visualizes camera and trajectory depending on the pressed key.
 
 ##
 	

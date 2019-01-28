@@ -221,7 +221,8 @@ void draw(void) {
 		clear_to_color(bufs, makecol(0, 0, 0));
 		textout_ex(bufs, font, "    STATUS WINDOW    ", BORDER, 5 * BORDER, makecol(255, 255, 255), -1);
 		textout_ex(bufs, font, "---------------------", BORDER, 10 * BORDER, makecol(255, 255, 255), -1);
-		textprintf_ex(bufs, font, BORDER, 12 * BORDER, makecol(255, 255, 255), -1, "ACTIVE TASKS    : %d", n_act);
+		textprintf_ex(bufs, font, BORDER, 12 * BORDER, 
+						makecol(255, 255, 255), -1, "ACTIVE TASKS    : %d", n_act);
 		textprintf_ex(bufs, font, BORDER, 14 * BORDER, makecol(255, 255, 255), -1, "TOTAL ENEMY     : %.0f", en_tot);
 		textprintf_ex(bufs, font, BORDER, 16 * BORDER, makecol(255, 255, 255), -1, "ENEMY DESTROYED : %.0f", en_died);
 		textprintf_ex(bufs, font, BORDER, 18 * BORDER, makecol(255, 255, 255), -1, "ENEMY ARRIVED   : %.0f", en_arrived);

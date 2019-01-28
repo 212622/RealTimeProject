@@ -18,6 +18,7 @@
 /*--------------------------------------------------------------*/
 extern void init(void);
 extern void make_pink_background(char *oldimg, char *newimg);
+extern int create_task(int period, void (*task)(void));
 /*--------------------------------------------------------------*/
 
 #endif // INIT_H
