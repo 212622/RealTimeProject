@@ -15,18 +15,43 @@ Simulate a set of Patriot defense missiles that identify enemy targets, predict 
 
 ## Application Structure
 ![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Applicationstructure.png)
+
 ## Graphical layout
 ![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Graphicallayout.png)
+
 ## User interface
 The user can create a new enemy:
 - SPACE : create a new enemy with random direction.
 - Q : visualize the camera and the predicted trajectory.
 - ESC : exit the program.
+
 ## Motion rules
 ![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Motionrules.png)
 ![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Motionrules2.png)
 
 ## Tasks description
+- CAMERA
+1. Image scanning and thresholding: read the pixel color in a given window and discard the pixel with black color.
+2. Centroid computation: compute the centroid of pixels found in the previous point.
+3. Camera control: control the camera axes to move to the calculated centroid.
+4. When a fixed number of detections is done, the enemys trajectory is calculated.
+5. Using the trajectory information obtained from the previous point, a Patriots defense missile is launched.
+
+- DRAW
+1. Draws every image in the updated position.
+2. Detects possiles crashes between enemies and allies.
+3. Write statistics in the status window and title and instructions in the menu area.
+
+- ALLY
+1. Using camera's informations, each Patriots defense missile moves to the target position.
+
+- ENEMY:
+1. Generates a random trajectory.
+2. Moves the plane using a fixed speed to the target position.
+
+- COMMAND:
+1. Takes users command and activates enemy task or exit the program or visualizes camera and trajectory depending on the pressed key.
+
 ## Istruzioni per Git
 
 Per caricare le modifiche
