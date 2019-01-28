@@ -51,6 +51,10 @@ void init(void) {
 
 	last_proc = 0;
 	ntasks = 0;
+
+	load_img();
+
+	srand(time(NULL));
 }
 /*----------------------------------------------------------------------*/
 int create_task(int period, void (*task)(void)) {

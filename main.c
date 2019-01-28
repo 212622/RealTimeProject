@@ -28,11 +28,7 @@
 int main(void) {	
 	int k, i;				// temporary variables
 	
-	srand(time(NULL));
-	
 	init();
-
-	load_img();
 
 	// graphic task creation
 	create_task(PER * 2/3, draw);
