@@ -54,19 +54,5 @@ The user can create a new enemy:
 1. Takes users command
 2. Activates enemy task or exit the program or visualizes camera and trajectory depending on the pressed key.
 
-## Git Instructions
-
-Update changes
-
-	git add .
-	git commit -m 'messaggio'
-	git push origin master
-
-Download changes
-
-	git pull
-	
-Changes status
-
-	git status
+##
 	
