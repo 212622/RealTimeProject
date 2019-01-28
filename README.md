@@ -43,14 +43,14 @@ The user can create a new enemy:
 3. Write statistics in the status window and title and instructions in the menu area.
 
 - ALLY
-1. Using camera's informations, each Patriots defense missile moves to the target position.
+Using camera's informations, each Patriots defense missile moves to the target position.
 
 - ENEMY:
 1. Generates a random trajectory.
 2. Moves the plane using a fixed speed to the target position.
 
 - COMMAND:
-1. Takes users command and activates enemy task or exit the program or visualizes camera and trajectory depending on the pressed key.
+Takes users command and activates enemy task or exit the program or visualizes camera and trajectory depending on the pressed key.
 
 ## Istruzioni per Git
 
