@@ -17,7 +17,10 @@ Simulate a set of Patriot defense missiles that identify enemy targets, predict 
 ## Graphical layout
 ![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Graphicallayout.png)
 ## User interface
-
+The user can create a new enemy:
+- SPACE: create a new enemy with random direction.
+- Q:	 visualize the camera and the predicted trajectory.
+- ESC:	 exit the program.
 ## Motion rules
 
 ## Tasks description
