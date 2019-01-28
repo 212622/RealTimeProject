@@ -6,15 +6,19 @@ This project simulate a physical system or the behavior of active agents interac
 Simulate a set of Patriot defense missiles that identify enemy targets, predict their trajectories and are launched to catch them.
 
 ## General description
-1.	Each enemy is animated by dedicated periodic task that updates its state every period.
-2.	Enemy motion is indipendent on the other enemies, but depends on its speed and direction.
-3.	Enemies must exploed when they arrive at the city or if they collide with a Patriots defense missile.
-4.	The user can interact with the program and create new enemies.
-5.	The system provides information on: number of active enemies and Patriots defense missiles, deadline misses, current statistics.
+1. Each enemy is animated by dedicated periodic task that updates its state every period.
+2. Enemy motion is indipendent on the other enemies, but depends on its speed and direction.
+3. Enemies must exploed when they arrive at the city or if they collide with a Patriots defense missile.
+4. The user can interact with the program and create new enemies.
+5. The system provides information on: number of active enemies and Patriots defense missiles, deadline misses, current statistics.
+
+## Application Structure
+![alt text](https://github.com/212622/RealTimeProject/README/ApplicationStructure.png)
 ## Graphical layout
+
 ## User interface
 ## Motion rules
-## Application Structure
+
 ## Tasks description
 ## Istruzioni per Git
 
