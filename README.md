@@ -15,8 +15,9 @@ Simulate a set of Patriot defense missiles that identify enemy targets, predict 
 ## Application Structure
 ![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Applicationstructure.png)
 ## Graphical layout
-
+![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Graphicallayout.png)
 ## User interface
+
 ## Motion rules
 
 ## Tasks description
