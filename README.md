@@ -24,6 +24,7 @@ The user can create a new enemy:
 - ESC : exit the program.
 ## Motion rules
 ![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Motionrules.png)
+![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Motionrules2.png)
 
 ## Tasks description
 ## Istruzioni per Git
