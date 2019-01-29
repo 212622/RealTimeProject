@@ -1,47 +1,51 @@
 /*----------------------------------------------------------------------*/
-/*  HEADER FILES        */
+//  INIT.C takes care of initializations and standard task creation
 /*----------------------------------------------------------------------*/
+#include <stdlib.h>
+#include <time.h>
+#include <sched.h>
 #include <allegro.h>
 #include "ptask.h"
+#include "pmutex.h"
 #include "init.h"
 #include "draw.h"
 #include "camera.h"
 #include "enemy.h"
 #include "ally.h"
-/*----------------------------------------------------------------------*/
-/*  GLOBAL CONSTRANTS   */
-/*----------------------------------------------------------------------*/
-#define ALLEGRO_NO_FIX_ALIASES 						// fix for the new version of glibc
+
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
-int last_proc;										// last assigned processor
-int ntasks;											// actual number of tasks
+static int last_proc;								// last assigned processor
+static int ntasks;									// actual number of tasks
+
 /*----------------------------------------------------------------------*/
-/*  FUNCTION DEFINITIONS   */
-/*----------------------------------------------------------------------*/
-// INIT: Initialization of global variables, mutexes and allegro parameters
+// INIT: initialization of global variables, mutexes and allegro parameters
 /*----------------------------------------------------------------------*/
 void init(void) {
-	int k;											// temporary variable
+	int k;									// temporary variable
 
+	// allegro and ptask libraries initialization
 	allegro_init();									
     install_keyboard();
     set_color_depth(32);
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, XWIN, YWIN, 0, 0);
     ptask_init(SCHED_FIFO, GLOBAL, PRIO_INHERITANCE);
 
+	// mutexes initialization
 	pmux_create_pi(&mcam);
 	pmux_create_pi(&men);
 	pmux_create_pi(&mal);
 	pmux_create_pi(&mdraw);
 
-	n_act = 0;
-	for (k=0; k<MAXE; k++) tid[k] = -1;
+	// enemy variables initialization
+	n_en_act = 0;
+	for (k=0; k<MAXE; k++) tid_en[k] = -1;
 	for (k=0; k<MAXE; k++) enemy_x[k] = -1;
 	for (k=0; k<MAXE; k++) enemy_y[k] = -1;
-	for (k=0; k<MAXE; k++) state[k] = -1;
+	for (k=0; k<MAXE; k++) state_en[k] = -1;
 
+	// ally variables initialization
 	n_al_act = 0;
 	for (k=0; k<MAXA; k++) tid_al[k] = -1;
 	for (k=0; k<MAXA; k++) ally_x[k] = -1;
@@ -55,12 +59,15 @@ void init(void) {
 
 	srand(time(NULL));
 }
+
 /*----------------------------------------------------------------------*/
-// CREATE_TASK: Initialize and create tasks with specified attributes, returning task id.
+//	CREATE_TASK: initializes and creates task with specified attributes.
+//	It requires a period and the task pointer and return the task id of
+//	the created task.
 /*----------------------------------------------------------------------*/
 int create_task(int period, void (*task)(void)) {
-	int tid;
-	tpars params;
+	int tid;						// task identifier
+	tpars params;					// parameter for task creation
 
 	ptask_param_init(params);
 	ptask_param_period(params, period, MILLI);
@@ -68,14 +75,17 @@ int create_task(int period, void (*task)(void)) {
 	ptask_param_priority(params, PRIO - ntasks);
 	ptask_param_activation(params, NOW);
 	ptask_param_measure(params);
-	// a round robin assignment
+
+	// round robin assignment of processors
 	ptask_param_processor(params, last_proc);
 	last_proc++;
 	if (last_proc >= ptask_getnumcores())
 		last_proc = 0;
+	
 	tid = ptask_create_param(task, &params);
 	ntasks++;
 
 	return tid;
 }
+
 /*----------------------------------------------------------------------*/

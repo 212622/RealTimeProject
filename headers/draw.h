@@ -8,6 +8,7 @@
 #include "pmutex.h"
 #include "enemy.h"
 #include "ally.h"
+
 /*--------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*--------------------------------------------------------------*/
@@ -21,8 +22,7 @@
 #define BORDER  10
 /*--------------------------------------------------------------*/
 #define TEXP	10							// explosion time
-/*--------------------------------------------------------------*/
-#define ALLEGRO_NO_FIX_ALIASES 				// fix for the new version of glibc
+
 /*--------------------------------------------------------------*/
 /*  FUNCTION PROTOTYPES   */
 /*--------------------------------------------------------------*/
@@ -40,16 +40,17 @@ extern void print_world(void);
 extern void en_movement_draw(void);
 extern void al_movement_draw(void);
 extern void check_deadline_miss_draw(void);
+
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
+extern pthread_mutex_t mdraw;               // mutex for draw global variables
 extern BITMAP   *sfondo, *aereo, *razzo;    // images
 extern BITMAP   *bufw;                      // double buffering
 extern int      crash_al[MAXA];
 extern int      crash_en[MAXE];
 extern int      draw_deadline;
 
-extern pthread_mutex_t mdraw;               // draw mutex
-/*--------------------------------------------------------------*/
-
 #endif // DRAW_H
+
+/*--------------------------------------------------------------*/

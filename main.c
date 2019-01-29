@@ -7,21 +7,16 @@
 /*	Simulate a set of Patriot defense missiles that identify enemy targets, predict their							*/
 /* 	trajectories and are launched to catch them. 																	*/
 /*----------------------------------------------------------------------*/
-/*  HEADER FILES        */
-/*----------------------------------------------------------------------*/
-#include <stdlib.h>
-#include <stdio.h>
 #include <pthread.h>
-#include <sched.h>
 #include <allegro.h>
 #include "ptask.h"
-#include "pmutex.h"
 #include "init.h"
 #include "draw.h"
 #include "enemy.h"
 #include "ally.h"
 #include "camera.h"
 #include "commands.h"
+
 /*----------------------------------------------------------------------*/
 /*  MAIN process   */
 /*----------------------------------------------------------------------*/
@@ -37,8 +32,8 @@ int main(void) {
 	for (k=0; k<MAXE; k++) {
 		i = create_task(PER, enemy);
 		pthread_mutex_lock(&men);
-		tid[k] = i;
-		state[k] = WAIT;
+		tid_en[k] = i;
+		state_en[k] = WAIT;
 		pthread_mutex_unlock(&men);
 	}
 
@@ -62,18 +57,13 @@ int main(void) {
 	allegro_exit();
 	return 0;
 }
+
 /*----------------------------------------------------------------------*/
 /*
 	Problemi:
 	- un aereo di troppo quando si tiene premuto
 
 	Rivedere:
-	- suddividere in funzioni più piccole
-	- mettere a posto commenti
-	- cambiare nomi variabili enemy
-	- chiedi prof dubbio algebra puntatori
-
-	Features (forse):
-	- una sola esplosione
-	- regolazione velocità ally da utente? (ne canna parecchi)
+	- mettere a posto commenti e ordinamento/spazi
+	- struct?
 */

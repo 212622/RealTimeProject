@@ -1,36 +1,41 @@
 /*----------------------------------------------------------------------*/
-/*  HEADER FILES        */
+//	DRAW.C deals with screen managing, image printing and
+//	collisions identification
 /*----------------------------------------------------------------------*/
+#include <stdlib.h>
 #include <math.h>
 #include <pthread.h>
 #include "ptask.h"
-#include "init.h"
 #include "draw.h"
+#include "init.h"
 #include "enemy.h"
 #include "ally.h"
 #include "camera.h"
 #include "commands.h"
+
 /*----------------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*----------------------------------------------------------------------*/
-#define PI 3.14159265
+#define PI 3.14159265								// PI greek
+
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
-BITMAP  *buf;						        		// global buffer
-BITMAP  *bufm, *bufw, *bufs;                		// double buffering
-BITMAP	*sfondo, *aereo, *boom, *patriot, *razzo;	// images
-int 	crash_al[MAXA];
+pthread_mutex_t mdraw;								// mutex for draw global variables
+BITMAP	*bufw;										// sub-buffer for graphic world
+BITMAP	*sfondo, *aereo, *razzo;					
+int 	crash_al[MAXA];								
 int 	crash_en[MAXE];
 int     draw_deadline;
-int		view;
-float	defense_per, attack_per, angle_al, angle_en;
+static BITMAP	*buf;						        		// global buffer for double buffering
+static BITMAP	*bufm;
+static BITMAP	*bufs;                		// sub-windows buffers
+static BITMAP	*boom, *patriot;	// images
+static int		view;
+static float	defense_per, attack_per, angle_al, angle_en;
 
-pthread_mutex_t mdraw;								// draw mutex
 /*----------------------------------------------------------------------*/
-/*  FUNCTION DEFINITIONS   */
-/*----------------------------------------------------------------------*/
-// GET_CRASH_EN: identify crashing enemies.
+//	GET_CRASH_EN: identify crashing enemies.
 /*----------------------------------------------------------------------*/
 void get_crash_en(int k) {
 	int i;											// temporary variable
@@ -49,7 +54,7 @@ void get_crash_en(int k) {
 			al_up = ally_y[i];
 			al_down = ally_y[i] + razzo->h;
 
-			if (((al_left > en_left && al_left < en_right) || (al_right > en_left && al_right < en_right)) &&
+			if (((al_left > en_left && al_left < en_right) ||(al_right > en_left && al_right < en_right)) &&
 				((al_up < en_down && al_up > en_up) || (al_down < en_down && al_up > en_up))) {
 				pthread_mutex_lock(&mdraw);
 				crash_en[k] = 1;
@@ -58,8 +63,9 @@ void get_crash_en(int k) {
 		}
 	}
 }
+
 /*----------------------------------------------------------------------*/
-// GET_CRASH_AL: identify crashing allies.
+//	GET_CRASH_AL: identify crashing allies.
 /*----------------------------------------------------------------------*/
 void get_crash_al(int k) {
 	int i;											// temporary variable
@@ -72,7 +78,7 @@ void get_crash_al(int k) {
 	al_down = ally_y[k] + razzo->h;
 	
 	for(i=0; i<MAXE; i++) {
-		if (state[i] == ACTIVE) {
+		if (state_en[i] == ACTIVE) {
 			en_left = enemy_x[i];
 			en_right = enemy_x[i] + aereo->w;
 			en_up = enemy_y[i];
@@ -87,8 +93,9 @@ void get_crash_al(int k) {
 		}
 	}
 }
+
 /*----------------------------------------------------------------------*/
-// LOAD_IMAGE: create a bitmap for each image and create buffers.
+//	LOAD_IMAGE: create buffers and a bitmap for each image.
 /*----------------------------------------------------------------------*/
 void load_img(void) {
 	buf = create_bitmap(SCREEN_W, SCREEN_H);		// general buffer
@@ -98,30 +105,31 @@ void load_img(void) {
 
     sfondo = load_bitmap("img/sfondo3.bmp", NULL);
 	if (sfondo == NULL) {
-		printf("file not found\n");
+		printf("ERROR: file not found\n");
 		exit(1);
 	}
 	aereo = load_bitmap("img/aereo.bmp", NULL);
 	if (aereo == NULL) {
-		printf("file not found\n");
+		printf("ERROR: file not found\n");
 		exit(1);
 	}
 	boom = load_bitmap("img/boom.bmp", NULL);
 	if (boom == NULL) {
-		printf("file not found\n");
+		printf("ERROR: file not found\n");
 		exit(1);
 	}
 	patriot = load_bitmap("img/patriot.bmp", NULL);
 	if (patriot == NULL) {
-		printf("file not found\n");
+		printf("ERROR: file not found\n");
 		exit(1);
 	}
 	razzo = load_bitmap("img/razzo.bmp", NULL);
 	if (razzo == NULL) {
-		printf("file not found\n");
+		printf("ERROR: file not found\n");
 		exit(1);
 	}
 }
+
 /*----------------------------------------------------------------------*/
 //	INIT_DRAW: initialize draws parameters.
 /*----------------------------------------------------------------------*/
@@ -139,12 +147,11 @@ void init_draw(void) {
 	command_deadline = 0;
 
 	pthread_mutex_lock(&mdraw);
-	for (k=0; k<MAXE; k++)
-		crash_en[k] = 0;
-	for (k=0; k<MAXA; k++)
-		crash_al[k] = 0;
+	for (k=0; k<MAXE; k++) crash_en[k] = 0;
+	for (k=0; k<MAXA; k++) crash_al[k] = 0;
 	pthread_mutex_unlock(&mdraw);
 }
+
 /*----------------------------------------------------------------------*/
 //	PRINT_WORLD: print statics parameters in world buffer.
 /*----------------------------------------------------------------------*/
@@ -155,6 +162,7 @@ void print_world(void) {
 	draw_sprite(bufw, patriot, (XWORLD / 2) - (patriot->w / 2) + BORDER, YWORLD - patriot->h - (BORDER * 2));
 	pthread_mutex_unlock(&mdraw);
 }
+
 /*----------------------------------------------------------------------*/
 //	PRINT_MENU_AREA: print menu parameters, title and border.
 /*----------------------------------------------------------------------*/
@@ -173,6 +181,7 @@ void print_menu_area(void) {
 	textout_ex(bufm, font, "Press ESC for quit", (XMENU / 3) + (3 * BORDER),
 				 6.5 * BORDER, makecol(255, 255, 255), -1);
 }
+
 /*----------------------------------------------------------------------*/
 //	PRINT_STATUS_WINDOW: print statistics and credits.
 /*----------------------------------------------------------------------*/
@@ -181,7 +190,7 @@ void print_status_window(void) {
 	textout_ex(bufs, font, "    STATUS WINDOW    ", BORDER, 5 * BORDER, makecol(255, 255, 255), -1);
 	textout_ex(bufs, font, "---------------------", BORDER, 10 * BORDER, makecol(255, 255, 255), -1);
 	textprintf_ex(bufs, font, BORDER, 12 * BORDER, 
-					makecol(255, 255, 255), -1, "ACTIVE ENEMY    : %d", n_act);
+					makecol(255, 255, 255), -1, "ACTIVE ENEMY    : %d", n_en_act);
 	textprintf_ex(bufs, font, BORDER, 14 * BORDER,
 					makecol(255, 255, 255), -1, "TOTAL ENEMY     : %.0f", en_tot);
 	textprintf_ex(bufs, font, BORDER, 16 * BORDER,
@@ -210,8 +219,8 @@ void print_status_window(void) {
 	textout_ex(bufs, font, "  TORRICELLI TOMAS   ", BORDER, 64 * BORDER, makecol(255, 255, 255), -1);
 	textout_ex(bufs, font, "   CUOGHI LORENZO    ", BORDER, 66 * BORDER, makecol(255, 255, 255), -1);
 	textout_ex(bufs, font, "#####################", BORDER, 70 * BORDER, makecol(255, 255, 255), -1);
-		
 }
+
 /*----------------------------------------------------------------------*/
 //	PRINT_SCREEN: print everything on the screen from the buffers.
 /*----------------------------------------------------------------------*/
@@ -227,6 +236,7 @@ void print_screen(void) {
 
 	blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
 }
+
 /*----------------------------------------------------------------------*/
 //	EN_MOVEMENT_DRAW: compute movement and state of enemies.
 /*----------------------------------------------------------------------*/
@@ -234,7 +244,7 @@ void en_movement_draw(void) {
 	int k;
 	
 	for (k=0; k<MAXE; k++) {
-		if (state[k] == ACTIVE) {
+		if (state_en[k] == ACTIVE) {
 			angle_en = ((atan(en_angle[k]) * 180) / PI);
 			if (angle_en < 0) angle_en += 180;
 			angle_en = ftofix((256 * angle_en) / 360);
@@ -243,15 +253,15 @@ void en_movement_draw(void) {
 			pthread_mutex_unlock(&mdraw);
 			get_crash_en(k);
 		}
-		else if (state[k] == BOOM) {
+		else if (state_en[k] == BOOM) {
 			pthread_mutex_lock(&mdraw);
 			draw_sprite(bufw, boom, enemy_x[k], enemy_y[k]);
 			pthread_mutex_unlock(&mdraw);
 			if (view >= TEXP) {
 				view = 0;
 				pthread_mutex_lock(&men);
-				state[k] = WAIT;
-				n_act--;
+				state_en[k] = WAIT;
+				n_en_act--;
 				pthread_mutex_unlock(&men);
 			}
 			else
@@ -259,6 +269,7 @@ void en_movement_draw(void) {
 		}
 	}
 }
+
 /*----------------------------------------------------------------------*/
 //	AL_MOVEMENT_DRAW: compute movement and state of allies.
 /*----------------------------------------------------------------------*/
@@ -291,6 +302,7 @@ void al_movement_draw(void) {
 		}
 	}
 }
+
 /*----------------------------------------------------------------------*/
 //	VIEW_CAM_LINE: visualize camera and trajectory lines if Q is pressed.
 /*----------------------------------------------------------------------*/
@@ -302,6 +314,7 @@ void view_cam_line(void) {
 		pthread_mutex_unlock(&mdraw);
 	}
 }
+
 /*----------------------------------------------------------------------*/
 //	PER_STATS_CALC: compute % of attack and defense.
 /*----------------------------------------------------------------------*/
@@ -311,6 +324,7 @@ void per_stats_calc(void) {
 		attack_per = (en_arrived / (en_died + en_arrived)) * 100;
 	}
 }
+
 /*----------------------------------------------------------------------*/
 //	CHECK_DEADLINE_MISS_DRAW: counts the number of deadline miss in ally.
 /*----------------------------------------------------------------------*/
@@ -321,15 +335,14 @@ void check_deadline_miss_draw(void) {
 		pthread_mutex_unlock(&mdraw);
 	}
 }
+
 /*----------------------------------------------------------------------*/
 //	DRAW: periodic task for drawing.
 /*----------------------------------------------------------------------*/
 void draw(void) {
-
 	init_draw();
 
 	while (1) {
-
 		// Graphic world
 		print_world();
 
@@ -342,22 +355,17 @@ void draw(void) {
 		// statistics calculation
 		per_stats_calc();
 
-		// camera and line visibility
 		view_cam_line();
 
-		// Menu area
 		print_menu_area();
 
-		// Status window
 		print_status_window();
 		
-		// Print screen
 		print_screen();
 
-		// check for deadline miss
 		check_deadline_miss_draw();
-		 
 		ptask_wait_for_period();
 	}
 }
+
 /*----------------------------------------------------------------------*/

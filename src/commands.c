@@ -62,9 +62,9 @@ void commands(void) {
 	while (1) {
 		scan = 0;
 		if (keypressed()) scan = readkey() >> 8;
-		if (scan == KEY_SPACE && n_act < MAXE) {
+		if (scan == KEY_SPACE && n_en_act < MAXE) {
 			for (k=0; k<MAXE; k++) {
-				if (state[k] == WAIT && one == 0) {
+				if (state_en[k] == WAIT && one == 0) {
 					clock_gettime(CLOCK_REALTIME, &spec);
 					now_s = spec.tv_sec;
 					now_ms = round(spec.tv_nsec / 1.0e6);
@@ -73,9 +73,9 @@ void commands(void) {
 						old_ms = now_ms;
 						pthread_mutex_lock(&men);
 						en_tot++;
-						n_act++;
-						state[k] = ACTIVE;
-						ptask_activate(tid[k]);
+						n_en_act++;
+						state_en[k] = ACTIVE;
+						ptask_activate(tid_en[k]);
 						pthread_mutex_unlock(&men);
 					}
 					one++;
