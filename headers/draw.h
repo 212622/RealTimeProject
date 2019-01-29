@@ -26,8 +26,19 @@
 /*--------------------------------------------------------------*/
 /*  FUNCTION PROTOTYPES   */
 /*--------------------------------------------------------------*/
+extern void get_crash_en(int k);
+extern void get_crash_al(int k);
 extern void draw(void);
 extern void load_img(void);
+extern void print_menu_area(void);
+extern void print_status_window(void);
+extern void print_screen(void);
+extern void init_draw(void);
+extern void view_cam_line(void);
+extern void per_stats_calc(void);
+extern void print_world(void);
+extern void en_movement_draw(void);
+extern void al_movement_draw(void);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/

@@ -22,10 +22,12 @@ pthread_mutex_t minit;								// init mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/
+// INIT: Initialization of global variables, mutexes and allegro parameters
+/*----------------------------------------------------------------------*/
 void init(void) {
-	int k;
+	int k;											// temporary variable
 
-	allegro_init();
+	allegro_init();									
     install_keyboard();
     set_color_depth(32);
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, XWIN, YWIN, 0, 0);
@@ -57,6 +59,8 @@ void init(void) {
 	srand(time(NULL));
 }
 /*----------------------------------------------------------------------*/
+// CREATE_TASK: Initialize and create tasks with specified attributes, returning task id.
+/*----------------------------------------------------------------------*/
 int create_task(int period, void (*task)(void)) {
 	int tid;
 	tpars params;
@@ -76,27 +80,5 @@ int create_task(int period, void (*task)(void)) {
 	ntasks++;
 
 	return tid;
-}
-/*----------------------------------------------------------------------*/
-void make_pink_background(char *oldimg, char *newimg) {
-	BITMAP		*img, *imgp;		// pointers to bitmap
-	PALETTE     pal;                // color palette
-	int         x, y, c;
-	int         pink, white;
-	
-	white = makecol(255, 255, 255);
-	pink = makecol(255, 0, 255);
-	img = load_bitmap(oldimg, NULL);
-	imgp = create_bitmap(img->w, img->h);
-	
-	for (x=0; x<img->w; x++) {
-		for (y=0; y<img->h; y++) {
-			c = getpixel(img, x, y);
-			if (c == white) c = pink;
-			putpixel(imgp, x, y, c);
-		}
-		get_palette(pal);
-		save_bitmap(newimg, imgp, pal);
-	}
 }
 /*----------------------------------------------------------------------*/
