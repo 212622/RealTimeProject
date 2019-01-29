@@ -39,6 +39,7 @@ extern void per_stats_calc(void);
 extern void print_world(void);
 extern void en_movement_draw(void);
 extern void al_movement_draw(void);
+extern void check_deadline_miss_draw(void);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/

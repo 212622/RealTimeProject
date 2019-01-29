@@ -312,6 +312,16 @@ void per_stats_calc(void) {
 	}
 }
 /*----------------------------------------------------------------------*/
+//	CHECK_DEADLINE_MISS_DRAW: counts the number of deadline miss in ally.
+/*----------------------------------------------------------------------*/
+void check_deadline_miss_draw(void) {
+	if (ptask_deadline_miss()) {
+		pthread_mutex_lock(&mdraw);
+		draw_deadline++;
+		pthread_mutex_unlock(&mdraw);
+	}
+}
+/*----------------------------------------------------------------------*/
 //	DRAW: periodic task for drawing.
 /*----------------------------------------------------------------------*/
 void draw(void) {
@@ -345,12 +355,7 @@ void draw(void) {
 		print_screen();
 
 		// check for deadline miss
-		
-        if (ptask_deadline_miss()) {
-			pthread_mutex_lock(&mdraw);
-			draw_deadline++;
-			pthread_mutex_unlock(&mdraw);
-		}
+		check_deadline_miss_draw();
 		 
 		ptask_wait_for_period();
 	}
