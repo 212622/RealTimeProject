@@ -13,15 +13,16 @@
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
+int scan, one, old_s, old_ms;
 int  cam_line_view;
 int  command_deadline;
 /*----------------------------------------------------------------------*/
-/*  Periodic task for commands   */
+// INIT_COMMAND: initialize command variables and saves initial clock.
 /*----------------------------------------------------------------------*/
-void commands(void) {
-	int scan, one = 0, k;
+void init_command(void) {
 	struct timespec spec;
-	int now_s = 0, old_s = 0, now_ms = 0, old_ms = 0;
+
+	old_s = one = old_ms = 0;
 	cam_line_view = 0;
 
 	pthread_mutex_lock(&men);
@@ -31,6 +32,16 @@ void commands(void) {
 	clock_gettime(CLOCK_REALTIME, &spec);
 	old_ms = round(spec.tv_nsec / 1.0e6);
 	old_s = spec.tv_sec;
+}
+/*----------------------------------------------------------------------*/
+//	COMMAND: periodic task for commands.
+/*----------------------------------------------------------------------*/
+void commands(void) {
+	int k;
+	int now_ms =0, now_s = 0;
+	struct timespec spec;
+
+	init_command();
 
 	while (1) {
 		scan = 0;
@@ -41,7 +52,6 @@ void commands(void) {
 					clock_gettime(CLOCK_REALTIME, &spec);
 					now_s = spec.tv_sec;
 					now_ms = round(spec.tv_nsec / 1.0e6);
-					//printf("now = %d, old = %d, spec.tv_nsec %ld\n", now, old, spec.tv_nsec);
 					if (now_s - old_s >= 1 || (now_s - old_s == 0 && now_ms - old_ms >= 500)) {
 						old_s = now_s;
 						old_ms = now_ms;
@@ -64,7 +74,6 @@ void commands(void) {
 		
 		/* check for deadline miss */
         if (ptask_deadline_miss()) command_deadline++;
-
 		ptask_wait_for_period();
 	}
 }
