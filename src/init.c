@@ -17,8 +17,6 @@
 /*----------------------------------------------------------------------*/
 int last_proc;										// last assigned processor
 int ntasks;											// actual number of tasks
-
-pthread_mutex_t minit;								// init mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/
@@ -33,7 +31,6 @@ void init(void) {
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, XWIN, YWIN, 0, 0);
     ptask_init(SCHED_FIFO, GLOBAL, PRIO_INHERITANCE);
 
-	pmux_create_pi(&minit);
 	pmux_create_pi(&mcam);
 	pmux_create_pi(&men);
 	pmux_create_pi(&mal);
