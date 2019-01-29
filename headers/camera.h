@@ -26,6 +26,7 @@ extern void compute(void);
 extern void go_on(void);
 extern void activate_ally(void);
 extern void follow_enemy(void);
+extern void check_deadline_miss_cam(void);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/

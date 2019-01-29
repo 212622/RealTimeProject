@@ -228,6 +228,16 @@ void follow_enemy(void) {
 	pthread_mutex_unlock(&mcam);
 }
 /*----------------------------------------------------------------------*/
+//	CHECK_DEADLINE_MISS_CAM: counts the number of deadline miss in ally.
+/*----------------------------------------------------------------------*/
+void check_deadline_miss_cam(void) {
+    if (ptask_deadline_miss()) {
+		pthread_mutex_lock(&mcam);
+		cam_deadline++;
+		pthread_mutex_unlock(&mcam);
+	}
+}
+/*----------------------------------------------------------------------*/
 /*  Periodic task for camera detection   */
 /*----------------------------------------------------------------------*/
 void camera(void) {
@@ -265,7 +275,7 @@ void camera(void) {
 		}
 
 		// check for deadline miss
-        if (ptask_deadline_miss()) cam_deadline++;
+        check_deadline_miss_cam();
 
 		ptask_wait_for_period();
 	}

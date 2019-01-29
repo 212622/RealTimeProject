@@ -345,8 +345,13 @@ void draw(void) {
 		print_screen();
 
 		// check for deadline miss
-        if (ptask_deadline_miss()) draw_deadline++;
-
+		
+        if (ptask_deadline_miss()) {
+			pthread_mutex_lock(&mdraw);
+			draw_deadline++;
+			pthread_mutex_unlock(&mdraw);
+		}
+		 
 		ptask_wait_for_period();
 	}
 }

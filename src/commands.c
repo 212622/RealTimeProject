@@ -13,9 +13,13 @@
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
-int scan, one, old_s, old_ms;
-int  cam_line_view;
-int  command_deadline;
+int  scan;									// scanning variable
+int  one;									// temporary variable
+int  old_s, old_ms;				  			// time of last activation
+int  cam_line_view;							// camera and line visualization variable
+int  command_deadline;						// deadline counter of command task
+
+pthread_mutex_t mcom;                       // command mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/
@@ -34,6 +38,16 @@ void init_command(void) {
 	clock_gettime(CLOCK_REALTIME, &spec);
 	old_ms = round(spec.tv_nsec / 1.0e6);
 	old_s = spec.tv_sec;
+}
+/*----------------------------------------------------------------------*/
+//	CHECK_DEADLINE_MISS_COM: counts the number of deadline miss in command.
+/*----------------------------------------------------------------------*/
+void check_deadline_miss_com(void) {
+    if (ptask_deadline_miss()) {
+		pthread_mutex_lock(&mcom);
+		command_deadline++;
+		pthread_mutex_unlock(&mcom);
+	}
 }
 /*----------------------------------------------------------------------*/
 //	COMMAND: periodic task for commands.
@@ -75,7 +89,7 @@ void commands(void) {
 		}
 		
 		/* check for deadline miss */
-        if (ptask_deadline_miss()) command_deadline++;
+        check_deadline_miss_com();
 		ptask_wait_for_period();
 	}
 }

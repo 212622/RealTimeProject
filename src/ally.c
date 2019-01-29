@@ -35,6 +35,16 @@ void write_al_att(float x1, float y1, float m, int tid) {
 	pthread_mutex_unlock(&mal);
 }
 /*----------------------------------------------------------------------*/
+//	CHECK_DEADLINE_MISS_AL: counts the number of deadline miss in ally.
+/*----------------------------------------------------------------------*/
+void check_deadline_miss_al(void) {
+    if (ptask_deadline_miss()) {
+		pthread_mutex_lock(&mal);
+		al_deadline++;
+		pthread_mutex_unlock(&mal);
+	}
+}
+/*----------------------------------------------------------------------*/
 //	ALLY: periodic task for ally
 /*----------------------------------------------------------------------*/
 void ally(void) {
@@ -74,7 +84,7 @@ void ally(void) {
 		}
 
 		/* check for deadline miss */
-        if (ptask_deadline_miss()) al_deadline++;
+		check_deadline_miss_al();
 		ptask_wait_for_period();
 	}
 }

@@ -9,6 +9,7 @@
 /*--------------------------------------------------------------*/
 extern void ally(void);
 extern void write_al_att(float x1, float y1, float m, int tid);
+extern void check_deadline_miss_al(void);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
