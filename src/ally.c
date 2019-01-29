@@ -23,7 +23,7 @@ int     al_deadline;
 
 pthread_mutex_t mal;						// ally mutex
 /*----------------------------------------------------------------------*/
-/*  Periodic task for enemy   */
+//	ALLY: periodic task for ally
 /*----------------------------------------------------------------------*/
 void ally(void) {
 

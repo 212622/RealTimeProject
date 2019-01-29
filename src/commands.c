@@ -17,6 +17,8 @@ int scan, one, old_s, old_ms;
 int  cam_line_view;
 int  command_deadline;
 /*----------------------------------------------------------------------*/
+/*  FUNCTION DEFINITIONS   */
+/*----------------------------------------------------------------------*/
 // INIT_COMMAND: initialize command variables and saves initial clock.
 /*----------------------------------------------------------------------*/
 void init_command(void) {
