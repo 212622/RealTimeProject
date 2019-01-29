@@ -181,7 +181,7 @@ void print_status_window(void) {
 	textout_ex(bufs, font, "    STATUS WINDOW    ", BORDER, 5 * BORDER, makecol(255, 255, 255), -1);
 	textout_ex(bufs, font, "---------------------", BORDER, 10 * BORDER, makecol(255, 255, 255), -1);
 	textprintf_ex(bufs, font, BORDER, 12 * BORDER, 
-					makecol(255, 255, 255), -1, "ACTIVE TASKS    : %d", n_act);
+					makecol(255, 255, 255), -1, "ACTIVE ENEMY    : %d", n_act);
 	textprintf_ex(bufs, font, BORDER, 14 * BORDER,
 					makecol(255, 255, 255), -1, "TOTAL ENEMY     : %.0f", en_tot);
 	textprintf_ex(bufs, font, BORDER, 16 * BORDER,

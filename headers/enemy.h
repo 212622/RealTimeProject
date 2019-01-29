@@ -13,6 +13,9 @@
 /*  FUNCTION PROTOTYPES   */
 /*--------------------------------------------------------------*/
 extern void enemy(void);
+extern void init_enemy(float *x1, float *x2, float *y1, float *y2, float *m, float *speed);
+extern void write_en_att(float x1, float y1, float m, int tid);
+extern void check_deadline_miss_en(void);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
