@@ -17,8 +17,15 @@
 /*  FUNCTION PROTOTYPES   */
 /*--------------------------------------------------------------*/
 extern void camera(void);
+extern void init_camera(int cam_x_old);
+extern void limits_check(void);
 extern int get_image_count(int x0, int y0);
 extern void get_centroid(void);
+extern void get_time(void);
+extern void compute(void);
+extern void go_on(void);
+extern void activate_ally(void);
+extern void follow_enemy(void);
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/

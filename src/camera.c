@@ -18,19 +18,22 @@ int     line_x1, line_x2, line_y1, line_y2;	    // coordinates of predict line
 int		en_time[NCENTR];
 float 	en_speed;
 int     cam_deadline;
-
-int centroid[NCENTR][2];
-int n_speed;
-float speed, tot_speed, new_speed;
-int n_x2, tot_x2, new_x2;
-int x1, my_y1, x2, y2;
-int old_x, old_y;
+int		centroid[NCENTR][2];
+int		n_speed;
+float	speed, tot_speed, new_speed;
+int		n_x2, tot_x2, new_x2;
+int		x1, my_y1, x2, y2;
+int		old_x, old_y;
+int 	v;
+int		tracking;
 
 pthread_mutex_t mcam;						    // camera mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/
-void init_camera(void) {
+// INIT_CAMERA	initialize the camera
+/*----------------------------------------------------------------------*/
+void init_camera(int cam_x_old) {
 	int i;
 
 	for (i=0; i<3; ++i) {
@@ -42,11 +45,39 @@ void init_camera(void) {
 	n_x2 = x2 = tot_x2 = new_x2 = 0;
 	old_x = old_y = 0;
 	x1 = my_y1 = x2 = y2 = 0;
+
+	if (tracking == 0) {
+		v = 1;
+		pthread_mutex_lock(&mcam);
+		camera_x = 0;
+		camera_y = 0;
+		en_speed = 0;
+		line_x1 = line_x2 = line_y1 = line_y2 = 0;
+		pthread_mutex_unlock(&mcam);
+	}
+	else {
+		pthread_mutex_lock(&mcam);
+		camera_x = cam_x_old + (v * VRES);
+		camera_y = 0;
+		limits_check();
+		pthread_mutex_unlock(&mcam);
+	}
+
+	tracking = 0;
 }
 /*----------------------------------------------------------------------*/
-// GET_IMAGE_COUNT reads an area of the screen centered in
-// (x0,y0) and stores it into image[][] and also return
-// the number of non-black pixels
+// LIMIT_CHECK	control if the camera remains into its screen limits
+/*----------------------------------------------------------------------*/
+void limits_check(void) {
+	if (camera_x < 0) camera_x = 0;
+	if (camera_x > XWORLD - VRES) camera_x = XWORLD - VRES;
+	if (camera_y < 0) camera_y = 0;
+	if (camera_y > (YWORLD / 2) - HRES) camera_y = (YWORLD / 2) - HRES;
+}
+/*----------------------------------------------------------------------*/
+// GET_IMAGE_COUNT read the pixel color in a given window centered in
+// (x0,y0) and stores it into image[][], discard the pixel with dark color,
+// and also return the number of non-black pixels
 /*----------------------------------------------------------------------*/
 int get_image_count(int x0, int y0) {
 	int		i, j;		// image indexes
@@ -107,6 +138,8 @@ void get_centroid(void) {
 	centroid[NCENTR - 1][1] = camera_y + min_y + ((max_y - min_y) / 2);
 }
 /*----------------------------------------------------------------------*/
+// GET_TIME		save the actual time in milliseconds
+/*----------------------------------------------------------------------*/
 void get_time(void) {
 	int ms = 0, i = 0;
 	struct timespec spec;
@@ -120,9 +153,9 @@ void get_time(void) {
 	en_time[NCENTR - 1] = ms;
 }
 /*----------------------------------------------------------------------*/
+// COMPUTE	calculate the arrival prediction and speed
+/*----------------------------------------------------------------------*/
 void compute(void) {
-
-	// Compute line and prediction
 	old_x = centroid[0][0];
 	old_y = centroid[0][1];
 	x1 = centroid[NCENTR - 1][0];
@@ -130,21 +163,21 @@ void compute(void) {
 	y2 = YWORLD - sfondo->h;
 	if (old_y == my_y1) my_y1++;
 	
+	// calculate predicted average position
 	x2 = (((y2 - old_y) / (my_y1 - old_y)) * (x1 - old_x)) + old_x;
 	if (x2 >= 0 && x2 <= XWORLD && old_y != 0) {
 		tot_x2 += x2;
 		n_x2++;
 		new_x2 = tot_x2 / n_x2;
 	}
-	// printf("new_x2 = %d, n_x2 = %d\n", new_x2, n_x2);
 
+	// calculate predicted average speed
 	speed = ((float)my_y1 - (float)old_y) / (en_time[NCENTR - 1] - en_time[0]);
 	if (speed >= 0 && old_y != 0) {
 		tot_speed += speed;
 		n_speed++;
 		new_speed = tot_speed / n_speed;
 	}
-	// printf("new_speed = %f\n", new_speed);
 
 	pthread_mutex_lock(&mcam);
 	line_x1 = x1;
@@ -155,25 +188,55 @@ void compute(void) {
 	pthread_mutex_unlock(&mcam);
 }
 /*----------------------------------------------------------------------*/
+// GO_ON	move the camera in the specified direction to find new enemies
+/*----------------------------------------------------------------------*/
+void go_on(void) {
+	if (camera_x <= 0) v = 1;
+	else if (camera_x + VRES >= XWORLD) v = -1;
+
+	pthread_mutex_lock(&mcam);
+	camera_x += v * VRES;
+	limits_check();
+	pthread_mutex_unlock(&mcam);
+}
+/*----------------------------------------------------------------------*/
+// ACTIVATE_ALLY	activate a new ally for oppose the identified enemy
+/*----------------------------------------------------------------------*/
+void activate_ally(void) {
+	int one = 0, k;
+
+	for(k=0; k<MAXA; k++) {
+		if (state_al[k] == WAIT && one == 0) {
+			pthread_mutex_lock(&mal);
+			n_al_act++;
+			state_al[k] = ACTIVE;
+			ptask_activate(tid_al[k]);
+			pthread_mutex_unlock(&mal);
+			one++;
+		}
+	}
+	one = 0;
+}
+/*----------------------------------------------------------------------*/
+// FOLLOW_ENEMY		control the camera axes to move to the centroid
+/*----------------------------------------------------------------------*/
+void follow_enemy(void) {
+	pthread_mutex_lock(&mcam);
+	camera_x = centroid[NCENTR - 1][0] - (VRES / 2);
+	camera_y = centroid[NCENTR - 1][1] - (HRES / 2);
+	limits_check();
+	pthread_mutex_unlock(&mcam);
+}
+/*----------------------------------------------------------------------*/
 /*  Periodic task for camera detection   */
 /*----------------------------------------------------------------------*/
 void camera(void) {
-	int v = 1, count = 0, cam_x_old = 0, k, one = 0;
-	int tracking = 0;
+	int count = 0, cam_x_old = 0;
 
-	pthread_mutex_lock(&mcam);
-	camera_x = 0;
-	camera_y = 0;
-	en_speed = 0;
-	line_x1 = line_x2 = line_y1 = line_y2 = 0;
-	pthread_mutex_unlock(&mcam);
-
-	init_camera();
+	init_camera(cam_x_old);
 
 	while (1) {
-		
-		// Image scanning & thresholding: read the pixel color in a given
-		// window and discard the pixel with dark color
+		// Image scanning & thresholding
 		count = get_image_count(camera_x + (VRES / 2), camera_y + (HRES /  2));
 
 		if (tracking == 0) {
@@ -181,70 +244,27 @@ void camera(void) {
 				tracking = 1;
 				cam_x_old = camera_x;
 			}
-			else {
-				if (camera_x <= 0) v = 1;
-				else if (camera_x + VRES >= XWORLD) v = -1;
-
-				pthread_mutex_lock(&mcam);
-				camera_x += v * VRES;
-				if (camera_x < 0) camera_x = 0;
-				if (camera_x > XWORLD - VRES) camera_x = XWORLD - VRES;
-				pthread_mutex_unlock(&mcam);
-			}
+			else go_on();
 		}
 
 		if (tracking >= 1) {
 			if (tracking <= CAMOV) {
-				
-				// Centroid computation: compute the centroid of pixels with light color
 				get_centroid();
 				get_time();
 				
 				compute();
 
-				// Camera control: control the camera axes to move to the centroid
-				pthread_mutex_lock(&mcam);
-				camera_x = centroid[NCENTR - 1][0] - (VRES / 2);
-				camera_y = centroid[NCENTR - 1][1] - (HRES / 2);
-				if (camera_x < 0) camera_x = 0;
-				if (camera_x > XWORLD - VRES) camera_x = XWORLD - VRES;
-				if (camera_y < 0) camera_y = 0;
-				pthread_mutex_unlock(&mcam);
-
+				follow_enemy();
 				tracking++;
 			}
 
 			if (tracking > CAMOV) {
-				// printf("en_speed = %f\n", en_speed);
-				// printf("line_x2 = %d\n", line_x2);
-
-				// activate ally
-				for(k=0; k<MAXA; k++) {
-					if (state_al[k] == WAIT && one == 0) {
-						pthread_mutex_lock(&mal);
-						n_al_act++;
-						state_al[k] = ACTIVE;
-						ptask_activate(tid_al[k]);
-						pthread_mutex_unlock(&mal);
-						one++;
-					}
-				}
-				one = 0;
-
-				// initialize camera
-				pthread_mutex_lock(&mcam);
-				camera_x = cam_x_old + (v * VRES);
-				if (camera_x > XWORLD - VRES) camera_x = XWORLD - VRES;
-				if (camera_x < 0) camera_x = 0;
-				camera_y = 0;
-				pthread_mutex_unlock(&mcam);
-				init_camera();
-
-				tracking = 0;
+				activate_ally();
+				init_camera(cam_x_old);
 			}
 		}
 
-		/* check for deadline miss */
+		// check for deadline miss
         if (ptask_deadline_miss()) cam_deadline++;
 
 		ptask_wait_for_period();
