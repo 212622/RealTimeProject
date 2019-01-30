@@ -19,6 +19,7 @@
 #define YMENU   84                              // menu area y resolution
 #define XSTATUS 190                             // status window x resolution
 #define YSTATUS 746                             // status window y resolution
+#define BORDER  10								// border between sub-windows and global window
 
 /*--------------------------------------------------------------*/
 /*  FUNCTION PROTOTYPES   */

@@ -9,25 +9,26 @@
 #include "draw.h"
 #include "ally.h"
 #include "init.h"
+
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
+pthread_mutex_t mcam;						    // mutex for camera global variables
 int 	image[HRES][VRES]; 				        // global image buffer
 int		camera_x, camera_y;					    // coordinates of camera
-int     line_x1, line_x2, line_y1, line_y2;	    // coordinates of predict line
-int		en_time[NCENTR];
-float 	en_speed;
+int     line_x1, line_x2, line_y1, line_y2;	    // coordinates of prediction line
 int     cam_deadline;
-int		centroid[NCENTR][2];
-int		n_speed;
-float	speed, tot_speed, new_speed;
-int		n_x2, tot_x2, new_x2;
-int		x1, my_y1, x2, y2;
-int		old_x, old_y;
-int 	v;
-int		tracking;
+float 	en_speed;
+static int		en_time[NCENTR];
+static int		centroid[NCENTR][2];
+static int		x1, my_y1, x2, y2;
+static int		old_x, old_y;
+static int		v;
+static int		tracking;
+static int		n_x2, tot_x2, new_x2;
+static int		n_speed;
+static float	speed, tot_speed, new_speed;
 
-pthread_mutex_t mcam;						    // camera mutex
 /*----------------------------------------------------------------------*/
 /*  FUNCTION DEFINITIONS   */
 /*----------------------------------------------------------------------*/

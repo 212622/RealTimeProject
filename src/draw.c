@@ -26,7 +26,6 @@
 /*  DRAW CONSTANTS   */
 /*----------------------------------------------------------------------*/
 #define MAXR	256								// maximum sprite rotation
-#define BORDER  10								// border between sub-windows and global window
 #define TRANSP	-1								// transparent background
 #define FULLCOL	255								// high color intensity, used for makecol
 #define MIDCOL	128								// medium color intensity, used for makecol
