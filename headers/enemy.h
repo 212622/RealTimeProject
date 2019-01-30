@@ -10,7 +10,7 @@
 #include "pmutex.h"
 
 /*--------------------------------------------------------------*/
-/*  GLOBAL CONSTRANTS   */
+/*  GLOBAL CONSTANTS   */
 /*--------------------------------------------------------------*/
 #define MAXE    3							        // max number of enemy tasks
 
@@ -28,6 +28,7 @@ extern pthread_mutex_t men;                         // enemy mutex
 extern int		tid_en[MAXE];						// enemy task IDs
 extern int		enemy_x[MAXE], enemy_y[MAXE];		// coordinates of enemies
 extern int      state_en[MAXE];						// enemy state
+extern int      crash_en[MAXE];                     // defines which enemy is crashing
 extern float    en_angle[MAXE];						// rotation angle
 extern int		n_en_act;							// number of active enemy tasks
 extern int      en_deadline;						// number of missed enemy deadlines

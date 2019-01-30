@@ -19,6 +19,7 @@ extern int      tid_al[MAXA];                       // ally task IDs
 extern int      n_al_act;                           // number of active ally tasks
 extern float    al_angle[MAXA];                     // rotation angle
 extern int      al_deadline;
+extern int      crash_al[MAXA];                     // defines who is crashing
 
 extern pthread_mutex_t mal;                         // ally mutex
 /*--------------------------------------------------------------*/

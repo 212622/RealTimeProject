@@ -19,6 +19,7 @@ pthread_mutex_t men;						// mutex for enemy global variables
 int		tid_en[MAXE];						// enemy task IDs
 int		enemy_x[MAXE], enemy_y[MAXE];		// coordinates of enemies
 int 	state_en[MAXE];						// enemy state
+int		crash_en[MAXE];						// defines which enemy is crashing
 float   en_angle[MAXE];						// rotation angle
 int		n_en_act;							// number of active enemy tasks
 int     en_deadline;						// number of missed enemy deadlines
@@ -27,7 +28,7 @@ float	en_died;							// number of destroyed enemy plane
 float	en_arrived;							// number of non-destroyed enemy plane
 
 /*----------------------------------------------------------------------*/
-//	WRITE_EN_ATT: write enemies attributes in global variables.
+//	WRITE_EN_ATT: writes enemies attributes in global variables.
 //	It requires 4 arguments: the x coordinate of enemy (x1),
 //	its y coordinate (y1), its angular coefficient m and
 //	its task identifier (tid).
@@ -56,10 +57,10 @@ void check_deadline_miss_en(void) {
 /*----------------------------------------------------------------------*/
 void enemy(void) {
 	int		tid = ptask_get_index() - 1;				// enemy task identifier
-	float	x1 = rand() % (XWORLD - aereo->w);			// start x
-	float	x2 = rand() % (XWORLD - aereo->w);			// end x
+	float	x1 = rand() % (XWORLD - plane->w);			// start x
+	float	x2 = rand() % (XWORLD - plane->w);			// end x
 	float	y1 = 0;										// start y
-	float	y2 = YWORLD - sfondo->h - aereo->h;			// end y 
+	float	y2 = YWORLD - background->h - plane->h;			// end y 
 	float	speed = SPEED;								// speed of enemy plane
 	float	m = (y2 - y1) / (x2 - x1);					// angular coefficient
 
@@ -85,8 +86,8 @@ void enemy(void) {
 			ptask_wait_for_activation();
 
 			// random initializations
-			x1 = rand() % (XWORLD - aereo->w);
-			x2 = rand() % (XWORLD - aereo->w);
+			x1 = rand() % (XWORLD - plane->w);
+			x2 = rand() % (XWORLD - plane->w);
 			y1 = 0;
 			m = (y2 - y1) / (x2 - x1);
 			write_en_att(x1, y1, m, tid);

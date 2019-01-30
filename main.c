@@ -26,7 +26,7 @@ int main(void) {
 	init();
 
 	// graphic task creation
-	create_task(PER * 2/3, draw);
+	create_task(DPER, draw);
 	
 	// enemy task creation
 	for (k=0; k<MAXE; k++) {
@@ -47,7 +47,7 @@ int main(void) {
 	}
 
 	// camera task creation
-	create_task(PER * 2/3, camera);
+	create_task(DPER, camera);
 
 	// commands task creation
 	create_task(PER, commands);
@@ -66,4 +66,6 @@ int main(void) {
 	Rivedere:
 	- mettere a posto commenti e ordinamento/spazi
 	- struct?
+	- #define anche in .c o solo .h? ordine include
+	- usa #define per numeri draw
 */

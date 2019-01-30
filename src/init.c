@@ -14,10 +14,15 @@
 #include "ally.h"
 
 /*----------------------------------------------------------------------*/
+/*  GLOBAL CONSTANTS   */
+/*----------------------------------------------------------------------*/
+#define CDEPTH  32                          // color depth
+
+/*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
-static int last_proc;								// last assigned processor
-static int ntasks;									// actual number of tasks
+static int last_proc;						// last assigned processor
+static int ntasks;							// actual number of tasks
 
 /*----------------------------------------------------------------------*/
 // INIT: initialization of global variables, mutexes and allegro parameters
@@ -28,7 +33,7 @@ void init(void) {
 	// allegro and ptask libraries initialization
 	allegro_init();									
     install_keyboard();
-    set_color_depth(32);
+    set_color_depth(CDEPTH);
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, XWIN, YWIN, 0, 0);
     ptask_init(SCHED_FIFO, GLOBAL, PRIO_INHERITANCE);
 
@@ -40,17 +45,17 @@ void init(void) {
 
 	// enemy variables initialization
 	n_en_act = 0;
-	for (k=0; k<MAXE; k++) tid_en[k] = -1;
-	for (k=0; k<MAXE; k++) enemy_x[k] = -1;
-	for (k=0; k<MAXE; k++) enemy_y[k] = -1;
-	for (k=0; k<MAXE; k++) state_en[k] = -1;
+	for (k=0; k<MAXE; k++) tid_en[k] = NONE;
+	for (k=0; k<MAXE; k++) enemy_x[k] = 0;
+	for (k=0; k<MAXE; k++) enemy_y[k] = 0;
+	for (k=0; k<MAXE; k++) state_en[k] = NONE;
 
 	// ally variables initialization
 	n_al_act = 0;
-	for (k=0; k<MAXA; k++) tid_al[k] = -1;
-	for (k=0; k<MAXA; k++) ally_x[k] = -1;
-	for (k=0; k<MAXA; k++) ally_y[k] = -1;
-	for (k=0; k<MAXA; k++) state_al[k] = -1;
+	for (k=0; k<MAXA; k++) tid_al[k] = NONE;
+	for (k=0; k<MAXA; k++) ally_x[k] = 0;
+	for (k=0; k<MAXA; k++) ally_y[k] = 0;
+	for (k=0; k<MAXA; k++) state_al[k] = NONE;
 
 	last_proc = 0;
 	ntasks = 0;
@@ -66,8 +71,8 @@ void init(void) {
 //	the created task.
 /*----------------------------------------------------------------------*/
 int create_task(int period, void (*task)(void)) {
-	int tid;						// task identifier
-	tpars params;					// parameter for task creation
+	int tid;								// task identifier
+	tpars params;							// parameter for task creation
 
 	ptask_param_init(params);
 	ptask_param_period(params, period, MILLI);

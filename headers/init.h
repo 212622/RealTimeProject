@@ -5,22 +5,24 @@
 #define INIT_H
 
 /*----------------------------------------------------------------------*/
-/*  GLOBAL CONSTRANTS   */
+/*  GLOBAL CONSTANTS   */
 /*----------------------------------------------------------------------*/
 #define ALLEGRO_NO_FIX_ALIASES 				// fix for the new version of glibc
 /*--------------------------------------------------------------*/
-//  GRAPHICS CONSTANTS
+/*  GRAPHICS CONSTANTS  */
 /*--------------------------------------------------------------*/
 #define XWIN    1024                        // window x resolution
 #define YWIN    768                         // window y resolution
 /*--------------------------------------------------------------*/
-//  TASK CONSTANTS
+/*  TASK CONSTANTS  */
 /*--------------------------------------------------------------*/
 #define PER 	20							// base period
+#define DPER    13                          // period of draw and camera
 #define PRIO    80							// task priority
 /*--------------------------------------------------------------*/
-/*  STATE CONSTRANTS   */
+/*  STATE CONSTANTS   */
 /*--------------------------------------------------------------*/
+#define NONE    -1                          // no state
 #define WAIT	0							// stop enemy/ally state
 #define ACTIVE	1							// moving enemy/ally state
 #define BOOM	2							// explosion enemy/ally state

@@ -7,6 +7,7 @@
 #include "ally.h"
 #include "draw.h"
 #include "camera.h"
+#include "enemy.h"
 /*----------------------------------------------------------------------*/
 /*  GLOBAL CONSTRANTS   */
 /*----------------------------------------------------------------------*/
@@ -20,6 +21,7 @@ int		tid_al[MAXA];						// ally task IDs
 int		n_al_act;		                    // number of active ally tasks
 float   al_angle[MAXA];                     // rotation angle
 int     al_deadline;
+int 	crash_al[MAXA];						// defines who is crashing
 
 pthread_mutex_t mal;						// ally mutex
 /*----------------------------------------------------------------------*/
@@ -49,10 +51,10 @@ void check_deadline_miss_al(void) {
 /*----------------------------------------------------------------------*/
 void ally(void) {
 	int tid = ptask_get_index() - (MAXE + 1);	// task array index
-	float m, x1, x2, y1, y2, speed = 8;			// ally position and speed variables
+	float m, x1, x2, y1, y2, speed;			// ally position and speed variables
 
-	x1 = (XWORLD / 2) - (razzo->w / 2) + (BORDER * 3);
-	y1 = YWORLD - sfondo->h - razzo->h;
+	x1 = (XWORLD / 2) - (rocket->w / 2) + (BORDER * 3);
+	y1 = YWORLD - background->h - rocket->h;
 	y2 = YWORLD / 2;
 
 	ptask_wait_for_activation();
@@ -75,8 +77,8 @@ void ally(void) {
 			pthread_mutex_unlock(&mdraw);
 
 			ptask_wait_for_activation();
-			x1 = (XWORLD / 2) - (razzo->w / 2) + (BORDER * 3);
-			y1 = YWORLD - sfondo->h - razzo->h;
+			x1 = (XWORLD / 2) - (rocket->w / 2) + (BORDER * 3);
+			y1 = YWORLD - background->h - rocket->h;
 			y2 = YWORLD / 2;
 			x2 = (((y2 - line_y1) / (line_y2 - line_y1)) * (line_x2 - line_x1)) + line_x1;
 			m = (y2 - y1) / (x2 - x1);

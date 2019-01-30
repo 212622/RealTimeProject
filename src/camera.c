@@ -160,7 +160,7 @@ void compute(void) {
 	old_y = centroid[0][1];
 	x1 = centroid[NCENTR - 1][0];
 	my_y1 = centroid[NCENTR - 1][1];
-	y2 = YWORLD - sfondo->h;
+	y2 = YWORLD - background->h;
 	if (old_y == my_y1) my_y1++;
 	
 	// calculate predicted average position
