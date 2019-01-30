@@ -33,11 +33,21 @@
 #define TEXP	10							    // explosion time in periods
 /*----------------------------------------------------------------------*/
 #define SPACEA  10								// space between prints
-#define SPACEB  30								// space between prints
+#define SPACEB  38								// space between prints
 #define SPACEC  50								// space between prints
-#define SPACED  100								// space between prints
-#define SPACEE  320								// space between prints
-#define SPACEF  560								// space between prints
+#define SPACED	62								// space between prints
+#define SPACEE  40								// space between prints
+#define SPACEF  140								// space between prints
+#define SPACEG  160								// space between prints
+#define SPACEH  180								// space between prints
+#define SPACEI  200								// space between prints
+#define SPACEJ  220								// space between prints
+#define SPACEK  240								// space between prints
+#define SPACEL  260								// space between prints
+#define SPACEM  300								// space between prints
+#define SPACEN  340								// space between prints
+#define SPACEO  380								// space between prints
+
 
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
@@ -216,11 +226,11 @@ void print_menu_area(void) {
 	textout_ex(bufm, font, "-------------------------------------", (XMENU / 3),
 				 3 * SPACEA, white, TRANSP);
 	textout_ex(bufm, font, "Press SPACE for create enemy", (XMENU / 3) + (3 * SPACEA),
-				 1.3 * SPACEB, white, TRANSP);
+				 SPACEB, white, TRANSP);
 	textout_ex(bufm, font, "Press Q for camera and line", (XMENU / 3) + (3 * SPACEA),
-				 1.8 * SPACEB, white, TRANSP);
+				 SPACEC, white, TRANSP);
 	textout_ex(bufm, font, "Press ESC for quit", (XMENU / 3) + (3 * SPACEA),
-				 2.3 * SPACEB, white, TRANSP);
+				 SPACED, white, TRANSP);
 }
 
 /*----------------------------------------------------------------------*/
@@ -236,36 +246,36 @@ void print_status_window(void) {
 
 	textout_ex(bufs, font, "    STATUS WINDOW    ", SPACEA, SPACEC, white, TRANSP);
 	textout_ex(bufs, font, "---------------------", SPACEA, 2 * SPACEC, white, TRANSP);
-	textprintf_ex(bufs, font, SPACEA, 2.4 * SPACEC, 
+	textprintf_ex(bufs, font, SPACEA, 3 * SPACEE, 
 					white, TRANSP, "ACTIVE ENEMY    : %d", n_en_act);
-	textprintf_ex(bufs, font, SPACEA, 2.8 * SPACEC,
+	textprintf_ex(bufs, font, SPACEA, SPACEF,
 					white, TRANSP, "TOTAL ENEMY     : %.0f", en_tot);
-	textprintf_ex(bufs, font, SPACEA, 1.6 * SPACED,
+	textprintf_ex(bufs, font, SPACEA, SPACEG,
 					white, TRANSP, "ENEMY DESTROYED : %.0f", en_died);
-	textprintf_ex(bufs, font, SPACEA, 1.8 * SPACED, 
+	textprintf_ex(bufs, font, SPACEA, SPACEH, 
 					white, TRANSP, "ENEMY ARRIVED   : %.0f", en_arrived);
-	textout_ex(bufs, font, "---------------------", SPACEA, 2 * SPACED, white, TRANSP);
-	textprintf_ex(bufs, font, SPACEA, 2.2 * SPACED, 
+	textout_ex(bufs, font, "---------------------", SPACEA, SPACEI, white, TRANSP);
+	textprintf_ex(bufs, font, SPACEA, SPACEJ, 
 					white, TRANSP, "DEFENSE         : %.0f%%", defense_per);
-	textprintf_ex(bufs, font, SPACEA, 2.4 * SPACED, 
+	textprintf_ex(bufs, font, SPACEA, SPACEK, 
 					white, TRANSP, "ATTACK          : %.0f%%", attack_per);
-	textout_ex(bufs, font, "---------------------", SPACEA, 2.6 * SPACED, white, TRANSP);
-	textprintf_ex(bufs, font, SPACEA, 2.8 * SPACED, 
+	textout_ex(bufs, font, "---------------------", SPACEA, SPACEL, white, TRANSP);
+	textprintf_ex(bufs, font, SPACEA, 2 * SPACEF, 
 					white, TRANSP, "EN  DEADLINE MISS: %d", en_deadline);
-	textprintf_ex(bufs, font, SPACEA, 3 * SPACED, 
+	textprintf_ex(bufs, font, SPACEA, SPACEM, 
 					white, TRANSP, "AL  DEADLINE MISS: %d", al_deadline);
-	textprintf_ex(bufs, font, SPACEA, SPACEE, 
+	textprintf_ex(bufs, font, SPACEA, 2 * SPACEG, 
 					white, TRANSP, "CAM DEADLINE MISS: %d", cam_deadline);
-	textprintf_ex(bufs, font, SPACEA, 1.06 * SPACEE, 
+	textprintf_ex(bufs, font, SPACEA, SPACEN, 
 					white, TRANSP, "GRA DEADLINE MISS: %d", draw_deadline);
-	textprintf_ex(bufs, font, SPACEA, 1.12 * SPACEE, 
+	textprintf_ex(bufs, font, SPACEA, 2 * SPACEH, 
 					white, TRANSP, "COM DEADLINE MISS: %d", command_deadline);
-	textout_ex(bufs, font, "---------------------", SPACEA, 1.18 * SPACEE, white, TRANSP);
-	textout_ex(bufs, font, "#####################", SPACEA, 1.03 * SPACEF, white, TRANSP);
-	textout_ex(bufs, font, "     CREATED BY      ", SPACEA, 1.1 * SPACEF, white, TRANSP);
-	textout_ex(bufs, font, "  TORRICELLI TOMAS   ", SPACEA, 1.14 * SPACEF, white, TRANSP);
-	textout_ex(bufs, font, "   CUOGHI LORENZO    ", SPACEA, 1.17 * SPACEF, white, TRANSP);
-	textout_ex(bufs, font, "#####################", SPACEA, 1.25 * SPACEF, white, TRANSP);
+	textout_ex(bufs, font, "---------------------", SPACEA, SPACEO, white, TRANSP);
+	textout_ex(bufs, font, "#####################", SPACEA, SPACEO + SPACEF, white, TRANSP);
+	textout_ex(bufs, font, "     CREATED BY      ", SPACEA, SPACEO + SPACEG, white, TRANSP);
+	textout_ex(bufs, font, "  TORRICELLI TOMAS   ", SPACEA, SPACEO + SPACEH, white, TRANSP);
+	textout_ex(bufs, font, "   CUOGHI LORENZO    ", SPACEA, SPACEO + SPACEI, white, TRANSP);
+	textout_ex(bufs, font, "#####################", SPACEA, SPACEO + SPACEJ, white, TRANSP);
 }
 
 /*----------------------------------------------------------------------*/
