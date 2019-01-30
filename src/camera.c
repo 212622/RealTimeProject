@@ -12,13 +12,24 @@
 #include "init.h"
 
 /*----------------------------------------------------------------------*/
+/*  GLOBAL CONSTANTS   */
+/*----------------------------------------------------------------------*/
+#define FULLCOL	255								// high color intensity, used for makecol
+#define MILLION 1.0e6							// one million
+/*----------------------------------------------------------------------*/
+/*  CAMERA CONSTANTS   */
+/*----------------------------------------------------------------------*/
+#define CAMOV	30								// camera movements
+#define NCENTR  5								// maximum number of saved centroid
+
+/*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
 pthread_mutex_t mcam;						    // mutex for camera global variables
 int 	image[HRES][VRES]; 				        // global image buffer
 int		camera_x, camera_y;					    // coordinates of camera
 int     line_x1, line_x2, line_y1, line_y2;	    // coordinates of prediction line
-int     cam_deadline;							// counter for draw deadline miss
+int     cam_deadline;							// counter for camera deadline miss
 float 	en_speed;								// predicted enemy speed
 static int		en_time[NCENTR];				// acquisition times
 static int		centroid[NCENTR][2];			// calculated centroids
@@ -26,9 +37,9 @@ static int		x1, my_y1, x2, y2;				// prediction line buffer variables
 static int		old_x, old_y;					// first centroid coordinates
 static int		v;								// direction of camera movement
 static int		tracking;						// state of tracking. 0 if no object identified
-static int		n_x2, tot_x2, new_x2;			// for compute average arrival point
+static int		n_x2, tot_x2, new_x2;			// for computing average arrival point
 static int		n_speed;						// numer of calculated speeds, used for average speed
-static float	speed, tot_speed, new_speed;	// for compute average speed
+static float	speed, tot_speed, new_speed;	// for computing average speed
 
 /*----------------------------------------------------------------------*/
 //	INIT_CAMERA: initializes camera variables.
@@ -82,16 +93,17 @@ void limits_check(void) {
 //	and also return the number of non-black pixels
 /*----------------------------------------------------------------------*/
 int get_image_count(int x0, int y0) {
-	int		i, j;		// image indexes
-	int		x, y;		// video coordinates
-	int 	c, count = 0;
+	int		i, j;					// image indexes
+	int		x, y;					// video coordinates
+	int 	c;						// color of saved pixel
+	int		count = 0;				// number of non-black and non-red pixels
 
 	for (i=0; i<VRES; i++) {
 		for (j=0; j<HRES; j++) {
 			x = x0 - (VRES / 2) + i;
 			y = y0 - (HRES / 2) + j;
 			c = getpixel(bufw, x, y);
-			if (c == makecol(255, 0, 0))
+			if (c == makecol(FULLCOL, 0, 0))
 				c = makecol(0, 0, 0);
 			pthread_mutex_lock(&mcam);
 			image[i][j] = c;
@@ -109,16 +121,15 @@ int get_image_count(int x0, int y0) {
 //	compute the centroid of pixels with light color
 /*----------------------------------------------------------------------*/
 void get_centroid(void) {
-	int		x, y;		// video coordinates
-	int		c;
-	int		i;
-	int 	min_x, max_x, min_y, max_y;
+	int		x, y;							// video coordinates
+	int		c;								// saved color
+	int		i;								// temporary variable
+	int 	min_x, max_x, min_y, max_y;		// image edges (thresholding)
 
 	max_x = max_y = 0;
 	min_x = VRES;
 	min_y = HRES;
 
-	// elimino i vecchi valori e faccio spazio per i nuovi
 	for (i=0; i<NCENTR - 1; i++) {
 		centroid[i][0] = centroid[i + 1][0];
 		centroid[i][1] = centroid[i + 1][1];
@@ -145,11 +156,12 @@ void get_centroid(void) {
 //	GET_TIME: saves the actual time in milliseconds.
 /*----------------------------------------------------------------------*/
 void get_time(void) {
-	int ms = 0, i = 0;
-	struct timespec spec;
+	int					ms = 0;			// time in milliseconds
+	int					i = 0;			// temporary variable
+	struct timespec		spec;			// temporary variable for time acquisition
 
 	clock_gettime(CLOCK_REALTIME, &spec);
-	ms = round(spec.tv_nsec / 1.0e6);
+	ms = round(spec.tv_nsec / MILLION);
 
 	for (i=0; i< NCENTR - 1; i++)
 		en_time[i] = en_time[i + 1];
@@ -210,7 +222,8 @@ void go_on(void) {
 //	ACTIVATE_ALLY: activate a new ally for oppose the identified enemy.
 /*----------------------------------------------------------------------*/
 void activate_ally(void) {
-	int one = 0, k;
+	int one = 0;			// flag for activate one single ally
+	int k;					// temporary variable
 
 	for(k=0; k<MAXA; k++) {
 		if (state_al[k] == WAIT && one == 0) {
@@ -251,12 +264,13 @@ void check_deadline_miss_cam(void) {
 //  CAMERA: periodic task for camera detection.
 /*----------------------------------------------------------------------*/
 void camera(void) {
-	int count = 0, cam_x_old = 0;
+	int count = 0;				// number of non-black pixel found
+	int cam_x_old = 0;			// camera position before tracking
 
 	init_camera(cam_x_old);
 
 	while (1) {
-		// Image scanning & thresholding
+		// image scanning & thresholding
 		count = get_image_count(camera_x + (VRES / 2), camera_y + (HRES /  2));
 
 		if (tracking == 0) {
@@ -284,9 +298,7 @@ void camera(void) {
 			}
 		}
 
-		// check for deadline miss
         check_deadline_miss_cam();
-
 		ptask_wait_for_period();
 	}
 }

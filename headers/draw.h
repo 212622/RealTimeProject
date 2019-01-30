@@ -11,7 +11,7 @@
 #include "pmutex.h"
 
 /*--------------------------------------------------------------*/
-/*  GRAPHICS CONSTANTS   */
+/*  GRAPHIC CONSTANTS   */
 /*--------------------------------------------------------------*/
 #define XWORLD  800                             // graphic world x resolution
 #define YWORLD  650                             // graphic world y resolution
