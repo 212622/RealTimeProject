@@ -32,22 +32,23 @@
 #define LOWCOL	24								// low color intensity, used for makecol
 #define TEXP	10							    // explosion time in periods
 /*----------------------------------------------------------------------*/
-#define SPACEA  10								// space between prints
-#define SPACEB  38								// space between prints
-#define SPACEC  50								// space between prints
-#define SPACED	62								// space between prints
-#define SPACEE  40								// space between prints
-#define SPACEF  140								// space between prints
-#define SPACEG  160								// space between prints
-#define SPACEH  180								// space between prints
-#define SPACEI  200								// space between prints
-#define SPACEJ  220								// space between prints
-#define SPACEK  240								// space between prints
-#define SPACEL  260								// space between prints
-#define SPACEM  300								// space between prints
-#define SPACEN  340								// space between prints
-#define SPACEO  380								// space between prints
-
+/*  CONSTANTS for spacing text visualization   */
+/*----------------------------------------------------------------------*/
+#define SPACEA  10
+#define SPACEB  38
+#define SPACEC  50
+#define SPACED	62
+#define SPACEE  40
+#define SPACEF  140
+#define SPACEG  160
+#define SPACEH  180
+#define SPACEI  200
+#define SPACEJ  220
+#define SPACEK  240
+#define SPACEL  260
+#define SPACEM  300
+#define SPACEN  340
+#define SPACEO  380
 
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
@@ -58,7 +59,7 @@ BITMAP	*background, *plane, *rocket;			// images
 static BITMAP	*buf;							// global buffer for double buffering
 static BITMAP	*bufm, *bufs;					// sub-windows buffer for menu and status area
 static BITMAP	*boom, *patriot;				// images
-static int		draw_deadline;					// flag for draw line and camera
+static int		draw_deadline;					// counter for draw deadline miss
 static int		view;							// temporary variable for view explosion
 static float	defense_per, attack_per;		// rate of destroyed and non-destroyed enemies
 static int		black, white, blue, yellow, purple, red;	// colors

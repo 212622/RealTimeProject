@@ -1,5 +1,6 @@
 /*----------------------------------------------------------------------*/
-/*  HEADER FILES        */
+//	CAMERA.C has the task of identify arriving enemy planes and
+//	predict their trajectories.
 /*----------------------------------------------------------------------*/
 #include <time.h>
 #include <math.h>
@@ -17,25 +18,23 @@ pthread_mutex_t mcam;						    // mutex for camera global variables
 int 	image[HRES][VRES]; 				        // global image buffer
 int		camera_x, camera_y;					    // coordinates of camera
 int     line_x1, line_x2, line_y1, line_y2;	    // coordinates of prediction line
-int     cam_deadline;
-float 	en_speed;
-static int		en_time[NCENTR];
-static int		centroid[NCENTR][2];
-static int		x1, my_y1, x2, y2;
-static int		old_x, old_y;
-static int		v;
-static int		tracking;
-static int		n_x2, tot_x2, new_x2;
-static int		n_speed;
-static float	speed, tot_speed, new_speed;
+int     cam_deadline;							// counter for draw deadline miss
+float 	en_speed;								// predicted enemy speed
+static int		en_time[NCENTR];				// acquisition times
+static int		centroid[NCENTR][2];			// calculated centroids
+static int		x1, my_y1, x2, y2;				// prediction line buffer variables
+static int		old_x, old_y;					// first centroid coordinates
+static int		v;								// direction of camera movement
+static int		tracking;						// state of tracking. 0 if no object identified
+static int		n_x2, tot_x2, new_x2;			// for compute average arrival point
+static int		n_speed;						// numer of calculated speeds, used for average speed
+static float	speed, tot_speed, new_speed;	// for compute average speed
 
 /*----------------------------------------------------------------------*/
-/*  FUNCTION DEFINITIONS   */
-/*----------------------------------------------------------------------*/
-// INIT_CAMERA	initialize the camera
+//	INIT_CAMERA: initializes camera variables.
 /*----------------------------------------------------------------------*/
 void init_camera(int cam_x_old) {
-	int i;
+	int i;										// temporary variable
 
 	for (i=0; i<3; ++i) {
 		centroid[i][0] = 0;
@@ -66,8 +65,9 @@ void init_camera(int cam_x_old) {
 
 	tracking = 0;
 }
+
 /*----------------------------------------------------------------------*/
-// LIMIT_CHECK	control if the camera remains into its screen limits
+//	LIMIT_CHECK: controls if the camera remains into its screen limits.
 /*----------------------------------------------------------------------*/
 void limits_check(void) {
 	if (camera_x < 0) camera_x = 0;
@@ -75,10 +75,11 @@ void limits_check(void) {
 	if (camera_y < 0) camera_y = 0;
 	if (camera_y > (YWORLD / 2) - HRES) camera_y = (YWORLD / 2) - HRES;
 }
+
 /*----------------------------------------------------------------------*/
-// GET_IMAGE_COUNT read the pixel color in a given window centered in
-// (x0,y0) and stores it into image[][], discard the pixel with dark color,
-// and also return the number of non-black pixels
+//	GET_IMAGE_COUNT: reads the pixel color in a given window centered in
+//	(x0,y0) and stores it into image[][], discard the pixel with dark color,
+//	and also return the number of non-black pixels
 /*----------------------------------------------------------------------*/
 int get_image_count(int x0, int y0) {
 	int		i, j;		// image indexes
@@ -102,9 +103,10 @@ int get_image_count(int x0, int y0) {
 
 	return count;
 }
+
 /*----------------------------------------------------------------------*/
-// GET_CENTROID do the centroid computation:
-// compute the centroid of pixels with light color
+//	GET_CENTROID: does the centroid computation:
+//	compute the centroid of pixels with light color
 /*----------------------------------------------------------------------*/
 void get_centroid(void) {
 	int		x, y;		// video coordinates
@@ -138,8 +140,9 @@ void get_centroid(void) {
 	centroid[NCENTR - 1][0] = camera_x + min_x + ((max_x - min_x) / 2);
 	centroid[NCENTR - 1][1] = camera_y + min_y + ((max_y - min_y) / 2);
 }
+
 /*----------------------------------------------------------------------*/
-// GET_TIME		save the actual time in milliseconds
+//	GET_TIME: saves the actual time in milliseconds.
 /*----------------------------------------------------------------------*/
 void get_time(void) {
 	int ms = 0, i = 0;
@@ -153,8 +156,9 @@ void get_time(void) {
 	
 	en_time[NCENTR - 1] = ms;
 }
+
 /*----------------------------------------------------------------------*/
-// COMPUTE	calculate the arrival prediction and speed
+//	COMPUTE: calculates the arrival prediction and speed.
 /*----------------------------------------------------------------------*/
 void compute(void) {
 	old_x = centroid[0][0];
@@ -188,8 +192,9 @@ void compute(void) {
 	en_speed = new_speed;
 	pthread_mutex_unlock(&mcam);
 }
+
 /*----------------------------------------------------------------------*/
-// GO_ON	move the camera in the specified direction to find new enemies
+//	GO_ON: move the camera in the specified direction to find new enemies.
 /*----------------------------------------------------------------------*/
 void go_on(void) {
 	if (camera_x <= 0) v = 1;
@@ -200,8 +205,9 @@ void go_on(void) {
 	limits_check();
 	pthread_mutex_unlock(&mcam);
 }
+
 /*----------------------------------------------------------------------*/
-// ACTIVATE_ALLY	activate a new ally for oppose the identified enemy
+//	ACTIVATE_ALLY: activate a new ally for oppose the identified enemy.
 /*----------------------------------------------------------------------*/
 void activate_ally(void) {
 	int one = 0, k;
@@ -218,8 +224,9 @@ void activate_ally(void) {
 	}
 	one = 0;
 }
+
 /*----------------------------------------------------------------------*/
-// FOLLOW_ENEMY		control the camera axes to move to the centroid
+//	FOLLOW_ENEMY: control the camera axes to move to the centroid.
 /*----------------------------------------------------------------------*/
 void follow_enemy(void) {
 	pthread_mutex_lock(&mcam);
@@ -228,6 +235,7 @@ void follow_enemy(void) {
 	limits_check();
 	pthread_mutex_unlock(&mcam);
 }
+
 /*----------------------------------------------------------------------*/
 //	CHECK_DEADLINE_MISS_CAM: counts the number of deadline miss in ally.
 /*----------------------------------------------------------------------*/
@@ -238,8 +246,9 @@ void check_deadline_miss_cam(void) {
 		pthread_mutex_unlock(&mcam);
 	}
 }
+
 /*----------------------------------------------------------------------*/
-/*  Periodic task for camera detection   */
+//  CAMERA: periodic task for camera detection.
 /*----------------------------------------------------------------------*/
 void camera(void) {
 	int count = 0, cam_x_old = 0;
@@ -281,4 +290,5 @@ void camera(void) {
 		ptask_wait_for_period();
 	}
 }
+
 /*----------------------------------------------------------------------*/
