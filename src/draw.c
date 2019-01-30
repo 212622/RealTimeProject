@@ -16,32 +16,80 @@
 /*----------------------------------------------------------------------*/
 /*  MATH CONSTANTS   */
 /*----------------------------------------------------------------------*/
-#define PI		3.14159265							// PI greek
-#define FLAT	180									// flat angle
-#define LAP		360									// lap angle
-#define	RIGHT	90									// right angle
+#define PI		3.14159265						// PI greek
+#define FLAT	180								// flat angle
+#define LAP		360								// lap angle
+#define	RIGHT	90								// right angle
+/*----------------------------------------------------------------------*/
+#define MAXRATE	100								// maximum rate
 /*----------------------------------------------------------------------*/
 /*  DRAW CONSTANTS   */
 /*----------------------------------------------------------------------*/
-#define MAXR	256									// maximum sprite rotation
-#define BLACK	makecol(0, 0, 0)					// color black
-#define WHITE	makecol(255, 255, 255)				// color white
-#define BLUE	makecol(0, 0, 255)					// color blue
-#define YELLOW	makecol(255, 255, 24)				// color yellow
-#define PURPLE	makecol(128, 0, 128)				// color purple
+#define MAXR	256								// maximum sprite rotation
+#define BORDER  10								// border between sub-windows and global window
+#define TRANSP	-1								// transparent background
+#define FULLCOL	255								// high color intensity, used for makecol
+#define MIDCOL	128								// medium color intensity, used for makecol
+#define LOWCOL	24								// low color intensity, used for makecol
+#define TEXP	10							    // explosion time in periods
+/*----------------------------------------------------------------------*/
+#define SPACEA  10								// space between prints
+#define SPACEB  30								// space between prints
+#define SPACEC  50								// space between prints
+#define SPACED  100								// space between prints
+#define SPACEE  320								// space between prints
+#define SPACEF  560								// space between prints
 
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
-pthread_mutex_t mdraw;								// mutex for draw global variables
-BITMAP	*bufw;										// sub-window buffer for graphic world
-BITMAP	*background, *plane, *rocket;				// images
-static BITMAP	*buf;						        // global buffer for double buffering
-static BITMAP	*bufm, *bufs;                		// sub-windows buffer for menu and status area
-static BITMAP	*boom, *patriot;					// images
-static int		draw_deadline;						// flag for draw line and camera
-static int		view;								// temporary variable for view explosion
-static float	defense_per, attack_per;			// rate of destroyed and non-destroyed enemies
+pthread_mutex_t mdraw;							// mutex for draw global variables
+BITMAP	*bufw;									// sub-window buffer for graphic world
+BITMAP	*background, *plane, *rocket;			// images
+static BITMAP	*buf;							// global buffer for double buffering
+static BITMAP	*bufm, *bufs;					// sub-windows buffer for menu and status area
+static BITMAP	*boom, *patriot;				// images
+static int		draw_deadline;					// flag for draw line and camera
+static int		view;							// temporary variable for view explosion
+static float	defense_per, attack_per;		// rate of destroyed and non-destroyed enemies
+static int		black, white, blue, yellow, purple, red;	// colors
+
+/*----------------------------------------------------------------------*/
+//	INIT_DRAW: initializes draw parameters.
+/*----------------------------------------------------------------------*/
+void init_draw(void) {
+	int k;										// temporary variable
+
+	view = 0;
+	defense_per = MAXRATE;
+	attack_per = 0;
+	draw_deadline = 0;
+
+	black = makecol(0, 0, 0);
+	white = makecol(FULLCOL, FULLCOL, FULLCOL);
+	blue = makecol(0, 0, FULLCOL);
+	yellow = makecol(FULLCOL, FULLCOL, LOWCOL);
+	purple = makecol(FULLCOL, 0, MIDCOL);
+	red = makecol(FULLCOL, 0, 0);
+
+	pthread_mutex_lock(&men);
+	en_deadline = 0;
+	for (k=0; k<MAXE; k++) crash_en[k] = 0;
+	pthread_mutex_unlock(&men);
+
+	pthread_mutex_lock(&mal);
+	al_deadline = 0;
+	for (k=0; k<MAXA; k++) crash_al[k] = 0;
+	pthread_mutex_unlock(&mal);
+
+	pthread_mutex_lock(&mcam);
+	cam_deadline = 0;
+	pthread_mutex_unlock(&mcam);
+	
+	pthread_mutex_lock(&mcom);
+	command_deadline = 0;
+	pthread_mutex_unlock(&mcom);
+}
 
 /*----------------------------------------------------------------------*/
 //	GET_CRASH_EN: identifies crashing enemies.
@@ -140,44 +188,14 @@ void load_img(void) {
 }
 
 /*----------------------------------------------------------------------*/
-//	INIT_DRAW: initializes draw parameters.
-/*----------------------------------------------------------------------*/
-void init_draw(void) {
-	int k;									// temporary variable
-
-	view = 0;
-	defense_per = 100;
-	attack_per = 0;
-	draw_deadline = 0;
-
-	pthread_mutex_lock(&men);
-	en_deadline = 0;
-	for (k=0; k<MAXE; k++) crash_en[k] = 0;
-	pthread_mutex_unlock(&men);
-
-	pthread_mutex_lock(&mal);
-	al_deadline = 0;
-	for (k=0; k<MAXA; k++) crash_al[k] = 0;
-	pthread_mutex_unlock(&mal);
-
-	pthread_mutex_lock(&mcam);
-	cam_deadline = 0;
-	pthread_mutex_unlock(&mcam);
-	
-	pthread_mutex_lock(&mcom);
-	command_deadline = 0;
-	pthread_mutex_unlock(&mcom);
-}
-
-/*----------------------------------------------------------------------*/
-//	PRINT_WORLD: prints static parameters in graphic world buffer.
+//	PRINT_GRAPHIC_WORLD: prints static parameters in graphic world buffer.
 /*----------------------------------------------------------------------*/
 void print_graphic_world(void) {
 	// print background
 	pthread_mutex_lock(&mdraw);
-	clear_to_color(bufw, BLACK);
+	clear_to_color(bufw, black);
 	draw_sprite(bufw, background, 0, YWORLD - background->h);
-	draw_sprite(bufw, patriot, (XWORLD / 2) - (patriot->w / 2) + BORDER, YWORLD - patriot->h - (BORDER * 2));
+	draw_sprite(bufw, patriot, (XWORLD / 2) - (patriot->w / 2) + SPACEA, YWORLD - patriot->h - (SPACEA * 2));
 	pthread_mutex_unlock(&mdraw);
 
 	draw_enemy();
@@ -190,20 +208,20 @@ void print_graphic_world(void) {
 //	PRINT_MENU_AREA: prints menu area parameters, title and border.
 /*----------------------------------------------------------------------*/
 void print_menu_area(void) {
-	clear_to_color(bufm, BLACK);
+	clear_to_color(bufm, black);
 
 	textout_ex(bufm, font, "-------------------------------------", (XMENU / 3), 
-				SPACEA, WHITE, -1);
+				SPACEA, white, TRANSP);
 	textout_ex(bufm, font, "PATRIOT MISSILE LAUNCHER DEFENSE V1.0", (XMENU / 3),
-				 2 * SPACEA, WHITE, -1);
+				 2 * SPACEA, white, TRANSP);
 	textout_ex(bufm, font, "-------------------------------------", (XMENU / 3),
-				 3 * SPACEA, WHITE, -1);
-	textout_ex(bufm, font, "Press SPACE for create enemy", (XMENU / 3) + (3 * BORDER),
-				 1.3 * SPACEB, WHITE, -1);
-	textout_ex(bufm, font, "Press Q for camera and line", (XMENU / 3) + (3 * BORDER),
-				 1.8 * SPACEB, WHITE, -1);
-	textout_ex(bufm, font, "Press ESC for quit", (XMENU / 3) + (3 * BORDER),
-				 2.3 * SPACEB, WHITE, -1);
+				 3 * SPACEA, white, TRANSP);
+	textout_ex(bufm, font, "Press SPACE for create enemy", (XMENU / 3) + (3 * SPACEA),
+				 1.3 * SPACEB, white, TRANSP);
+	textout_ex(bufm, font, "Press Q for camera and line", (XMENU / 3) + (3 * SPACEA),
+				 1.8 * SPACEB, white, TRANSP);
+	textout_ex(bufm, font, "Press ESC for quit", (XMENU / 3) + (3 * SPACEA),
+				 2.3 * SPACEB, white, TRANSP);
 }
 
 /*----------------------------------------------------------------------*/
@@ -211,51 +229,51 @@ void print_menu_area(void) {
 /*----------------------------------------------------------------------*/
 void print_status_window(void) {
 	if (en_arrived + en_died != 0) {
-		defense_per = (en_died / (en_died + en_arrived)) * 100;
-		attack_per = (en_arrived / (en_died + en_arrived)) * 100;
+		defense_per = (en_died / (en_died + en_arrived)) * MAXRATE;
+		attack_per = (en_arrived / (en_died + en_arrived)) * MAXRATE;
 	}
 
-	clear_to_color(bufs, BLACK);
+	clear_to_color(bufs, black);
 
-	textout_ex(bufs, font, "    STATUS WINDOW    ", BORDER, SPACEC, WHITE, -1);
-	textout_ex(bufs, font, "---------------------", BORDER, 2 * SPACEC, WHITE, -1);
-	textprintf_ex(bufs, font, BORDER, 2.4 * SPACEC, 
-					WHITE, -1, "ACTIVE ENEMY    : %d", n_en_act);
-	textprintf_ex(bufs, font, BORDER, 2.8 * SPACEC,
-					WHITE, -1, "TOTAL ENEMY     : %.0f", en_tot);
-	textprintf_ex(bufs, font, BORDER, 1.6 * SPACED,
-					WHITE, -1, "ENEMY DESTROYED : %.0f", en_died);
-	textprintf_ex(bufs, font, BORDER, 1.8 * SPACED, 
-					WHITE, -1, "ENEMY ARRIVED   : %.0f", en_arrived);
-	textout_ex(bufs, font, "---------------------", BORDER, 2 * SPACED, WHITE, -1);
-	textprintf_ex(bufs, font, BORDER, 2.2 * SPACED, 
-					WHITE, -1, "DEFENSE         : %.0f%%", defense_per);
-	textprintf_ex(bufs, font, BORDER, 2.4 * SPACED, 
-					WHITE, -1, "ATTACK          : %.0f%%", attack_per);
-	textout_ex(bufs, font, "---------------------", BORDER, 2.6 * SPACED, WHITE, -1);
-	textprintf_ex(bufs, font, BORDER, 2.8 * SPACED, 
-					WHITE, -1, "EN  DEADLINE MISS: %d", en_deadline);
-	textprintf_ex(bufs, font, BORDER, 3 * SPACED, 
-					WHITE, -1, "AL  DEADLINE MISS: %d", al_deadline);
-	textprintf_ex(bufs, font, BORDER, SPACEE, 
-					WHITE, -1, "CAM DEADLINE MISS: %d", cam_deadline);
-	textprintf_ex(bufs, font, BORDER, 1.06 * SPACEE, 
-					WHITE, -1, "GRA DEADLINE MISS: %d", draw_deadline);
-	textprintf_ex(bufs, font, BORDER, 1.12 * SPACEE, 
-					WHITE, -1, "COM DEADLINE MISS: %d", command_deadline);
-	textout_ex(bufs, font, "---------------------", BORDER, 1.18 * SPACEE, WHITE, -1);
-	textout_ex(bufs, font, "#####################", BORDER, 1.03 * SPACEF, WHITE, -1);
-	textout_ex(bufs, font, "     CREATED BY      ", BORDER, 1.1 * SPACEF, WHITE, -1);
-	textout_ex(bufs, font, "  TORRICELLI TOMAS   ", BORDER, 1.14 * SPACEF, WHITE, -1);
-	textout_ex(bufs, font, "   CUOGHI LORENZO    ", BORDER, 1.17 * SPACEF, WHITE, -1);
-	textout_ex(bufs, font, "#####################", BORDER, 1.25 * SPACEF, WHITE, -1);
+	textout_ex(bufs, font, "    STATUS WINDOW    ", SPACEA, SPACEC, white, TRANSP);
+	textout_ex(bufs, font, "---------------------", SPACEA, 2 * SPACEC, white, TRANSP);
+	textprintf_ex(bufs, font, SPACEA, 2.4 * SPACEC, 
+					white, TRANSP, "ACTIVE ENEMY    : %d", n_en_act);
+	textprintf_ex(bufs, font, SPACEA, 2.8 * SPACEC,
+					white, TRANSP, "TOTAL ENEMY     : %.0f", en_tot);
+	textprintf_ex(bufs, font, SPACEA, 1.6 * SPACED,
+					white, TRANSP, "ENEMY DESTROYED : %.0f", en_died);
+	textprintf_ex(bufs, font, SPACEA, 1.8 * SPACED, 
+					white, TRANSP, "ENEMY ARRIVED   : %.0f", en_arrived);
+	textout_ex(bufs, font, "---------------------", SPACEA, 2 * SPACED, white, TRANSP);
+	textprintf_ex(bufs, font, SPACEA, 2.2 * SPACED, 
+					white, TRANSP, "DEFENSE         : %.0f%%", defense_per);
+	textprintf_ex(bufs, font, SPACEA, 2.4 * SPACED, 
+					white, TRANSP, "ATTACK          : %.0f%%", attack_per);
+	textout_ex(bufs, font, "---------------------", SPACEA, 2.6 * SPACED, white, TRANSP);
+	textprintf_ex(bufs, font, SPACEA, 2.8 * SPACED, 
+					white, TRANSP, "EN  DEADLINE MISS: %d", en_deadline);
+	textprintf_ex(bufs, font, SPACEA, 3 * SPACED, 
+					white, TRANSP, "AL  DEADLINE MISS: %d", al_deadline);
+	textprintf_ex(bufs, font, SPACEA, SPACEE, 
+					white, TRANSP, "CAM DEADLINE MISS: %d", cam_deadline);
+	textprintf_ex(bufs, font, SPACEA, 1.06 * SPACEE, 
+					white, TRANSP, "GRA DEADLINE MISS: %d", draw_deadline);
+	textprintf_ex(bufs, font, SPACEA, 1.12 * SPACEE, 
+					white, TRANSP, "COM DEADLINE MISS: %d", command_deadline);
+	textout_ex(bufs, font, "---------------------", SPACEA, 1.18 * SPACEE, white, TRANSP);
+	textout_ex(bufs, font, "#####################", SPACEA, 1.03 * SPACEF, white, TRANSP);
+	textout_ex(bufs, font, "     CREATED BY      ", SPACEA, 1.1 * SPACEF, white, TRANSP);
+	textout_ex(bufs, font, "  TORRICELLI TOMAS   ", SPACEA, 1.14 * SPACEF, white, TRANSP);
+	textout_ex(bufs, font, "   CUOGHI LORENZO    ", SPACEA, 1.17 * SPACEF, white, TRANSP);
+	textout_ex(bufs, font, "#####################", SPACEA, 1.25 * SPACEF, white, TRANSP);
 }
 
 /*----------------------------------------------------------------------*/
 //	PRINT_SCREEN: prints everything to the screen from the buffers.
 /*----------------------------------------------------------------------*/
 void print_screen(void) {
-	clear_to_color(buf, BLACK);
+	clear_to_color(buf, black);
 
 	// print sub-window buffers into global buffer
 	blit(bufm, buf, 0, 0, BORDER + 1, BORDER + 1, bufm->w, bufm->h);
@@ -263,9 +281,9 @@ void print_screen(void) {
 	blit(bufs, buf, 0, 0, XMENU + (BORDER * 2) + 3, BORDER + 1, bufs->w, bufs->h);
 
 	// print borders of windows into global buffer
-	rect(buf, BORDER, SCREEN_H - BORDER, XWORLD + BORDER + 1, YMENU + (BORDER * 2) + 2, BLUE);
-	rect(buf, BORDER, YMENU + BORDER + 1, XMENU + BORDER + 1, BORDER, YELLOW);
-	rect(buf, XWORLD + (BORDER * 2) + 2, SCREEN_H - BORDER, SCREEN_W - BORDER, BORDER, PURPLE);
+	rect(buf, BORDER, SCREEN_H - BORDER, XWORLD + BORDER + 1, YMENU + (BORDER * 2) + 2, blue);
+	rect(buf, BORDER, YMENU + BORDER + 1, XMENU + BORDER + 1, BORDER, yellow);
+	rect(buf, XWORLD + (BORDER * 2) + 2, SCREEN_H - BORDER, SCREEN_W - BORDER, BORDER, purple);
 
 	// print global buffer on screen
 	blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);
@@ -346,8 +364,8 @@ void draw_ally(void) {
 void view_cam_line(void) {
 	if (cam_line_view == 1) {	
 		pthread_mutex_lock(&mdraw);
-		rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, makecol(255, 0, 0));
-		line(bufw, line_x1, line_y1, line_x2, line_y2, makecol(255, 0, 0));
+		rect(bufw, camera_x, camera_y + HRES, camera_x + VRES, camera_y, red);
+		line(bufw, line_x1, line_y1, line_x2, line_y2, red);
 		pthread_mutex_unlock(&mdraw);
 	}
 }
