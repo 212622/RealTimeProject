@@ -24,6 +24,11 @@
 /*  DRAW CONSTANTS   */
 /*----------------------------------------------------------------------*/
 #define MAXR	256									// maximum sprite rotation
+#define BLACK	makecol(0, 0, 0)					// color black
+#define WHITE	makecol(255, 255, 255)				// color white
+#define BLUE	makecol(0, 0, 255)					// color blue
+#define YELLOW	makecol(255, 255, 24)				// color yellow
+#define PURPLE	makecol(128, 0, 128)				// color purple
 
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
@@ -170,7 +175,7 @@ void init_draw(void) {
 void print_graphic_world(void) {
 	// print background
 	pthread_mutex_lock(&mdraw);
-	clear_to_color(bufw, makecol(0, 0, 0));
+	clear_to_color(bufw, BLACK);
 	draw_sprite(bufw, background, 0, YWORLD - background->h);
 	draw_sprite(bufw, patriot, (XWORLD / 2) - (patriot->w / 2) + BORDER, YWORLD - patriot->h - (BORDER * 2));
 	pthread_mutex_unlock(&mdraw);
@@ -185,20 +190,20 @@ void print_graphic_world(void) {
 //	PRINT_MENU_AREA: prints menu area parameters, title and border.
 /*----------------------------------------------------------------------*/
 void print_menu_area(void) {
-	clear_to_color(bufm, makecol(0, 0, 0));
+	clear_to_color(bufm, BLACK);
 
 	textout_ex(bufm, font, "-------------------------------------", (XMENU / 3), 
-				BORDER, makecol(255, 255, 255), -1);
+				SPACEA, WHITE, -1);
 	textout_ex(bufm, font, "PATRIOT MISSILE LAUNCHER DEFENSE V1.0", (XMENU / 3),
-				 2 * BORDER, makecol(255, 255, 255), -1);
+				 2 * SPACEA, WHITE, -1);
 	textout_ex(bufm, font, "-------------------------------------", (XMENU / 3),
-				 3 * BORDER, makecol(255, 255, 255), -1);
+				 3 * SPACEA, WHITE, -1);
 	textout_ex(bufm, font, "Press SPACE for create enemy", (XMENU / 3) + (3 * BORDER),
-				 4.5 * BORDER, makecol(255, 255, 255), -1);
+				 1.3 * SPACEB, WHITE, -1);
 	textout_ex(bufm, font, "Press Q for camera and line", (XMENU / 3) + (3 * BORDER),
-				 5.5 * BORDER, makecol(255, 255, 255), -1);
+				 1.8 * SPACEB, WHITE, -1);
 	textout_ex(bufm, font, "Press ESC for quit", (XMENU / 3) + (3 * BORDER),
-				 6.5 * BORDER, makecol(255, 255, 255), -1);
+				 2.3 * SPACEB, WHITE, -1);
 }
 
 /*----------------------------------------------------------------------*/
@@ -210,47 +215,47 @@ void print_status_window(void) {
 		attack_per = (en_arrived / (en_died + en_arrived)) * 100;
 	}
 
-	clear_to_color(bufs, makecol(0, 0, 0));
+	clear_to_color(bufs, BLACK);
 
-	textout_ex(bufs, font, "    STATUS WINDOW    ", BORDER, 5 * BORDER, makecol(255, 255, 255), -1);
-	textout_ex(bufs, font, "---------------------", BORDER, 10 * BORDER, makecol(255, 255, 255), -1);
-	textprintf_ex(bufs, font, BORDER, 12 * BORDER, 
-					makecol(255, 255, 255), -1, "ACTIVE ENEMY    : %d", n_en_act);
-	textprintf_ex(bufs, font, BORDER, 14 * BORDER,
-					makecol(255, 255, 255), -1, "TOTAL ENEMY     : %.0f", en_tot);
-	textprintf_ex(bufs, font, BORDER, 16 * BORDER,
-					makecol(255, 255, 255), -1, "ENEMY DESTROYED : %.0f", en_died);
-	textprintf_ex(bufs, font, BORDER, 18 * BORDER, 
-					makecol(255, 255, 255), -1, "ENEMY ARRIVED   : %.0f", en_arrived);
-	textout_ex(bufs, font, "---------------------", BORDER, 20 * BORDER, makecol(255, 255, 255), -1);
-	textprintf_ex(bufs, font, BORDER, 22 * BORDER, 
-					makecol(255, 255, 255), -1, "DEFENSE         : %.0f%%", defense_per);
-	textprintf_ex(bufs, font, BORDER, 24 * BORDER, 
-					makecol(255, 255, 255), -1, "ATTACK          : %.0f%%", attack_per);
-	textout_ex(bufs, font, "---------------------", BORDER, 26 * BORDER, makecol(255, 255, 255), -1);
-	textprintf_ex(bufs, font, BORDER, 28 * BORDER, 
-					makecol(255, 255, 255), -1, "EN  DEADLINE MISS: %d", en_deadline);
-	textprintf_ex(bufs, font, BORDER, 30 * BORDER, 
-					makecol(255, 255, 255), -1, "AL  DEADLINE MISS: %d", al_deadline);
-	textprintf_ex(bufs, font, BORDER, 32 * BORDER, 
-					makecol(255, 255, 255), -1, "CAM DEADLINE MISS: %d", cam_deadline);
-	textprintf_ex(bufs, font, BORDER, 34 * BORDER, 
-					makecol(255, 255, 255), -1, "GRA DEADLINE MISS: %d", draw_deadline);
-	textprintf_ex(bufs, font, BORDER, 36 * BORDER, 
-					makecol(255, 255, 255), -1, "COM DEADLINE MISS: %d", command_deadline);
-	textout_ex(bufs, font, "---------------------", BORDER, 38 * BORDER, makecol(255, 255, 255), -1);
-	textout_ex(bufs, font, "#####################", BORDER, 56 * BORDER, makecol(255, 255, 255), -1);
-	textout_ex(bufs, font, "     CREATED BY      ", BORDER, 60 * BORDER, makecol(255, 255, 255), -1);
-	textout_ex(bufs, font, "  TORRICELLI TOMAS   ", BORDER, 64 * BORDER, makecol(255, 255, 255), -1);
-	textout_ex(bufs, font, "   CUOGHI LORENZO    ", BORDER, 66 * BORDER, makecol(255, 255, 255), -1);
-	textout_ex(bufs, font, "#####################", BORDER, 70 * BORDER, makecol(255, 255, 255), -1);
+	textout_ex(bufs, font, "    STATUS WINDOW    ", BORDER, SPACEC, WHITE, -1);
+	textout_ex(bufs, font, "---------------------", BORDER, 2 * SPACEC, WHITE, -1);
+	textprintf_ex(bufs, font, BORDER, 2.4 * SPACEC, 
+					WHITE, -1, "ACTIVE ENEMY    : %d", n_en_act);
+	textprintf_ex(bufs, font, BORDER, 2.8 * SPACEC,
+					WHITE, -1, "TOTAL ENEMY     : %.0f", en_tot);
+	textprintf_ex(bufs, font, BORDER, 1.6 * SPACED,
+					WHITE, -1, "ENEMY DESTROYED : %.0f", en_died);
+	textprintf_ex(bufs, font, BORDER, 1.8 * SPACED, 
+					WHITE, -1, "ENEMY ARRIVED   : %.0f", en_arrived);
+	textout_ex(bufs, font, "---------------------", BORDER, 2 * SPACED, WHITE, -1);
+	textprintf_ex(bufs, font, BORDER, 2.2 * SPACED, 
+					WHITE, -1, "DEFENSE         : %.0f%%", defense_per);
+	textprintf_ex(bufs, font, BORDER, 2.4 * SPACED, 
+					WHITE, -1, "ATTACK          : %.0f%%", attack_per);
+	textout_ex(bufs, font, "---------------------", BORDER, 2.6 * SPACED, WHITE, -1);
+	textprintf_ex(bufs, font, BORDER, 2.8 * SPACED, 
+					WHITE, -1, "EN  DEADLINE MISS: %d", en_deadline);
+	textprintf_ex(bufs, font, BORDER, 3 * SPACED, 
+					WHITE, -1, "AL  DEADLINE MISS: %d", al_deadline);
+	textprintf_ex(bufs, font, BORDER, SPACEE, 
+					WHITE, -1, "CAM DEADLINE MISS: %d", cam_deadline);
+	textprintf_ex(bufs, font, BORDER, 1.06 * SPACEE, 
+					WHITE, -1, "GRA DEADLINE MISS: %d", draw_deadline);
+	textprintf_ex(bufs, font, BORDER, 1.12 * SPACEE, 
+					WHITE, -1, "COM DEADLINE MISS: %d", command_deadline);
+	textout_ex(bufs, font, "---------------------", BORDER, 1.18 * SPACEE, WHITE, -1);
+	textout_ex(bufs, font, "#####################", BORDER, 1.03 * SPACEF, WHITE, -1);
+	textout_ex(bufs, font, "     CREATED BY      ", BORDER, 1.1 * SPACEF, WHITE, -1);
+	textout_ex(bufs, font, "  TORRICELLI TOMAS   ", BORDER, 1.14 * SPACEF, WHITE, -1);
+	textout_ex(bufs, font, "   CUOGHI LORENZO    ", BORDER, 1.17 * SPACEF, WHITE, -1);
+	textout_ex(bufs, font, "#####################", BORDER, 1.25 * SPACEF, WHITE, -1);
 }
 
 /*----------------------------------------------------------------------*/
 //	PRINT_SCREEN: prints everything to the screen from the buffers.
 /*----------------------------------------------------------------------*/
 void print_screen(void) {
-	clear_to_color(buf, makecol(0, 0, 0));
+	clear_to_color(buf, BLACK);
 
 	// print sub-window buffers into global buffer
 	blit(bufm, buf, 0, 0, BORDER + 1, BORDER + 1, bufm->w, bufm->h);
@@ -258,9 +263,9 @@ void print_screen(void) {
 	blit(bufs, buf, 0, 0, XMENU + (BORDER * 2) + 3, BORDER + 1, bufs->w, bufs->h);
 
 	// print borders of windows into global buffer
-	rect(buf, BORDER, SCREEN_H - BORDER, XWORLD + BORDER + 1, YMENU + (BORDER * 2) + 2, makecol(0, 0, 255));
-	rect(buf, BORDER, YMENU + BORDER + 1, XMENU + BORDER + 1, BORDER, makecol(255, 255, 24));
-	rect(buf, XWORLD + (BORDER * 2) + 2, SCREEN_H - BORDER, SCREEN_W - BORDER, BORDER, makecol(128, 0, 128));
+	rect(buf, BORDER, SCREEN_H - BORDER, XWORLD + BORDER + 1, YMENU + (BORDER * 2) + 2, BLUE);
+	rect(buf, BORDER, YMENU + BORDER + 1, XMENU + BORDER + 1, BORDER, YELLOW);
+	rect(buf, XWORLD + (BORDER * 2) + 2, SCREEN_H - BORDER, SCREEN_W - BORDER, BORDER, PURPLE);
 
 	// print global buffer on screen
 	blit(buf, screen, 0, 0, 0, 0, buf->w, buf->h);

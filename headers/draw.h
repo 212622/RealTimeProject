@@ -20,6 +20,12 @@
 #define XSTATUS 190                             // status window x resolution
 #define YSTATUS 746                             // status window y resolution
 #define BORDER  10                              // border between sub-windows and global window
+#define SPACEA  10                              // space between prints
+#define SPACEB  30                              // space between prints
+#define SPACEC  50                              // space between prints
+#define SPACED  100                             // space between prints
+#define SPACEE  320                             // space between prints
+#define SPACEF  560                             // space between prints
 #define TEXP	10							    // explosion time in periods
 
 /*--------------------------------------------------------------*/
