@@ -17,7 +17,8 @@
 /*  TASK CONSTANTS  */
 /*--------------------------------------------------------------*/
 #define PER 	20							// base period
-#define DPER    13                          // period of draw and camera
+#define DPER    12                          // period of draw
+#define CPER    13                          // period of camera
 #define PRIO    80							// task priority
 /*--------------------------------------------------------------*/
 /*  STATE CONSTANTS   */

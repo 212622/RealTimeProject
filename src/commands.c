@@ -77,7 +77,9 @@ void commands(void) {
 					clock_gettime(CLOCK_REALTIME, &spec);
 					now_s = spec.tv_sec;
 					now_ms = round(spec.tv_nsec / MILLION);
-					if (now_s - old_s >= 1 || (now_s - old_s == 0 && now_ms - old_ms >= HALFSEC)) {
+					if (now_s - old_s > 1 ||
+						(now_s - old_s == 0 && now_ms - old_ms >= HALFSEC) ||
+						(now_s - old_s == 1 && old_ms - now_ms <= HALFSEC)) {
 						old_s = now_s;
 						old_ms = now_ms;
 						pthread_mutex_lock(&men);

@@ -13,7 +13,7 @@
 //  SPEED CONSTANT: speed conversion coefficient between 20 and 23.xx
 //	from pixel/sec to pixel based motion value.
 /*----------------------------------------------------------------------*/
-#define CONVERSION	22.7
+#define CONVERSION	23.25
 
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */

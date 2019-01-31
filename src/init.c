@@ -31,7 +31,7 @@ void init(void) {
 	int k;									// temporary variable
 
 	// allegro and ptask libraries initialization
-	allegro_init();									
+	allegro_init();
     install_keyboard();
     set_color_depth(CDEPTH);
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, XWIN, YWIN, 0, 0);

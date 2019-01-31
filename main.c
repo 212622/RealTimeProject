@@ -50,7 +50,7 @@ int main(void) {
 	create_task(DPER, camera);
 
 	// commands task creation
-	create_task(PER, commands);
+	create_task(CPER, commands);
 
 	while (!key[KEY_ESC]);
 
