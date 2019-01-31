@@ -56,6 +56,7 @@
 pthread_mutex_t mdraw;							// mutex for draw global variables
 BITMAP	*bufw;									// sub-window buffer for graphic world
 BITMAP	*background, *plane, *rocket;			// images
+int		cam_line_view;							// camera and line visualization variable
 static BITMAP	*buf;							// global buffer for double buffering
 static BITMAP	*bufm, *bufs;					// sub-windows buffer for menu and status area
 static BITMAP	*boom, *patriot;				// images
@@ -99,6 +100,10 @@ void init_draw(void) {
 	pthread_mutex_lock(&mcom);
 	command_deadline = 0;
 	pthread_mutex_unlock(&mcom);
+
+	pthread_mutex_lock(&mdraw);
+	cam_line_view = 0;
+	pthread_mutex_unlock(&mdraw);
 }
 
 /*----------------------------------------------------------------------*/
@@ -165,32 +170,39 @@ void get_crash_al(int k) {
 //	LOAD_IMAGE: creates buffers and a bitmap for each image.
 /*----------------------------------------------------------------------*/
 void load_img(void) {
-	buf = create_bitmap(SCREEN_W, SCREEN_H);		// global buffer
-	bufm = create_bitmap(XMENU, YMENU);				// menu area buffer
-	bufw = create_bitmap(XWORLD, YWORLD);			// graphic world buffer
-	bufs = create_bitmap(XSTATUS, YSTATUS);			// status window buffer
+	pthread_mutex_lock(&mdraw);
+	buf = create_bitmap(SCREEN_W, SCREEN_H);
+	bufm = create_bitmap(XMENU, YMENU);
+	bufw = create_bitmap(XWORLD, YWORLD);
+	bufs = create_bitmap(XSTATUS, YSTATUS);
 
-    background = load_bitmap("img/background.bmp", NULL);
+	background = load_bitmap("img/background.bmp", NULL);
+	plane = load_bitmap("img/plane.bmp", NULL);
+	boom = load_bitmap("img/boom.bmp", NULL);
+	patriot = load_bitmap("img/patriot.bmp", NULL);
+	rocket = load_bitmap("img/rocket.bmp", NULL);
+	pthread_mutex_unlock(&mdraw);
+
 	if (background == NULL) {
 		printf("ERROR: file not found\n");
 		exit(1);
 	}
-	plane = load_bitmap("img/plane.bmp", NULL);
+	
 	if (plane == NULL) {
 		printf("ERROR: file not found\n");
 		exit(1);
 	}
-	boom = load_bitmap("img/boom.bmp", NULL);
+	
 	if (boom == NULL) {
 		printf("ERROR: file not found\n");
 		exit(1);
 	}
-	patriot = load_bitmap("img/patriot.bmp", NULL);
+	
 	if (patriot == NULL) {
 		printf("ERROR: file not found\n");
 		exit(1);
 	}
-	rocket = load_bitmap("img/rocket.bmp", NULL);
+	
 	if (rocket == NULL) {
 		printf("ERROR: file not found\n");
 		exit(1);

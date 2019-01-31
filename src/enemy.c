@@ -60,7 +60,7 @@ void enemy(void) {
 	float	x1 = rand() % (XWORLD - plane->w);			// start x
 	float	x2 = rand() % (XWORLD - plane->w);			// end x
 	float	y1 = 0;										// start y
-	float	y2 = YWORLD - background->h - plane->h;			// end y 
+	float	y2 = YWORLD - background->h - plane->h;		// end y 
 	float	speed = SPEED;								// speed of enemy plane
 	float	m = (y2 - y1) / (x2 - x1);					// angular coefficient
 
@@ -77,11 +77,11 @@ void enemy(void) {
 			state_en[tid] = BOOM;
 			pthread_mutex_unlock(&men);
 			
-			pthread_mutex_lock(&mdraw);
+			pthread_mutex_lock(&men);
 			if (crash_en[tid] == 1)	en_died++;
 			else en_arrived++;
 			crash_en[tid] = 0;
-			pthread_mutex_unlock(&mdraw);
+			pthread_mutex_unlock(&men);
 
 			ptask_wait_for_activation();
 

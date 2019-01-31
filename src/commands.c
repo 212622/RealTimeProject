@@ -24,7 +24,6 @@
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
 pthread_mutex_t mcom;                       // mutex for command global variables
-int  cam_line_view;							// camera and line visualization variable
 int  command_deadline;						// number of missed command deadlines
 static int  old_s, old_ms;				  	// times of last activation
 
@@ -35,7 +34,6 @@ void init_command(void) {
 	struct timespec spec;					// temporary variable for time acquisition
 
 	old_s = old_ms = 0;
-	cam_line_view = 0;
 
 	pthread_mutex_lock(&men);
 	en_tot = en_died = 0;
@@ -95,8 +93,10 @@ void commands(void) {
 			one = 0;
 		}
 		else if (scan == KEY_Q) {
+			pthread_mutex_lock(&mdraw);
 			if (cam_line_view == 0) cam_line_view = 1;
 			else cam_line_view = 0;
+			pthread_mutex_unlock(&mdraw);
 		}
 
         check_deadline_miss_com();

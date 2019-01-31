@@ -67,6 +67,7 @@ void ally(void) {
 	while(1) {
 		if (y1 > HRES + 1 && crash_al[tid] == 0) {
 			write_al_att(x1, y1, m , tid);
+			
 			x1 += (-speed / (y2 - y1)) * (x2 - x1);
 			y1 -= speed;
 		}
@@ -75,9 +76,9 @@ void ally(void) {
 			state_al[tid] = BOOM;
 			pthread_mutex_unlock(&mal);
 
-			pthread_mutex_lock(&mdraw);
+			pthread_mutex_lock(&mal);
 			crash_al[tid] = 0;
-			pthread_mutex_unlock(&mdraw);
+			pthread_mutex_unlock(&mal);
 
 			ptask_wait_for_activation();
 			x1 = (XWORLD / 2) - (rocket->w / 2) + (BORDER * 3);

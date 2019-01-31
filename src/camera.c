@@ -70,8 +70,8 @@ void init_camera(int cam_x_old) {
 		pthread_mutex_lock(&mcam);
 		camera_x = cam_x_old + (v * VRES);
 		camera_y = 0;
-		limits_check();
 		pthread_mutex_unlock(&mcam);
+		limits_check();
 	}
 
 	tracking = 0;
@@ -81,10 +81,12 @@ void init_camera(int cam_x_old) {
 //	LIMIT_CHECK: controls if the camera remains into its screen limits.
 /*----------------------------------------------------------------------*/
 void limits_check(void) {
+	pthread_mutex_lock(&mcam);
 	if (camera_x < 0) camera_x = 0;
 	if (camera_x > XWORLD - VRES) camera_x = XWORLD - VRES;
 	if (camera_y < 0) camera_y = 0;
 	if (camera_y > (YWORLD / 2) - HRES) camera_y = (YWORLD / 2) - HRES;
+	pthread_mutex_unlock(&mcam);
 }
 
 /*----------------------------------------------------------------------*/
@@ -124,7 +126,7 @@ void get_centroid(void) {
 	int		x, y;							// video coordinates
 	int		c;								// saved color
 	int		i;								// temporary variable
-	int 	min_x, max_x, min_y, max_y;		// image edges (thresholding)
+	int 	min_x, max_x, min_y, max_y;		// image edges
 
 	max_x = max_y = 0;
 	min_x = VRES;
@@ -214,8 +216,8 @@ void go_on(void) {
 
 	pthread_mutex_lock(&mcam);
 	camera_x += v * VRES;
-	limits_check();
 	pthread_mutex_unlock(&mcam);
+	limits_check();
 }
 
 /*----------------------------------------------------------------------*/
@@ -245,8 +247,8 @@ void follow_enemy(void) {
 	pthread_mutex_lock(&mcam);
 	camera_x = centroid[NCENTR - 1][0] - (VRES / 2);
 	camera_y = centroid[NCENTR - 1][1] - (HRES / 2);
-	limits_check();
 	pthread_mutex_unlock(&mcam);
+	limits_check();
 }
 
 /*----------------------------------------------------------------------*/

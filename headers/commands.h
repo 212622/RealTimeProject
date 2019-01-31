@@ -15,7 +15,6 @@ extern void check_deadline_miss_com(void);
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
 extern pthread_mutex_t mcom;                    // mutex for command global variables
-extern int  cam_line_view;                      // camera and line visualization variable
 extern int  command_deadline;                   // number of missed command deadlines
 
 #endif // COMMANDS_H

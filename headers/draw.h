@@ -44,6 +44,7 @@ extern void check_deadline_miss_draw(void);
 extern pthread_mutex_t mdraw;                   // mutex for draw global variables
 extern BITMAP   *background, *plane, *rocket;   // images
 extern BITMAP   *bufw;                          // sub-window buffer for graphic world
+extern int      cam_line_view;                  // camera and line visualization variable
 
 #endif // DRAW_H
 
