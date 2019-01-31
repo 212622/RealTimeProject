@@ -13,9 +13,6 @@ Simulate a set of Patriot defense missiles that identify enemy targets, predict 
 5. The user can interact with the program and create new enemies.
 6. The system provides information on: number of active enemies and Patriots defense missiles, deadline misses, current statistics.
 
-## Application Structure
-![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Applicationstructure.png)
-
 ## Graphical layout
 ![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Graphicallayout.png)
 
@@ -24,10 +21,6 @@ The user can create a new enemy:
 - SPACE : create a new enemy with random direction.
 - Q : visualize the camera and the predicted trajectory.
 - ESC : exit the program.
-
-## Motion rules
-![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Motionrules.png)
-![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Motionrules2.png)
 
 ## Tasks description
 - CAMERA
@@ -54,5 +47,11 @@ The user can create a new enemy:
 1. Takes user commands.
 2. Activates enemy task or visualizes camera and trajectory depending on the pressed key.
 
+## Application Structure
+![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Applicationstructure.png)
+
+## Motion rules
+![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Motionrules.png)
+![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Motionrules2.png)
+
 ##
-	
