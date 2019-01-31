@@ -12,9 +12,9 @@
 #include "ptask.h"
 #include "init.h"
 #include "draw.h"
+#include "camera.h"
 #include "enemy.h"
 #include "ally.h"
-#include "camera.h"
 #include "commands.h"
 
 /*----------------------------------------------------------------------*/
@@ -64,8 +64,5 @@ int main(void) {
 	- un aereo di troppo quando si tiene premuto
 
 	Rivedere:
-	- mettere a posto commenti e ordinamento/spazi
 	- struct?
-	- #define anche in .c o solo .h? ordine include
-	- usa #define per numeri draw
 */

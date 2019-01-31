@@ -1,3 +1,6 @@
+/*--------------------------------------------------------------*/
+//  COMMANDS.H - header file of commands.c
+/*--------------------------------------------------------------*/
 #if !defined COMMANDS_H
 #define COMMANDS_H
 
@@ -7,13 +10,14 @@
 extern void commands(void);
 extern void init_command(void);
 extern void check_deadline_miss_com(void);
+
 /*--------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*--------------------------------------------------------------*/
-extern int  cam_line_view;
-extern int  command_deadline;
-
-extern pthread_mutex_t mcom;                         // command mutex
-/*--------------------------------------------------------------*/
+extern pthread_mutex_t mcom;                    // mutex for command global variables
+extern int  cam_line_view;                      // camera and line visualization variable
+extern int  command_deadline;                   // number of missed command deadlines
 
 #endif // COMMANDS_H
+
+/*--------------------------------------------------------------*/

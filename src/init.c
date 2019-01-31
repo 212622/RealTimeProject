@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------*/
-//  INIT.C takes care of initializations and standard task creation
+//  INIT.C takes care of initializations and standard task creation.
 /*----------------------------------------------------------------------*/
 #include <stdlib.h>
 #include <time.h>

@@ -1,6 +1,6 @@
 /*----------------------------------------------------------------------*/
 //	DRAW.C deals with screen managing, image printing and
-//	collisions identification
+//	collisions identification.
 /*----------------------------------------------------------------------*/
 #include <stdlib.h>
 #include <math.h>

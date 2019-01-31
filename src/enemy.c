@@ -1,9 +1,9 @@
 /*----------------------------------------------------------------------*/
-//	ENEMY.C describes the behavior of enemy planes and their attributes
+//	ENEMY.C describes the behavior of enemy planes and their attributes.
 /*----------------------------------------------------------------------*/
 #include <pthread.h>
-#include "enemy.h"
 #include "ptask.h"
+#include "enemy.h"
 #include "init.h"
 #include "draw.h"
 
@@ -18,14 +18,14 @@
 pthread_mutex_t men;						// mutex for enemy global variables
 int		tid_en[MAXE];						// enemy task IDs
 int		enemy_x[MAXE], enemy_y[MAXE];		// coordinates of enemies
-int 	state_en[MAXE];						// enemy state
+int 	state_en[MAXE];						// enemy states
 int		crash_en[MAXE];						// defines which enemy is crashing
-float   en_angle[MAXE];						// rotation angle
+float   en_angle[MAXE];						// enemy rotation angles
 int		n_en_act;							// number of active enemy tasks
 int     en_deadline;						// number of missed enemy deadlines
-float	en_tot;								// total numer of created enemy
-float	en_died;							// number of destroyed enemy plane
-float	en_arrived;							// number of non-destroyed enemy plane
+float	en_tot;								// total numer of created enemies
+float	en_died;							// number of destroyed enemy planes
+float	en_arrived;							// number of non-destroyed enemy planes
 
 /*----------------------------------------------------------------------*/
 //	WRITE_EN_ATT: writes enemies attributes in global variables.

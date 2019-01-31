@@ -1,33 +1,34 @@
 /*----------------------------------------------------------------------*/
-/*  HEADER FILES        */
+//	ALLY.C describes the behavior of allied rockets and their attributes.
 /*----------------------------------------------------------------------*/
 #include <pthread.h>
 #include "ptask.h"
-#include "init.h"
 #include "ally.h"
+#include "init.h"
 #include "draw.h"
 #include "camera.h"
 #include "enemy.h"
+
 /*----------------------------------------------------------------------*/
-/*  GLOBAL CONSTRANTS   */
+//  SPEED CONSTANT: speed conversion coefficient between 20 and 23.xx
+//	from pixel/sec to pixel based motion value.
 /*----------------------------------------------------------------------*/
-#define CONVERSION	22.7	// oscilla tra 20 e 23.xx per la tolleranza dei calcoli
+#define CONVERSION	22.7
+
 /*----------------------------------------------------------------------*/
 /*  GLOBAL VARIABLES   */
 /*----------------------------------------------------------------------*/
-int		ally_x[MAXA], ally_y[MAXA];			// coordinates of ally
-int 	state_al[MAXA];						// ally state
+pthread_mutex_t mal;						// mutex for ally global variables
+int		ally_x[MAXA], ally_y[MAXA];			// coordinates of allies
+int 	state_al[MAXA];						// ally states
 int		tid_al[MAXA];						// ally task IDs
 int		n_al_act;		                    // number of active ally tasks
-float   al_angle[MAXA];                     // rotation angle
-int     al_deadline;
+float   al_angle[MAXA];                     // ally rotation angles
+int     al_deadline;						// number of missed ally deadlines
 int 	crash_al[MAXA];						// defines who is crashing
 
-pthread_mutex_t mal;						// ally mutex
 /*----------------------------------------------------------------------*/
-/*  FUNCTION DEFINITIONS   */
-/*----------------------------------------------------------------------*/
-//	WRITE_AL_ATT: write allies attributes in global variables.
+//	WRITE_AL_ATT: writes allies attributes in global variables.
 /*----------------------------------------------------------------------*/
 void write_al_att(float x1, float y1, float m, int tid) {
 	pthread_mutex_lock(&mal);
@@ -36,6 +37,7 @@ void write_al_att(float x1, float y1, float m, int tid) {
 	al_angle[tid] = m;
 	pthread_mutex_unlock(&mal);
 }
+
 /*----------------------------------------------------------------------*/
 //	CHECK_DEADLINE_MISS_AL: counts the number of deadline miss in ally.
 /*----------------------------------------------------------------------*/
@@ -46,12 +48,13 @@ void check_deadline_miss_al(void) {
 		pthread_mutex_unlock(&mal);
 	}
 }
+
 /*----------------------------------------------------------------------*/
-//	ALLY: periodic task for ally
+//	ALLY: periodic task for ally.
 /*----------------------------------------------------------------------*/
 void ally(void) {
 	int tid = ptask_get_index() - (MAXE + 1);	// task array index
-	float m, x1, x2, y1, y2, speed;			// ally position and speed variables
+	float m, x1, x2, y1, y2, speed;				// ally position and speed variables
 
 	x1 = (XWORLD / 2) - (rocket->w / 2) + (BORDER * 3);
 	y1 = YWORLD - background->h - rocket->h;
@@ -85,9 +88,9 @@ void ally(void) {
 			write_al_att(x1, y1, m, tid);
 		}
 
-		/* check for deadline miss */
 		check_deadline_miss_al();
 		ptask_wait_for_period();
 	}
 }
+
 /*----------------------------------------------------------------------*/
