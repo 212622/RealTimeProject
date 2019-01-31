@@ -18,8 +18,8 @@ Simulate a set of Patriot defense missiles that identify enemy targets, predict 
 
 ## User interface
 The user can interact with the application with the following keys:
-- SPACE : create a new enemy with random direction.
-- Q : visualize the camera and the predicted trajectory.
+- SPACE : create a new enemy with random direction;
+- Q : visualize the camera and the predicted trajectory;
 - ESC : exit the program.
 
 ## Tasks description
