@@ -60,9 +60,6 @@ int main(void) {
 
 /*----------------------------------------------------------------------*/
 /*
-	Problemi:
-	- un aereo di troppo quando si tiene premuto
-
 	Rivedere:
 	- struct?
 */
