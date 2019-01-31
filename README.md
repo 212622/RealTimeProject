@@ -34,7 +34,7 @@ The user can create a new enemy:
 1. Image scanning and thresholding: read the pixel color in a given window and discard the pixel with black color.
 2. Centroid computation: compute the centroid of pixels found in the previous point.
 3. Camera control: control the camera axes to move to the calculated centroid.
-4. When a fixed number of detections is done, the enemys trajectory is calculated.
+4. When a fixed number of detections is done, the enemies trajectory is calculated.
 5. Using the trajectory information obtained from the previous point, a Patriots defense missile is launched.
 
 - DRAW
