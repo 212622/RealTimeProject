@@ -48,10 +48,10 @@ The user can create a new enemy:
 
 - ENEMY
 1. Generates a random trajectory.
-2. Moves the plane using a fixed speed to the target position.
+2. Moves the plane with a fixed speed to the target position.
 
 - COMMAND
-1. Takes users command
+1. Takes user commands.
 2. Activates enemy task or visualizes camera and trajectory depending on the pressed key.
 
 ##
