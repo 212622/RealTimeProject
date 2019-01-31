@@ -53,5 +53,3 @@ The user can interact with the application with the following keys:
 ## Motion rules
 ![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Motionrules.png)
 ![alt text](https://github.com/212622/RealTimeProject/blob/master/README/Motionrules2.png)
-
-##
